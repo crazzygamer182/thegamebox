@@ -1,773 +1,274 @@
-let a1;
-let a2;
-let a3;
-let a4;
-let a5;
-let g2;
-let g3;
-let g5;
-let g7;
-let pImg;
-let exit;
-let title;
-let player;
-let level1;
-let level2;
-let level3;
-let move = 0;
-let tryagain;
-let gameover;
-let lives = 3;
-let timer = 0;
-let gameStart;
-let level = 1;
-let bossfight;
-let time = 900;
-let levelUp = 0;
-let timeT = 900;
-let bullets = [];
-let instructions;
-let moveR = false;
-let moveL = false;
-let asteroids = [];
-let particles = [];
-let endless = true;
-let bossbattle = false;
-let choices = [2, 3, 5, 7];
+let blocks = []
+let ones
+let tens
+let hundreds
+let thousands
+let number = 0
+var makerNum = 0
+var yeeh
+var Wehay
+var welldonerec
+var chart
+var chartNum = 1
+var lbp
+var correct = 0
+var sound
+var layout
 
-function preload() {
-  pImg1 = loadImage("spaceship.png");
-  pImg2 = loadImage("spaceship_dying.png");
-  pImg3 = loadImage("spaceship_almost_dead.png");
-  a1 = loadImage("m1.png");
-  a2 = loadImage("m2.png");
-  a3 = loadImage("m3.png");
-  a4 = loadImage("m4.png");
-  a5 = loadImage("m5.png");
-  button1 = loadImage("button_1.png");
-  button2 = loadImage("button_2.png");
-  title = loadImage("title.png");
-  song = loadSound("music.wav");
-  destroy = loadSound("destroy.wav");
-  g2 = loadImage("2.png");
-  g3 = loadImage("3.png");
-  g5 = loadImage("5.png");
-  g7 = loadImage("7.png");
-  left = loadImage("left.png");
-  right = loadImage("right.png");
-  level1 = loadImage("level1.png");
-  level2 = loadImage("level2.png");
-  level3 = loadImage("level3.png");
-  bossfight = loadImage("bossfight.png");
-  tryagain = loadImage("tryagain.png");
-  exit = loadImage("exit.png");
-  gameover = loadImage("gameover.png");
-  instructions = loadImage("instructions.png");
+class Block {
+  constructor(blockNum, number) {
+    this.blockNum = blockNum;
+    this.mousePressed = 1
+    this.xPos = mouseX
+    this.yPos = mouseY
+    this.realesed = 0
+    this.number = number
+  }
+  show() {
+    let i
+    let j
+    if (this.mousePressed == 1) {
+      image(this.blockNum, mouseX, mouseY)
+      this.xPos = mouseX
+      this.yPos = mouseY
+      if (this.blockNum == ones) {
+        chartNum = 5
+      }
+      if (this.blockNum == tens) {
+        chartNum = 4
+      }
+      if (this.blockNum == hundreds) {
+        chartNum = 3
+      }
+      if (this.blockNum == thousands) {
+        chartNum = 2
+      }
+      if (this.blockNum == tenThousands) {
+        chartNum = 6
+      }
+      if (this.blockNum == hunThousands) {
+        chartNum = 7
+      }
+    } else {
+      image(this.blockNum, this.xPos, this.yPos)
+      chartNum = 1
+
+    }
+  }
 }
 
 function setup() {
-  gamestart = false;
-  createCanvas(windowWidth, windowHeight);
-  rectMode(CENTER);
-  for (let i = 0; i < width / 10; i++) {
-    particles.push(new Particle(width, height));
-  }
-  song.loop();
+  createCanvas(1200, 800);
+  newQuestion()
+  block1 = new Block(10)
+  block1.mousePressed = 0
+}
+
+function preload() {
+  layout = loadImage('layout.png')
+  hundreds = loadImage('hundred.png');
+  ones = loadImage('ones.png');
+  tens = loadImage('tens.png');
+  thousands = loadImage('thousand.png');
+  yeeh = loadSound('yeeh.mp3')
+  Wehay = loadSound('Wehay.mp3')
+  welldonerec = loadSound('welldonerec.mp3')
+  chart = loadImage('chart.png')
+  hunThouChart = loadImage('hun-thou.png')
+  tenThouChart = loadImage('ten-thou.png')
+  thouChart = loadImage('thou.png')
+  hunChart = loadImage('hun.png')
+  tenChart = loadImage('ten.png')
+  oneChart = loadImage('one.png')
+  guy = loadImage('littleguy.png')
+  correctGuy = loadImage('correct_guy.png')
+  tenThousands = loadImage('thousand (1).png')
+  hunThousands = loadImage('100_thousand.png')
 }
 
 function draw() {
-  if (gamestart != true) {
-    Player.x = width/2
+  imageMode(CORNER)
+  if (number == 'NaN') {
+    number = 0
   }
-  background(30);
-  for (let i = 0; i < particles.length; i++) {
-    particles[i].createParticle();
-    particles[i].moveParticle();
-    particles[i].joinParticles(particles.slice(i));
+  thousands.resize(100, 100)
+  hundreds.resize(100, 100)
+  tens.resize(15, 90)
+  hunThousands.resize(125, 125)
+  tenThousands.resize(15, 112)
+  fill(175)
+  textSize(40)
+  background(220);
+  if (chartNum == 2) {
+    image(thouChart, 0, 240)
+  } else if (chartNum == 3) {
+    image(hunChart, 0, 240)
+  } else if (chartNum == 4) {
+    image(tenChart, 0, 240)
+  } else if (chartNum == 5) {
+    image(oneChart, 0, 240)
+  } else if (chartNum == 1) {
+    image(chart, 0, 240)
+  } else if (chartNum == 6) {
+    image(tenThouChart, 0, 240)
+  } else {
+    image(hunThouChart, 0, 240)
   }
-  if (lives == 0 && gamestart == true) {
-    gamestart = "gameover";
-    lives = 3;
-    asteroids = []
-    bullets = []
+  fill(0)
+  text('Represent ' + makerNum + ' with the Base Ten Blocks.', 300, 200)
+  fill(80)
+  textSize(60)
+  text(number, 710, 90)
+  fill(0, 100, 255)
+  rect(50, height - 100, 100, 50)
+  rect(1035, 16, 150, 66)
+  fill(200)
+  rect(178, height - 100, 100, 50)
+  fill(0)
+  textSize(40)
+  text('Clear', 52, height - 63)
+  textSize(50)
+  text('Undo', 1050, 65)
+  textSize(40)
+  text('Next', 186.5, height - 63)
+  image(layout, 10, 10)
+  number = 0
+  blocks.map((block) => {
+    block.show()
+    if (block.mousePressed == 0) number += block.number
+  })
+  imageMode(CENTER)
+  if (correct > 0) {
+    image(correctGuy, 600, 400)
   }
-  if (gamestart == "gameover") {
-    imageMode(CENTER);
-    text("Score: " + (885-timeT)*10, width/2, height*(8/9))
-    image(
-      gameover,
-      width / 2,
-      height / 2 + height / 12,
-      width / 1,
-      width / 1.5
-    );
-    image(
-      tryagain,
-      width / 2.6,
-      height / 2 + height / 18,
-      width / 5,
-      width / 10
-    );
-    image(
-      exit,
-      width - width / 2.6,
-      height / 2 + height / 18,
-      width / 5,
-      width / 10
-    );
+  if (makerNum != number) {
+    correct = 0
   }
-  if (gamestart == false) {
-    imageMode(CENTER);
-    image(title, width / 2, height / 2 + height / 12, width / 1, width / 1.5);
-    image(
-      button1,
-      width / 2.6,
-      height / 2 + height / 18,
-      width / 5,
-      width / 10
-    );
-    image(
-      button2,
-      width - width / 2.6,
-      height / 2 + height / 18,
-      width / 5,
-      width / 10
-    );
+  if (makerNum == number) {
+    correct++
   }
-  if (gamestart == "choose") {
-    image(level1, width * (23 / 64), height * (3 / 8), width / 4, width / 7);
-    image(level2, width * (41 / 64), height * (3 / 8), width / 4, width / 7);
-    image(
-      level3,
-      width * (23 / 64),
-      height * (36 / 51.2),
-      width / 4,
-      width / 7
-    );
-    image(
-      bossfight,
-      width * (41 / 64),
-      height * (36 / 51.2),
-      width / 4,
-      width / 7
-    );
-  }
-  if (gamestart == "instructions") {
-    image(instructions, width / 2, height / 2, height, height);
-  }
-  if (gamestart != false && gamestart != "gameover") {
-    imageMode(CORNER);
-    image(exit, 0, 0, width / 18, width / 32);
-    imageMode(CENTER);
-  }
-  if (gamestart == true) {
-    if (endless == false) {
-      if (timeT == 600) {
-        level = 2;
-      }
-      if (timeT == 400) {
-        level = 3;
-      }
-      if (timeT == 300) {
-        level = 4;
-      }
-      if (timeT == 250) {
-        if (endless == false) {
-          bossbattle = true;
-          song.stop();
-        }
-      }
-    }
-    if (time == timeT) {
-      if (bossbattle == false) {
-        asteroids.push(new Asteroid(level));
-      }
-      time = 0;
-      if (bossbattle == false) {
-        if (endless == true) {
-          if (level == 1) {
-            timeT -= 15;
-          }
-          if (level == 2) {
-            timeT -= 30;
-          }
-          if (level == 3) {
-            timeT -= 50;
-          }
-        } else {
-          timeT -= 50;
-        }
-      }
+  if (correct == 1) {
+    sound = int(random(3)) + 1
+    if (sound == 1) {
+      Wehay.play()
     } else {
-      time++;
-    }
-    textSize((width / 20 / 3) * 2 - 5);
-    textAlign(LEFT, TOP);
-    fill(225);
-    textAlign(CENTER, CENTER);
-    rectMode(CORNER);
-    text("Score: " + (885-timeT)*10, width*(9/10), height/15)
-    fill(0, 225, 0);
-    rect(width / 30, height / 30 + 100, 30, 900 / (height / 250));
-    fill(0);
-    rect(width / 30, height / 30 + 100, 30, timeT / (height / 250));
-    fill(225);
-    rectMode(CORNER);
-    fill(225, 0, 0);
-    rect(width / 10, height / 30, (width / 30) * 3, width / 30 / 2);
-    fill(0, 225, 0);
-    if (lives > 0) {
-      rect(width / 10, height / 30, width / 30, width / 30 / 2);
-    }
-    if (lives > 1) {
-      rect(width / 10 + width / 30, height / 30, width / 30, width / 30 / 2);
-    }
-    rectMode(CENTER);
-    fill(75);
-    rect(width / 2, height * (12 / 13), width, width / 12.5);
-    fill(0, 225, 0);
-    rectMode(CORNER);
-    image(g2, width / 17, height * (12 / 13), width / 20, width / 20);
-    image(g3, (width / 17) * 2, height * (12 / 13), width / 20, width / 20);
-    image(g5, (width / 17) * 3, height * (12 / 13), width / 20, width / 20);
-    image(g7, (width / 17) * 4, height * (12 / 13), width / 20, width / 20);
-    image(right, width * (16 / 17), height * (12 / 13), width / 20, width / 20);
-    image(left, width * (15 / 17), height * (12 / 13), width / 20, width / 20);
-    if (lives > 2) {
-      rect(
-        width / 10 + width / 30 + width / 30,
-        height / 30,
-        width / 30,
-        width / 30 / 2
-      );
-    }
-    rectMode(CENTER);
-    player = new Player();
-    for (let j = 0; j < asteroids.length; j++) {
-      if (asteroids[j].y > height - width / 20 + width / 20 / 2) {
-        lives--;
-        asteroids.splice(j, 1);
-      }
-    }
-    if (keyIsDown(RIGHT_ARROW) || moveR == true) {
-      if (move < width/2) {
-        move += width / 120;
-      }
-    }
-    if (keyIsDown(LEFT_ARROW) || moveL == true) {
-      if (move > -width/2) {
-        move -= width / 120;
-      }
-    }
-    player.playerX += move
-    for (let i = bullets.length - 1; i > 0; i--) {
-      bullets[i].show();
-      for (let j = 0; j < asteroids.length; j++) {
-        if (bullets[i].hits(asteroids[j])) {
-          if (asteroids[j].num % bullets[i].number == 0) {
-            asteroids[j].num = asteroids[j].num / bullets[i].number;
-            asteroids[j].size = asteroids[j].size - 30;
-            if (asteroids[j].size == 0) {
-              asteroids.splice(j, 1);
-              time = timeT;
-            }
-          } else {
-            lives--;
-          }
-          bullets.splice(i, 1);
-        }
-      }
-    }
-    player.show();
-    for (let i = 0; i < asteroids.length; i++) {
-      if (bossbattle == false) {
-        asteroids[i].show();
+      if (sound == 2) {
+        welldonerec.play()
+      } else {
+        yeeh.play()
       }
     }
   }
 }
 
-function keyPressed() {
-  if (keyCode == 50 || keyCode == 51 || keyCode == 53 || keyCode == 55) {
-    bullets.push(new Bullet(key));
-  }
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  particles = []
-  for (let i = 0; i < width / 10; i++) {
-    particles.push(new Particle(width, height));
-  }
-}
-
-function hexagon(transX, transY, s, colour) {
-  fill(colour);
-  push();
-  translate(transX, transY);
-  scale(s);
-  beginShape();
-  vertex(-75, -130);
-  vertex(75, -130);
-  vertex(150, 0);
-  vertex(75, 130);
-  vertex(-75, 130);
-  vertex(-150, 0);
-  endShape(CLOSE);
-  pop();
-}
-
-function mousePressed() {
-  if (
-    gamestart == "choose" &&
-    mouseX > width * (23 / 64) - width / 8 &&
-    mouseX < width * (23 / 64) + width / 8 &&
-    mouseY < height * (3 / 8) + width / 14 &&
-    mouseY > height * (3 / 8) - width / 14
-  ) {
-    level = 1;
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == "choose" &&
-    mouseX > width * (41 / 64) - width / 8 &&
-    mouseX < width * (41 / 64) + width / 8 &&
-    mouseY < height * (3 / 8) + width / 14 &&
-    mouseY > height * (3 / 8) - width / 14
-  ) {
-    level = 2;
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == "choose" &&
-    mouseX > width * (23 / 64) - width / 8 &&
-    mouseX < width * (23 / 64) + width / 8 &&
-    mouseY < height * (36 / 51.2) + width / 14 &&
-    mouseY > height * (36 / 51.2) - width / 14
-  ) {
-    level = 3;
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == false &&
-    mouseX > width / 2.6 - width / 10 &&
-    mouseX < width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = "choose";
-  }
-  if (
-    gamestart == false &&
-    mouseX > width - width / 2.6 - width / 10 &&
-    mouseX < width - width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = "instructions";
-  }
-  if (mouseX < width / 18 && mouseX > 0 && mouseY < width / 32 && mouseY > 0) {
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    if (gamestart == "instructions" || gamestart == "choose") {
-      gamestart = false
-    }
-    if (gamestart == true) {
-      gamestart = "choose"
-      time = 900;
-      timeT = 900;
-      asteroids = []
-      bullets = []
-    }
-  }
-  if (
-    gamestart == "gameover" &&
-    mouseX > width / 2.6 - width / 10 &&
-    mouseX < width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == "gameover" &&
-    mouseX > width - width / 2.6 - width / 10 &&
-    mouseX < width - width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = false;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width / 17, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(2));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, (width / 17) * 2, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(3));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, (width / 17) * 3, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(5));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, (width / 17) * 4, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(7));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (16 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveR = true;
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (15 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveL = true;
-  }
-}
-
-function mouseReleased() {
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (16 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveR = false;
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (15 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveL = false;
-  }
+function newQuestion() {
+  makerNum = int(random(189473)) + 83
+  blocks.length = 0
+  number = 0
 }
 
 function touchStarted(event) {
-  if (
-    gamestart == "choose" &&
-    mouseX > width * (23 / 64) - width / 8 &&
-    mouseX < width * (23 / 64) + width / 8 &&
-    mouseY < height * (3 / 8) + width / 14 &&
-    mouseY > height * (3 / 8) - width / 14
-  ) {
-    level = 1;
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == "choose" &&
-    mouseX > width * (41 / 64) - width / 8 &&
-    mouseX < width * (41 / 64) + width / 8 &&
-    mouseY < height * (3 / 8) + width / 14 &&
-    mouseY > height * (3 / 8) - width / 14
-  ) {
-    level = 2;
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == "choose" &&
-    mouseX > width * (23 / 64) - width / 8 &&
-    mouseX < width * (23 / 64) + width / 8 &&
-    mouseY < height * (36 / 51.2) + width / 14 &&
-    mouseY > height * (36 / 51.2) - width / 14
-  ) {
-    level = 3;
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == false &&
-    mouseX > width / 2.6 - width / 10 &&
-    mouseX < width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = "choose";
-  }
-  if (
-    gamestart == false &&
-    mouseX > width - width / 2.6 - width / 10 &&
-    mouseX < width - width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = "instructions";
-  }
-  if (mouseX < width / 18 && mouseX > 0 && mouseY < width / 32 && mouseY > 0) {
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    if (gamestart == "instructions" || gamestart == "choose") {
-      gamestart = false
-    }
-    if (gamestart == true) {
-      gamestart = "choose"
-      time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    }
-  }
-  if (
-    gamestart == "gameover" &&
-    mouseX > width / 2.6 - width / 10 &&
-    mouseX < width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = true;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-    lives = 3
-  }
-  if (
-    gamestart == "gameover" &&
-    mouseX > width - width / 2.6 - width / 10 &&
-    mouseX < width - width / 2.6 + width / 10 &&
-    mouseY > height / 2 + height / 18 - width / 20 &&
-    mouseY < height / 2 + height / 18 + width / 20
-  ) {
-    gamestart = false;
-    time = 900;
-    timeT = 900;
-    asteroids = []
-    bullets = []
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width / 17, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(2));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, (width / 17) * 2, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(3));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, (width / 17) * 3, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(5));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, (width / 17) * 4, height * (12 / 13)) < width / 40
-  ) {
-    bullets.push(new Bullet(7));
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (16 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveR = true;
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (15 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveL = true;
-  }
+  console.log(event)
+  return mousePressed()
 }
 
-function touchEnded() {
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (16 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveR = false;
-  }
-  if (
-    gamestart == true &&
-    dist(mouseX, mouseY, width * (15 / 17), height * (12 / 13)) < width / 40
-  ) {
-    moveL = false;
-  }
+function touchEnded(event) {
+  console.log(event)
+  return mouseReleased()
 }
 
-class Player {
-  constructor() {
-    this.playerX = width / 2;
-    this.playerY = (height / 7) * 5.6;
-  }
-  show() {
-    fill(0, 150, 200);
-    imageMode(CENTER);
-    //rect(this.playerX, this.playerY, width/20, width/20, 75, 75, 0, 0)
-      image(pImg1, this.playerX, this.playerY, width / 12, width / 18);
-  }
-}
-
-class Bullet {
-  constructor(number) {
-    this.bulletX = player.playerX;
-    this.bulletY = player.playerY;
-    this.number = number;
-    this.r = width / 20 / 3;
-  }
-  show() {
-    fill(150, 75, 25);
-    circle(this.bulletX, this.bulletY, (width / 20 / 3) * 2);
-    this.bulletY -= height / 40;
-    fill(0);
-    textSize(this.r * 1.5);
-    textAlign(CENTER, CENTER);
-    if (this.number == 2) {
-      text("2", this.bulletX, this.bulletY + width / 75);
+function mousePressed() {
+  console.log(mouseX + '_' + mouseY)
+  if (mouseX > 554 && mouseX < 602 && mouseY > 10 && mouseY < 59) {
+    createNewBlock(ones, 1)
+  } else {
+    if (mouseX > 510 && mouseX < 525 && mouseY > 11 && mouseY < 132) {
+      createNewBlock(tens, 10)
     } else {
-      if (this.number == 3) {
-        text("3", this.bulletX, this.bulletY + width / 75);
+      if (mouseX > 379 && mouseX < 485 && mouseY > 11 && mouseY < 118) {
+        createNewBlock(hundreds, 100)
       } else {
-        if (this.number == 5) {
-          text("5", this.bulletX, this.bulletY + width / 75);
+        if (mouseX > 235 && mouseX < 353 && mouseY > 12 && mouseY < 131) {
+          createNewBlock(thousands, 1000)
         } else {
-          if (this.number == 7) {
-            text("7", this.bulletX, this.bulletY + width / 75);
+          if (mouseX > 186 && mouseX < 205 && mouseY > 10 && mouseY < 157) {
+            createNewBlock(tenThousands, 10000)
+          } else {
+            if (mouseX > 10 && mouseX < 165 && mouseY > 10 && mouseY < 159) {
+              createNewBlock(hunThousands, 100000)
+            } else {
+              if (mouseX > 50 && mouseX < 149 && mouseY < height - 50 && mouseY > height - 100) {
+                blocks.length = 0
+                number = 0
+              } else if (mouseX > 1035 && mouseX < 1185 && mouseY > 15 && mouseY < 81) {
+                undo()
+              } else {
+                if (mouseX > 176 && mouseX < 277 && mouseY < height - 50 && mouseY > height - 100) {
+                  newQuestion()
+                }
+              }
+            }
           }
         }
       }
     }
   }
-  hits(rock) {
-    this.rock = rock;
-    this.d = dist(this.bulletX, this.bulletY, this.rock.x, this.rock.y);
-    if (this.d < this.r + rock.r) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  return false
 }
 
-class Asteroid {
-  constructor(level) {
-    this.level = level;
-    this.aNumber = 1 + this.level;
-    this.num = 1;
-    this.size = 0;
-    for (let i = 0; i < this.aNumber; i++) {
-      this.num = this.num * random(choices);
-      this.size += 30;
-    }
-    this.r = this.size / 2;
-    this.asteroidX = random(width - this.x * 2) + this.x;
-    this.asteroidY = 0;
-    this.x = random(this.size, width - this.size);
-    this.y = 0;
-    this.colour = random(49, 151);
-    this.aster = Math.round(random(0, 4) + 1);
-  }
-  show() {
-    textSize(this.size / 2);
-    textAlign(CENTER);
-    //hexagon(this.x, this.y, (this.size/6)/30, this.colour);
-    if (this.aster == 1) {
-      image(a1, this.x, this.y, this.size, this.size);
-    } else if (this.aster == 2) {
-      image(a2, this.x, this.y, this.size, this.size);
-    } else if (this.aster == 3) {
-      image(a3, this.x, this.y, this.size, this.size);
-    } else if (this.aster == 4) {
-      image(a4, this.x, this.y, this.size, this.size);
-    } else if (this.aster == 5) {
-      image(a5, this.x, this.y, this.size, this.size);
-    }
-    fill(0);
-    text(this.num, this.x, this.y);
-    this.y += height / (timeT - 50);
-  }
+function createNewBlock(blocksNum, number) {
+  blocks.push(new Block(blocksNum, number))
 }
 
-class Particle {
-  // setting the co-ordinates, radius and the
-  // speed of a particle in both the co-ordinates axes.
-  constructor(pWidth, pHeight) {
-    this.pWidth = pWidth
-    this.pHeight = pHeight
-    this.x = random(0, this.pWidth);
-    this.y = random(0, this.pHeight);
-    this.r = random(0.25, 6);
-    this.xSpeed = random(-0.25, 0.25);
-    this.ySpeed = random(-0.125, 0.25);
+function mouseReleased() {
+  lastBlock = blocks[blocks.length - 1]
+  if (lastBlock.mousePressed == 0) {
+    return false
+  }
+  lastBlock.mousePressed = 0
+  if (lastBlock.number == 100000) {
+    if (mouseX < 0 || mouseX > 75 || mouseY < 314 || mouseY > 489) {
+      undo()
+      chartNum = 1
+    }
+  }
+  if (lastBlock.number == 10000) {
+    if (mouseX < 200 || mouseX > 385 || mouseY < 312 || mouseY > 502) {
+      undo()
+      chartNum = 1
+    }
+  }
+  if (lastBlock.number == 1000) {
+    if (mouseX < 399 || mouseX > 501 || mouseY < 313 || mouseY > 514) {
+      undo()
+      chartNum = 1
+    }
+  }
+  if (lastBlock.number == 100) {
+    if (mouseX < 600 || mouseX > 699 || mouseY < 313 || mouseY > 514) {
+      undo()
+      chartNum = 1
+    }
+  }
+  if (lastBlock.number == 10) {
+    if (mouseX < 800 || mouseX > 984 || mouseY < 314 || mouseY > 523) {
+      undo()
+      chartNum = 1
+    }
+  }
+  if (lastBlock.number == 1) {
+    if (mouseX < 1000 || mouseX > 1146 || mouseY < 313 || mouseY > 559) {
+      undo()
+      chartNum = 1
+    }
   }
 
-  // creation of a particle.
-  createParticle() {
-    noStroke();
-    fill(225);
-    circle(this.x, this.y, this.r);
-  }
+  return false
+}
 
-  // setting the particle in motion.
-  moveParticle() {
-    if (this.x < 0 || this.x > this.pWidth) this.xSpeed *= -1;
-    if (this.y < 0 || this.y > this.pHeight) this.ySpeed *= -1;
-    this.x += this.xSpeed;
-    this.y += this.ySpeed;
-  }
-
-  // this function creates the connections(lines)
-  // between particles which are less than a certain distance apart
-
-  joinParticles(particles) {
-    particles.forEach((element) => {
-      let dis = dist(this.x, this.y, element.x, element.y);
-      if (dis < 50) {
-        stroke("rgba(255,255,255,0.04)");
-        line(this.x, this.y, element.x, element.y);
-      }
-    });
+function undo() {
+  if (blocks.length > 0) {
+    blocks.pop()
+    bp.pop()
   }
 }
