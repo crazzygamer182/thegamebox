@@ -37,8 +37,6 @@ let choices = [2, 3, 5, 7];
 
 function preload() {
   pImg1 = loadImage("spaceship.png");
-  pImg2 = loadImage("spaceship_dying.png");
-  pImg3 = loadImage("spaceship_almost_dead.png");
   a1 = loadImage("m1.png");
   a2 = loadImage("m2.png");
   a3 = loadImage("m3.png");
