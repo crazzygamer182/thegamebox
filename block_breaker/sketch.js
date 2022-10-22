@@ -173,6 +173,9 @@ function draw() {
           blocks[1].image = blocks[0].image
         }
         blocks.push(new Block());
+        while (blocks[0].number == blocks[1].number && blocks[2].number == blocks[0].number) {
+          blocks[2].choose()
+        }
         while (blocks[0].image == blocks[2].image && blocks[0].number != blocks[2].number) {
           blocks[2].image = bImages[int(random(5))];
         }
@@ -404,6 +407,16 @@ function draw() {
       brick.height * (ht / brick.height)
     );
     text("4", 468 * (wh / 500), 192 * (wh / 500));
+    if (level > 6) {
+      image(
+        brick,
+        0,
+        50 * 3 * (wh / 500),
+        brick.width * (wh / brick.width),
+        brick.height * (ht / brick.height)
+      );
+      text("5", 468 * (wh / 500), 241 * (wh / 500));
+    }
     if (selected) {
       if (
         blocks[0].yes == false &&
@@ -434,7 +447,6 @@ function draw() {
 }
 
 function mousePressed() {
-  console.log(one);
   if (
     mouseX > 193 * (wh / 500) &&
     mouseX < 311 * (wh / 500) &&
@@ -476,6 +488,16 @@ function mousePressed() {
     ) {
       selected = true;
       numS = 4;
+    }
+    if (
+      mouseX > 1078 * (wh / 1196) &&
+      mouseX < 1160 * (wh / 1196) &&
+      mouseY > 542 * (wh / 1196) &&
+      mouseY < 622 * (wh / 1196) &&
+      level > 6
+    ) {
+      selected = true;
+      numS = 5;
     }
   }
   if (
