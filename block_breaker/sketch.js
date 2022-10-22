@@ -528,6 +528,15 @@ function mouseReleased() {
     ) {
       blocks[0].number = blocks[0].number * numS;
       selected = false;
+      while ((blocks[0].image == blocks[1].image && blocks[0].number != blocks[1].number) || (blocks[0].image == blocks[2].image && blocks[0].number != blocks[2].number)) {
+        blocks[0].image = bImages[int(random(5))];
+      }
+      if (blocks[0].image != blocks[1].image && blocks[0].number == blocks[1].number) {
+        blocks[0].image = blocks[1].image
+      }
+      if (blocks[0].image != blocks[2].image && blocks[0].number == blocks[2].number) {
+        blocks[0].image = blocks[2].image
+      }
     }
     if (
       mouseX > 526 * (wh / 1196) &&
@@ -537,6 +546,15 @@ function mouseReleased() {
     ) {
       blocks[1].number = blocks[1].number * numS;
       selected = false;
+      while ((blocks[1].image == blocks[0].image && blocks[1].number != blocks[0].number) || (blocks[1].image == blocks[2].image && blocks[1].number != blocks[2].number)) {
+        blocks[0].image = bImages[int(random(5))];
+      }
+      if (blocks[1].image != blocks[0].image && blocks[1].number == blocks[0].number) {
+        blocks[1].image = blocks[0].image
+      }
+      if (blocks[1].image != blocks[2].image && blocks[1].number == blocks[2].number) {
+        blocks[1].image = blocks[2].image
+      }
     }
     if (
       mouseX > 688 * (wh / 1196) &&
@@ -546,24 +564,15 @@ function mouseReleased() {
     ) {
       blocks[2].number = blocks[2].number * numS;
       selected = false;
-    }
-    while (blocks[0].image == blocks[1].image && blocks[0].number != blocks[1].number) {
-      blocks[1].image = bImages[int(random(5))];
-    }
-    if (blocks[0].image != blocks[1].image && blocks[0].number == blocks[1].number) {
-      blocks[1].image = blocks[0].image
-    }
-    while (blocks[0].image == blocks[2].image && blocks[0].number != blocks[2].number) {
-      blocks[2].image = bImages[int(random(5))];
-    }
-    if (blocks[0].image != blocks[2].image && blocks[0].number == blocks[2].number) {
-      blocks[2].image = blocks[0].image
-    }
-    while (blocks[2].image == blocks[1].image && blocks[2].number != blocks[1].number) {
-      blocks[2].image = bImages[int(random(5))];
-    }
-    if (blocks[2].image != blocks[1].image && blocks[2].number == blocks[1].number) {
-      blocks[2].image = blocks[1].image
+      while ((blocks[2].image == blocks[0].image && blocks[2].number != blocks[0].number) || (blocks[2].image == blocks[1].image && blocks[2].number != blocks[1].number)) {
+        blocks[2].image = bImages[int(random(5))];
+      }
+      if (blocks[2].image != blocks[0].image && blocks[2].number == blocks[0].number) {
+        blocks[2].image = blocks[0].image
+      }
+      if (blocks[2].image != blocks[1].image && blocks[2].number == blocks[1].number) {
+        blocks[2].image = blocks[1].image
+      }
     }
     selected = false;
   }
