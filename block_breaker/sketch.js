@@ -166,7 +166,25 @@ function draw() {
       ) {
         blocks.push(new Block());
         blocks.push(new Block());
+        while (blocks[0].image == blocks[1].image && blocks[0].number != blocks[1].number) {
+          blocks[1].image = bImages[int(random(5))];
+        }
+        if (blocks[0].image != blocks[1].image && blocks[0].number == blocks[1].number) {
+          blocks[1].image = blocks[0].image
+        }
         blocks.push(new Block());
+        while (blocks[0].image == blocks[2].image && blocks[0].number != blocks[2].number) {
+          blocks[2].image = bImages[int(random(5))];
+        }
+        if (blocks[0].image != blocks[2].image && blocks[0].number == blocks[2].number) {
+          blocks[2].image = blocks[0].image
+        }
+        while (blocks[2].image == blocks[1].image && blocks[2].number != blocks[1].number) {
+          blocks[2].image = bImages[int(random(5))];
+        }
+        if (blocks[2].image != blocks[1].image && blocks[2].number == blocks[1].number) {
+          blocks[2].image = blocks[1].image
+        }
         numM = blocks[0].numI*blocks[1].numI*blocks[2].numI
         blocks[0].x -= 67 * (wh / 500);
         blocks[2].x += 67 * (wh / 500);
@@ -403,24 +421,6 @@ function draw() {
       }
     }
   }
-  while (blocks[0].image == blocks[1].image && blocks[0].number != blocks[1].number) {
-    blocks[1].image = bImages[int(random(5))];
-  }
-  if (blocks[0].image != blocks[1].image && blocks[0].number == blocks[1].number) {
-    blocks[1].image = blocks[0].image
-  }
-  while (blocks[0].image == blocks[2].image && blocks[0].number != blocks[2].number) {
-    blocks[2].image = bImages[int(random(5))];
-  }
-  if (blocks[0].image != blocks[2].image && blocks[0].number == blocks[2].number) {
-    blocks[2].image = blocks[0].image
-  }
-  while (blocks[2].image == blocks[1].image && blocks[2].number != blocks[1].number) {
-    blocks[2].image = bImages[int(random(5))];
-  }
-  if (blocks[2].image != blocks[1].image && blocks[2].number == blocks[1].number) {
-    blocks[2].image = blocks[1].image
-  }
   if (one == 1 && guy.image == 1 && guy.state == states[1]) {
     image(
       here,
@@ -546,6 +546,24 @@ function mouseReleased() {
     ) {
       blocks[2].number = blocks[2].number * numS;
       selected = false;
+    }
+    while (blocks[0].image == blocks[1].image && blocks[0].number != blocks[1].number) {
+      blocks[1].image = bImages[int(random(5))];
+    }
+    if (blocks[0].image != blocks[1].image && blocks[0].number == blocks[1].number) {
+      blocks[1].image = blocks[0].image
+    }
+    while (blocks[0].image == blocks[2].image && blocks[0].number != blocks[2].number) {
+      blocks[2].image = bImages[int(random(5))];
+    }
+    if (blocks[0].image != blocks[2].image && blocks[0].number == blocks[2].number) {
+      blocks[2].image = blocks[0].image
+    }
+    while (blocks[2].image == blocks[1].image && blocks[2].number != blocks[1].number) {
+      blocks[2].image = bImages[int(random(5))];
+    }
+    if (blocks[2].image != blocks[1].image && blocks[2].number == blocks[1].number) {
+      blocks[2].image = blocks[1].image
     }
     selected = false;
   }
