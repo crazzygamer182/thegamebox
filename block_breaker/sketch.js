@@ -547,7 +547,7 @@ function mouseReleased() {
       blocks[1].number = blocks[1].number * numS;
       selected = false;
       while ((blocks[1].image == blocks[0].image && blocks[1].number != blocks[0].number) || (blocks[1].image == blocks[2].image && blocks[1].number != blocks[2].number)) {
-        blocks[0].image = bImages[int(random(5))];
+        blocks[1].image = bImages[int(random(5))];
       }
       if (blocks[1].image != blocks[0].image && blocks[1].number == blocks[0].number) {
         blocks[1].image = blocks[0].image
