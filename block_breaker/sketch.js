@@ -600,15 +600,3 @@ function mouseReleased() {
   }
   return false;
 }
-
-function windowResized() {
-  if (500 * (windowHeight / 300) < windowWidth) {
-    wh = 500 * (windowHeight / 300);
-    ht = windowHeight;
-  } else {
-    wh = windowWidth;
-    ht = 300 * (windowWidth / 500);
-  }
-  cnv = createCanvas(wh, ht);
-  centerCanvas();
-}
