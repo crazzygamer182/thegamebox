@@ -48,7 +48,7 @@ class Block {
       this.numI = this.number;
     }
     show() {
-      if (this.yes == false || AlmostThere == true) {
+      if (this.yes == false || AlmostThere == true || selected == false) {
         image(
           this.image,
           this.x,
