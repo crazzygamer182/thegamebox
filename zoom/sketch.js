@@ -7,7 +7,12 @@ function centerCanvas() {
   cnv.position(x, y);
 }
 
+function preload() {
+  fontt = loadFont("Comfortaa-Regular.ttf");
+}
+
 function setup() {
+  textFont(fontt);
   enemies = [];
   if (500 * (windowHeight / 300) < windowWidth) {
     wh = 500 * (windowHeight / 300);
@@ -28,8 +33,8 @@ function draw() {
   background(220);
   guy.show();
   noStroke();
-  fill(0);
-  rect(0, 235 * (wh / 500), wh, ht);
+  fill(50);
+  rect(0, 234 * (wh / 500), wh, ht);
   for (let i = 0; i < enemies.length; i++) {
     enemies[i].show();
   }
@@ -45,14 +50,14 @@ class Guy {
     strokeWeight(4 * (wh / 500));
     stroke(0, 50, 155);
     fill(0, 100, 255);
-    rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5)
+    rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
     this.v += 1 * (wh / 500);
     this.y += this.v;
     this.y = constrain(this.y, 0, (233 - 35) * (wh / 500));
   }
 }
 
-function mousePressed () {
+function mousePressed() {
   if (guy.y > (233 - 50) * (wh / 500)) {
     guy.v = -14 * (wh / 500);
   }
@@ -60,18 +65,34 @@ function mousePressed () {
 
 class Enemy {
   constructor() {
-    this.x = random(wh*20)+wh/2;
-    this.y = 198 * (wh / 500);
+    this.x = random(wh * 20) + wh / 2;
+    this.y = 196 * (wh / 500);
+    this.number = int(random(5))+1;
   }
   show() {
-    this.x -= 10 * (wh / 500);
-    fill(255, 0, 0)
-    triangle(this.x, this.y+(37 * (wh / 500)), this.x+((37/2) * (wh / 500)), this.y, this.x+(37 * (wh / 500)), this.y+(37) * (wh / 500));
+    this.x -= 5 * (wh / 500);
+    fill(255, 0, 0);
+    strokeWeight(4 * (wh / 500));
+    stroke(155, 0, 0);
+    strokeJoin(ROUND);
+    triangle(
+      this.x,
+      this.y + 37 * (wh / 500),
+      this.x + (37 / 2) * (wh / 500),
+      this.y,
+      this.x + 37 * (wh / 500),
+      this.y + 37 * (wh / 500)
+    );
     if (this.x < -wh) {
-      this.x = random(wh*20)+wh/2;
+      this.x = random(wh * 20) + wh / 2;
     }
     if (guy.y + 35 > this.y && abs(guy.x - this.x) < 35) {
-        setup();
+      setup();
     }
+    fill(0);
+    noStroke();
+    textSize(20 * (wh / 500));
+    textAlign(CENTER, CENTER);
+    text(this.number, this.x+(18 * (wh / 500)), this.y+(22 * (wh / 500)));
   }
 }
