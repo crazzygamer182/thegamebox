@@ -93,8 +93,6 @@ function setup() {
   startX3 = -350 * (wh / 500);
   guy = new Man();
   textSize(25 * (wh / 500));
-  let fs = fullscreen();
-  fullscreen(!fs);
 }
 
 function draw() {
