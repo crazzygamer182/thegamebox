@@ -24,7 +24,7 @@ function setup() {
   cnv = createCanvas(wh, ht);
   centerCanvas();
   guy = new Guy();
-  while (enemies.length < 10) {
+  while (enemies.length < 1) {
     enemies.push(new Enemy());
   }
 }
@@ -58,14 +58,16 @@ class Guy {
 }
 
 function mousePressed() {
-  if (guy.y > (233 - 50) * (wh / 500)) {
-    guy.v = -14 * (wh / 500);
+  if (guy) {
+    if (guy.y > (233 - 50) * (wh / 500)) {
+      guy.v = -14 * (wh / 500);
+    }
   }
 }
 
 class Enemy {
   constructor() {
-    this.x = random(wh * 20) + wh / 2;
+    this.x = random(wh * 50) + (wh * 5);
     this.y = 196 * (wh / 500);
     this.number = int(random(5))+1;
   }
@@ -86,7 +88,7 @@ class Enemy {
     if (this.x < -wh) {
       this.x = random(wh * 20) + wh / 2;
     }
-    if (guy.y + 35 > this.y && abs(guy.x - this.x) < 35) {
+    if (guy.x + 35 * (wh / 500) > this.x && guy.x < this.x && guy.y + 35 * (wh / 500) > this.y) {
       setup();
     }
     fill(0);
@@ -95,4 +97,16 @@ class Enemy {
     textAlign(CENTER, CENTER);
     text(this.number, this.x+(18 * (wh / 500)), this.y+(22 * (wh / 500)));
   }
+}
+
+function windowResized() {
+  if (500 * (windowHeight / 300) < windowWidth) {
+    wh = 500 * (windowHeight / 300);
+    ht = windowHeight;
+  } else {
+    wh = windowWidth;
+    ht = 300 * (windowWidth / 500);
+  }
+  cnv = createCanvas(wh, ht);
+  centerCanvas();
 }
