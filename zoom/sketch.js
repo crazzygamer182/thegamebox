@@ -24,8 +24,8 @@ function setup() {
   cnv = createCanvas(wh, ht);
   centerCanvas();
   guy = new Guy();
-  while (enemies.length < 1) {
-    enemies.push(new Enemy());
+  while (enemies.length < 5000) {
+    enemies.push(new Block());
   }
 }
 
@@ -67,7 +67,7 @@ function mousePressed() {
 
 class Enemy {
   constructor() {
-    this.x = random(wh * 50) + (wh * 5);
+    this.x = wh * 2 * (wh / 500);
     this.y = 196 * (wh / 500);
     this.number = int(random(5))+1;
   }
@@ -95,7 +95,40 @@ class Enemy {
     noStroke();
     textSize(20 * (wh / 500));
     textAlign(CENTER, CENTER);
-    text(this.number, this.x+(18 * (wh / 500)), this.y+(22 * (wh / 500)));
+    //text(this.number, this.x+(18 * (wh / 500)), this.y+(22 * (wh / 500)));
+  }
+}
+
+class Block {
+    constructor() {
+      this.x = wh * 2 * (wh / 500);
+      this.y = 198 * (wh / 500);
+    }
+    show() {
+      strokeWeight(4 * (wh / 500));
+      stroke(0, 50, 155);
+      fill(200, 100, 50);
+      rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
+      this.x -= 5 * (wh / 500);
+    }
+}
+
+class RideUp {
+  constructor() {
+    this.x = random(wh * 50) + (wh * 5);
+    this.y = 196 * (wh / 500);
+    this.blocks = [];
+    while (this.blocks.length < 6) {
+      this.blocks.push(new Block());
+    }
+    blocks[1].x += 35 * (wh / 500);
+    blocks[2].x += 35 * (wh / 500);
+    blocks[3].x += 70 * (wh / 500);
+    blocks[4].x += 70 * (wh / 500);
+    blocks[5].x += 70 * (wh / 500);
+    while (this.blocks.length < 8) {
+      this.blocks.push(new Enemy());
+    }
   }
 }
 
