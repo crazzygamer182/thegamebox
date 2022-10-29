@@ -1,5 +1,6 @@
 let guy;
 let enemies;
+let ground;
 
 function centerCanvas() {
   let x = (windowWidth - width) / 2;
@@ -22,12 +23,17 @@ function setup() {
     ht = 300 * (windowWidth / 500);
   }
   cnv = createCanvas(wh, ht);
+  ground = (233 - 35) * (wh / 500);
   centerCanvas();
   guy = new Guy();
-  while (enemies.length < 5000) {
-    enemies.push(new Block());
+  while (enemies.length < 1) {
+    enemies.push(new RideUp());
   }
 }
+
+let onAnything = false;
+let wasOnAnything = false;
+let frameCount = 0;
 
 function draw() {
   background(220);
@@ -35,9 +41,28 @@ function draw() {
   noStroke();
   fill(50);
   rect(0, 234 * (wh / 500), wh, ht);
+  onAnything = false;
   for (let i = 0; i < enemies.length; i++) {
     enemies[i].show();
+    for (let j = 0; j < enemies[i].blocks.length; j++) {
+      if (abs((guy.x + ((35/2) * (wh / 500))) - (enemies[i].blocks[j].x + ((35/2) * (wh / 500)))) <= 35 * (wh / 500) && (guy.y + ((35/2) * (wh / 500))) - (enemies[i].blocks[j].y + ((35/2) * (wh / 500))) <= 0) {
+        ground = (233 - 70) * (wh / 500) - ((198 * (wh / 500)) - enemies[i].blocks[j].y);
+        onAnything = true;
+        wasOnAnything = true;
+        console.log("hi");
+      }
+    }
   }
+  if (onAnything == false) {
+    ground = (233 - 35) * (wh / 500);
+    if (wasOnAnything == true) {
+      if (guy.v > 0) {
+        guy.v = 0;
+      }
+      wasOnAnything = false;
+    }
+  }
+  frameCount++;
 }
 
 class Guy {
@@ -53,16 +78,14 @@ class Guy {
     rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
     this.v += 1 * (wh / 500);
     this.y += this.v;
-    this.y = constrain(this.y, 0, (233 - 35) * (wh / 500));
+    this.y = constrain(this.y, 0, ground);
   }
 }
 
 function mousePressed() {
-  if (guy) {
-    if (guy.y > (233 - 50) * (wh / 500)) {
+    if (guy.y > ground - 10 * (wh / 500)) {
       guy.v = -14 * (wh / 500);
     }
-  }
 }
 
 class Enemy {
@@ -100,34 +123,51 @@ class Enemy {
 }
 
 class Block {
-    constructor() {
-      this.x = wh * 2 * (wh / 500);
-      this.y = 198 * (wh / 500);
+    constructor(x, y) {
+      this.startingX = x;
+      this.x = this.startingX;
+      this.y = y;
     }
     show() {
       strokeWeight(4 * (wh / 500));
-      stroke(0, 50, 155);
+      stroke(100, 50, 25);
       fill(200, 100, 50);
-      rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
-      this.x -= 5 * (wh / 500);
+      if (this.x > 0 && this.x < wh) {
+        rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
+      }
+      this.x -= 5 + frameCount/1000 * (wh / 500);
+    }
+    random() {
+      //this.x = random(wh) + wh;
     }
 }
 
 class RideUp {
   constructor() {
-    this.x = random(wh * 50) + (wh * 5);
-    this.y = 196 * (wh / 500);
+    this.x = random(wh) + wh;
+    this.y = 198 * (wh / 500);
     this.blocks = [];
-    while (this.blocks.length < 6) {
-      this.blocks.push(new Block());
-    }
-    blocks[1].x += 35 * (wh / 500);
-    blocks[2].x += 35 * (wh / 500);
-    blocks[3].x += 70 * (wh / 500);
-    blocks[4].x += 70 * (wh / 500);
-    blocks[5].x += 70 * (wh / 500);
-    while (this.blocks.length < 8) {
-      this.blocks.push(new Enemy());
+    console.log("hi");
+    this.blocks.push(new Block(this.x, this.y));
+    console.log("hi");
+    this.blocks.push(new Block(this.x + 35 * (wh / 500), this.y));
+    console.log("hi");
+    this.blocks.push(new Block(this.x + 35 * (wh / 500), this.y - 35 * (wh / 500)));
+    console.log("hi");
+    this.blocks.push(new Block(this.x + 70 * (wh / 500), this.y));
+    console.log("hi");
+    this.blocks.push(new Block(this.x + 70 * (wh / 500), this.y - 35 * (wh / 500)));
+    console.log("hi");
+    this.blocks.push(new Block(this.x + 70 * (wh / 500), this.y - 70 * (wh / 500)));
+    console.log("hi");
+  }
+  show() {
+    for (let i = 0; i < this.blocks.length; i++) {
+      console.log(i);
+      this.blocks[i].show();
+      if (this.blocks[i].x < -wh) {
+        this.blocks[i].x = this.x + 35 * (wh / 500);
+      }
     }
   }
 }
