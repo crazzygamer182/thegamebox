@@ -15,6 +15,11 @@ function preload() {
 }
 
 function setup() {
+  guy;
+  ground;
+  buildings = [];
+  system;
+  structures = [];
   textFont(fontt);
   if (500 * (windowHeight / 300) < windowWidth) {
     wh = 500 * (windowHeight / 300);
@@ -31,32 +36,42 @@ function setup() {
     buildings.push(new Building(i));
   }
   system = new ParticleSystem(createVector((100 * (wh / 500)), (235 * (wh / 500))));
-  structures.push(new RideUp());
+  structures.push(new RideUp(0));
 }
 
 function draw() {
+  frameRate(60);
   background(0, 30, 0);
   noStroke();
   for (let i = 0; i < 10; i++) {
     buildings[i].show();
   }
-  if (guy.y > ground - 10 * (wh / 500)) {
+  if (guy.y > ground - 10 * (wh / 500) && ground == (233 - 35) * (wh / 500)) {
     system.addParticle();
     system.run();
   }
   fill(50);
   rect(0, 234 * (wh / 500), wh, ht);
   guy.show();
-  onAnything = false;
+  onAnything = [];
   ground = (233 - 35) * (wh / 500);
   for (let i = 0; i < structures.length; i++) {
     structures[i].show();
     for (let j = 0; j < structures[i].blocks.length; j++) {
-      if (abs(guy.x + ((35/2) * (wh / 500)) - structures[i].blocks[j].x + ((35/2) * (wh / 500))) < 35 * (wh / 500)) {
-        if (structures[i].blocks[j].y < ground) {
-          ground = structures[i].blocks[j].y;
+      if (abs((guy.x-(17.5 * (wh / 500))) + ((35/2) * (wh / 500)) - structures[i].blocks[j].x + ((35/2) * (wh / 500))) < 35 * (wh / 500)) {
+        if (guy.y < structures[i].blocks[j].y - 35 * (wh / 500)) {
+          onAnything.push(structures[i].blocks[j].y - (35 * (wh / 500)));
+        } else {
+          if (guy.y < structures[i].blocks[j].y + 35 * (wh / 500)) {
+            setup();
+          }
         }
       }
+    }
+  }
+  for (let i = 0; i < onAnything.length; i++) {
+    if (onAnything[i] < ground) {
+      ground = onAnything[i] - 3.5 * (wh / 500);
     }
   }
 }
@@ -79,18 +94,80 @@ class Guy {
 }
 
 class RideUp {
-  constructor() {
+  constructor(level) {
     this.blocks = [];
+    this.triangles = [];
     this.blocks.push(new Block(wh*2, 0));
     this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), 0));
     this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), -35 * (wh / 500)));
     this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), 0));
     this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), -70 * (wh / 500)));
+    this.triangles.push(new Gone(wh*2 - (39 * (wh / 500)), 0));
+    this.triangles.push(new Gone(wh*2 + (109 * (wh / 500)), 0));
+    this.triangles.push(new Gone(wh*2 + ((39+108) * (wh / 500)),0));
+    this.level = level;
+    this.x = wh*2;
   }
   show() {
+    this.x -= 6 * (wh / 500);
     for (let i = 0; i < this.blocks.length; i++) {
       this.blocks[i].show();
+    }
+    for (let i = 0; i < this.triangles.length; i++) {
+      this.triangles[i].show();
+    }
+    if (this.x + (200 * (wh / 500)) < 0) {
+      structures[this.level] = new Pit(this.level);
+    }
+  }
+}
+
+class Pit {
+  constructor(level) {
+    this.blocks = [];
+    this.triangles = [];
+    this.blocks.push(new Block(wh*2, 0));
+    this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (-35 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (0 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), -35 * (wh / 500)));
+    this.triangles.push(new Gone(wh*2 + ((68) * (wh / 500)), -230));
+    this.blocks.push(new Block(wh*2 + (175 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (175 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (175 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (140 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (140 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (140 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (105 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (105 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (105 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (363 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (363 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (363 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (401 * (wh / 500)), 0));
+    this.blocks.push(new Block(wh*2 + (401 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(wh*2 + (401 * (wh / 500)), -70 * (wh / 500)));
+    this.triangles.push(new Gone(wh*2 + ((144+70) * (wh / 500)), 0));
+    this.triangles.push(new Gone(wh*2 + ((35+39+108+70) * (wh / 500)),0));
+    this.triangles.push(new Gone(wh*2 + ((35+39+108+35+70) * (wh / 500)), 0));
+    this.triangles.push(new Gone(wh*2 + ((35+35+35+39+108+70) * (wh / 500)),0));
+    this.triangles.push(new Gone(wh*2 + ((405+35) * (wh / 500)), 0));
+    this.triangles.push(new Gone(wh*2 + ((405+70) * (wh / 500)),0));
+    this.level = level;
+    this.x = wh*2;
+  }
+  show() {
+    this.x -= 6 * (wh / 500);
+    for (let i = 0; i < this.blocks.length; i++) {
+      this.blocks[i].show();
+    }
+    for (let i = 0; i < this.triangles.length; i++) {
+      this.triangles[i].show();
+    }
+    if (this.x + (500 * (wh / 500)) < 0) {
+      structures[this.level] = new RideUp(this.level);
     }
   }
 }
@@ -104,7 +181,7 @@ class Building {
   show() {
     fill(0, 25+(this.level*3), 0);
     rect(this.x, this.y, (80 * (wh / 500)) + this.level*2, ht);
-    this.x -= (1 * (wh / 500)) + (this.level/((wh / 500)))
+    this.x -= (5 * (wh / 500)) + (this.level/((wh / 500)))
     if (this.x < -wh/4) {
       this.x = (random(wh) + wh) * (wh / 500);
       this.height = (random(200) + 200) * (wh / 500);
@@ -124,11 +201,27 @@ class Block {
     this.y = 198 * (wh / 500) + y;
   }
   show() {
-    this.x -= 3 * (wh / 500);
+    this.x -= 6 * (wh / 500);
     fill(0, 190, 0);
     strokeWeight(4 * (wh / 500));
     stroke(0, 90, 0);
     rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
+  }
+}
+
+class Gone {
+  constructor(x, y) {
+    this.x = x;
+    this.y = 198 * (wh / 500) + y;
+  }
+  show() {
+    this.x -= 6 * (wh / 500);
+    fill(190, 0, 0);
+    strokeWeight(4 * (wh / 500));
+    stroke(90, 0, 0);
+    //rect(this.x, this.y, 35 * (wh / 500), 35 * (wh / 500), 5, 5);
+    strokeJoin(ROUND);
+    triangle(this.x, this.y + (35 * (wh / 500)), this.x + ((35/2) * (wh / 500)), this.y, this.x + (35 * (wh / 500)), this.y + (35 * (wh / 500)));
   }
 }
 
@@ -156,7 +249,7 @@ Particle.prototype.update = function(){
 Particle.prototype.display = function() {
   noStroke();
   fill(219, 125, 42, this.lifespan);
-  ellipse(this.position.x, this.position.y, 3 * (wh / 500), 1 * (wh / 500));
+  ellipse(this.position.x, this.position.y, 3 * (wh / 500), 0.3 * (wh / 500));
 };
 
 // Is the particle still useful?
