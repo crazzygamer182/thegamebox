@@ -32,8 +32,8 @@ function setup() {
   ground = (233 - 35) * (wh / 500);
   centerCanvas();
   guy = new Guy();
-  for (let i = 0; i < 10; i++) {
-    buildings.push(new Building(i));
+  for (let i = 0; i < 50; i++) {
+    buildings.push(new Building(i/5));
   }
   system = new ParticleSystem(createVector((100 * (wh / 500)), (235 * (wh / 500))));
   structures.push(new RideUp(0));
@@ -95,18 +95,17 @@ class Guy {
 
 class RideUp {
   constructor(level) {
+    this.x = wh + (39 * (wh/500));
     this.blocks = [];
     this.triangles = [];
-    this.blocks.push(new Block(wh*2, 0));
-    this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), -35 * (wh / 500)));
-    this.triangles.push(new Gone(wh*2 - (39 * (wh / 500)), 0));
-    this.triangles.push(new Gone(wh*2 + (109 * (wh / 500)), 0));
-    this.triangles.push(new Gone(wh*2 + ((39+108) * (wh / 500)),0));
+    this.blocks.push(new Block(this.x, 0));
+    this.blocks.push(new Block(this.x + (35 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (35 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (70 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (70 * (wh / 500)), -35 * (wh / 500)));
+    this.triangles.push(new Gone(this.x + (109 * (wh / 500)), 0));
+    this.triangles.push(new Gone(this.x + ((39+108) * (wh / 500)),0));
     this.level = level;
-    this.x = wh*2;
   }
   show() {
     this.x -= 6 * (wh / 500);
@@ -116,47 +115,77 @@ class RideUp {
     for (let i = 0; i < this.triangles.length; i++) {
       this.triangles[i].show();
     }
-    if (this.x + (200 * (wh / 500)) < 0) {
+    if (this.triangles[this.triangles.length-1].x + (35 * (wh / 500)) < 0) {
       structures[this.level] = new Pit(this.level);
+    }
+  }
+}
+
+class Jumper {
+  constructor(level) {
+    this.x = wh + (39 * (wh/500));
+    this.blocks = [];
+    this.triangles = [];
+    this.blocks.push(new Block(this.x, 0));
+    this.blocks.push(new Block(this.x + (140 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (140 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + ((280+35) * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + ((280+35) * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + ((280+35) * (wh / 500)),-70 * (wh / 500)));
+    this.triangles.push(new Gone(this.x + ((319+35) * (wh / 500)), 0 * (wh / 500)));
+    this.triangles.push(new Gone(this.x + ((357+35) * (wh / 500)), 0 * (wh / 500)));
+    this.triangles.push(new Gone(this.x + ((357+70) * (wh / 500)), 0 * (wh / 500)));
+    this.level = level;
+  }
+  show() {
+    this.x -= 6 * (wh / 500);
+    for (let i = 0; i < this.blocks.length; i++) {
+      this.blocks[i].show();
+    }
+    for (let i = 0; i < this.triangles.length; i++) {
+      this.triangles[i].show();
+    }
+    if (this.triangles[this.triangles.length-1].x + (35 * (wh / 500)) < 0) {
+      structures[this.level] = new RideUp(this.level);
     }
   }
 }
 
 class Pit {
   constructor(level) {
+    this.x = wh + (39 * (wh/500));
     this.blocks = [];
     this.triangles = [];
-    this.blocks.push(new Block(wh*2, 0));
-    this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (-35 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (35 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (0 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (70 * (wh / 500)), -35 * (wh / 500)));
-    this.triangles.push(new Gone(wh*2 + ((68) * (wh / 500)), -230));
-    this.blocks.push(new Block(wh*2 + (175 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (175 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (175 * (wh / 500)), -70 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (140 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (140 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (140 * (wh / 500)), -70 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (105 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (105 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (105 * (wh / 500)), -70 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (363 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (363 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (363 * (wh / 500)), -70 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (401 * (wh / 500)), 0));
-    this.blocks.push(new Block(wh*2 + (401 * (wh / 500)), -35 * (wh / 500)));
-    this.blocks.push(new Block(wh*2 + (401 * (wh / 500)), -70 * (wh / 500)));
-    this.triangles.push(new Gone(wh*2 + ((144+70) * (wh / 500)), 0));
-    this.triangles.push(new Gone(wh*2 + ((35+39+108+70) * (wh / 500)),0));
-    this.triangles.push(new Gone(wh*2 + ((35+39+108+35+70) * (wh / 500)), 0));
-    this.triangles.push(new Gone(wh*2 + ((35+35+35+39+108+70) * (wh / 500)),0));
-    this.triangles.push(new Gone(wh*2 + ((405+35) * (wh / 500)), 0));
-    this.triangles.push(new Gone(wh*2 + ((405+70) * (wh / 500)),0));
+    this.blocks.push(new Block(this.x, 0));
+    this.blocks.push(new Block(this.x + (35 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (-35 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (35 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (0 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (70 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (70 * (wh / 500)), -35 * (wh / 500)));
+    this.triangles.push(new Gone(this.x + ((68) * (wh / 500)), -230));
+    this.blocks.push(new Block(this.x + (175 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (175 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (175 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (140 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (140 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (140 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (105 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (105 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (105 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (363 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (363 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (363 * (wh / 500)), -70 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (401 * (wh / 500)), 0));
+    this.blocks.push(new Block(this.x + (401 * (wh / 500)), -35 * (wh / 500)));
+    this.blocks.push(new Block(this.x + (401 * (wh / 500)), -70 * (wh / 500)));
+    this.triangles.push(new Gone(this.x + ((144+70) * (wh / 500)), 0));
+    this.triangles.push(new Gone(this.x + ((35+39+108+70) * (wh / 500)),0));
+    this.triangles.push(new Gone(this.x + ((35+39+108+35+70) * (wh / 500)), 0));
+    this.triangles.push(new Gone(this.x + ((35+35+35+39+108+70) * (wh / 500)),0));
+    this.triangles.push(new Gone(this.x + ((405+35) * (wh / 500)), 0));
+    this.triangles.push(new Gone(this.x + ((405+70) * (wh / 500)),0));
     this.level = level;
-    this.x = wh*2;
   }
   show() {
     this.x -= 6 * (wh / 500);
@@ -166,8 +195,8 @@ class Pit {
     for (let i = 0; i < this.triangles.length; i++) {
       this.triangles[i].show();
     }
-    if (this.x + (500 * (wh / 500)) < 0) {
-      structures[this.level] = new RideUp(this.level);
+    if (this.triangles[this.triangles.length-1].x + (35 * (wh / 500)) < 0) {
+      structures[this.level] = new Jumper(this.level);
     }
   }
 }
@@ -181,7 +210,7 @@ class Building {
   show() {
     fill(0, 25+(this.level*3), 0);
     rect(this.x, this.y, (80 * (wh / 500)) + this.level*2, ht);
-    this.x -= (5 * (wh / 500)) + (this.level/((wh / 500)))
+    this.x -= (1 * (wh / 500)) + ((this.level*10)/((wh / 500)))
     if (this.x < -wh/4) {
       this.x = (random(wh) + wh) * (wh / 500);
       this.height = (random(200) + 200) * (wh / 500);
