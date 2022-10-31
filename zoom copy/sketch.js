@@ -163,7 +163,7 @@ class Pit {
     this.blocks.push(new Block(this.x + (0 * (wh / 500)), -35 * (wh / 500)));
     this.blocks.push(new Block(this.x + (70 * (wh / 500)), 0));
     this.blocks.push(new Block(this.x + (70 * (wh / 500)), -35 * (wh / 500)));
-    this.triangles.push(new Gone(this.x + ((68) * (wh / 500)), -230));
+    this.triangles.push(new Gone(this.x + ((68) * (wh / 500)), -74 * (wh / 500)));
     this.blocks.push(new Block(this.x + (175 * (wh / 500)), 0));
     this.blocks.push(new Block(this.x + (175 * (wh / 500)), -35 * (wh / 500)));
     this.blocks.push(new Block(this.x + (175 * (wh / 500)), -70 * (wh / 500)));
