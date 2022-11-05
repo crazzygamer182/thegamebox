@@ -59,7 +59,7 @@ class Pipe {
   constructor(i) {
     this.y = random(160, 240)*(wh/500);
     this.i = i;
-    this.x = wh + this.i*(300*(wh/500));
+    this.x = wh + this.i*(275*(wh/500));
   }
   show() {
     strokeWeight(5*(wh/500));
@@ -70,7 +70,7 @@ class Pipe {
     rect(this.x, 0, 75*(wh/500), (this.y-(110*(wh/500))));
     rect(this.x-(5*(wh/500)), (this.y-(110*(wh/500)))-(45*(wh/500)), 75*(wh/500)+(10*(wh/500)), (45*(wh/500)));
     this.x -= 2*(wh/500);
-    if (this.x + (50*(wh/500)) < 0) {
+    if (this.x + (75*(wh/500)+(5*(wh/500))) < 0) {
       this.x = wh;
       this.y = random(160, 240)*(wh/500);
     }
