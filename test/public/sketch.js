@@ -4,7 +4,8 @@ function setup() {
   createCanvas(500, 500);
   background(220);
   socket = io();
-  socket.connect('https://game.thegamebox.ca/test/');
+  socket.connect('216.250.122.152');
+  //socket.connect('https://localhost:3000');
   socket.on('mouse', newDrawing);
 }
 
