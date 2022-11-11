@@ -66,7 +66,7 @@ class Pellet {
     this.color1 = random(50, 255);
     this.color2 = random(50, 255);
     this.color3 = random(50, 255);
-    this.size = random(20, 35);
+    this.size = random(15, 25);
     this.inc = 0.1;
     this.noiseMax = 0.00001;
     this.phase = 0;
