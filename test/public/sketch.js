@@ -3,9 +3,8 @@ var socket;
 function setup() {
   createCanvas(500, 500);
   background(220);
-  socket = io();
-  socket.connect('http://216.250.122.152:3000');
-  //socket.connect('http://localhost:3000');
+  socket = io('http://216.250.122.152:3000');
+  socket = io('http://localhost:3000');
   socket.on('mouse', newDrawing);
 }
 
