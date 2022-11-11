@@ -91,6 +91,8 @@ function draw() {
       dropBoxes[2].color = 0;
     }
   }
+  
+  //Find the pattern and recreate with the given shapes
 }
 
 class Block {
