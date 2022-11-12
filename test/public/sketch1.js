@@ -103,6 +103,7 @@ function draw() {
     }
     b = Object.keys(players);
     strokeWeight(1);
+    textSize(11*s/10000);
     text(namee, 250, 150)
     noStroke();
     fill(200);
@@ -111,6 +112,7 @@ function draw() {
       strokeWeight(3);
       stroke(red(players[b[i]].c)-50, green(players[b[i]].c)-50, blue(players[b[i]].c)-50);
       fill(players[b[i]].c);
+      textSize(players[b[i]].s/10000);
       circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s/10000));
       strokeWeight(1);
       stroke(0);
