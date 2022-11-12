@@ -3,8 +3,8 @@ var socket;
 function setup() {
   createCanvas(500, 500);
   background(220);
-  //socket = io('http://216.250.122.152:3000');
-  socket = io('https://api.thegamebox.ca/');
+  socket = io('http://localhost:3000');
+  //socket = io('https://api.thegamebox.ca/');
   socket.on('mouse', newDrawing);
 }
 

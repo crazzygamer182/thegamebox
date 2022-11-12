@@ -1,8 +1,11 @@
+
+
 let x = 0;
 let y = 0;
 let pellets = [];
 let s = 1;
 let socket;
+let players = {};
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -35,6 +38,7 @@ function setup() {
   socket = io('http://localhost:3000');
   //socket = io('http://216.250.122.152:3000');
   socket.on('mouse', newPlayer);
+  textAlign(CENTER);
 }
 
 function draw() {
@@ -63,6 +67,15 @@ function draw() {
     x: x,
     y: y
   }
+  
+  b = Object.keys(players);
+  text(b.length, 250, 100)
+  for (let i = 0; i < b.length; i++) {
+    strokeWeight(3);
+    stroke(0);
+    fill(255);
+    circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50);
+  }
   socket.emit('mouse', data);
 }
 
@@ -87,8 +100,6 @@ class Pellet {
       stroke(this.color1 - 50, this.color2 - 50, this.color3 - 50);
       circle(this.x - x + 250, this.y - y + 150, this.size / s);
       if (dist(this.x, this.y, x, y) < 25) {
-        //this.x = random(500) + x - 250;
-        //this.y = random(300) + y - 150;
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
         s += 0.001;
@@ -108,8 +119,5 @@ function showArray(arr) {
 }
 
 function newPlayer(data) {
-  strokeWeight(3);
-  stroke(0);
-  fill(255, 200, 200);
-  circle(data.x - x + 250, data.y - y + 150, 50);
+  players[data.id] = data;
 }
