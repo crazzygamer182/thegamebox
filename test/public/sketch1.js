@@ -85,7 +85,7 @@ function draw() {
     stroke(0);
     fill(255);
     let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
-    newvel.setMag(2.5 / s);
+    newvel.setMag(1.5 / s);
     vel.lerp(newvel, 0.2);
     pos.add(vel);
     x = pos.x;
@@ -182,10 +182,6 @@ class Pellet {
     this.color1 = random(50, 255);
     this.color2 = random(50, 255);
     this.color3 = random(50, 255);
-    this.inc = 0.1;
-    this.noiseMax = 0.00001;
-    this.phase = 0;
-    this.zoff = 0;
     this.number = int(random(17)) + 8;
   }
   show() {
