@@ -10,6 +10,9 @@ let num;
 let gs = 1;
 let fontt;
 let c;
+let one;
+let two;
+let wait = 0;
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -56,6 +59,8 @@ function setup() {
      storeItem('id', num);
    }
    console.log(num);
+   one = int(random(9)) + 4;
+   two = int(random(9)) + 4;
 }
 
 function draw() {
@@ -115,12 +120,56 @@ function draw() {
     }
     fill(c);
     circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s);
+    if (gs > s) {
+      s += 0.00001;
+    }
+    if (wait > 1) {
+      wait--;
+      textSize(30);
+      stroke(0);
+      strokeWeight(1);
+      fill(50, 255, 25);
+      text(one + " + " + two, 250, 50);
+    } else if (wait == 1) {
+      one = int(random(9)) + 4;
+      two = int(random(9)) + 4;
+      wait--;
+      textSize(30);
+      stroke(0);
+      strokeWeight(1);
+      fill(200);
+      text(one + " + " + two, 250, 50);
+    } else if (wait == 0) {
+      textSize(30);
+      stroke(0);
+      strokeWeight(1);
+      fill(200);
+      text(one + " + " + two, 250, 50);
+    }
+    else if (wait < -1) {
+      wait++;
+      textSize(30);
+      stroke(0);
+      strokeWeight(1);
+      fill(255, 25, 50);
+      text(one + " + " + two, 250, 50);
+    } else if (wait == -1) {
+      wait++;
+      textSize(30);
+      stroke(0);
+      strokeWeight(1);
+      fill(200);
+      text(one + " + " + two, 250, 50);
+    } else {
+      textSize(30);
+      stroke(0);
+      strokeWeight(1);
+      fill(200);
+      text(one + " + " + two, 250, 50);
+    }
     socket.emit('mouse', data);
   } else {
     text("Enter Name", 250, 100)
-  }
-  if (gs > s) {
-    s += 0.00001;
   }
 }
 
@@ -137,7 +186,7 @@ class Pellet {
     this.noiseMax = 0.00001;
     this.phase = 0;
     this.zoff = 0;
-    this.number = int(random(9)) + 1;
+    this.number = int(random(17)) + 8;
   }
   show() {
     if (this.x - x > -300 && this.x - x < 300 && this.y - y > -200 && this.y - y < 200) {
@@ -152,13 +201,18 @@ class Pellet {
       textSize(8);
       text(this.number, this.x - x + 250, this.y - y + 150);
       if (dist(this.x, this.y, x, y) < 25) {
+        if (this.number == one + two) {
+          wait = 100;
+          gs += 0.01;
+        } else {
+          wait = -100;
+          gs -= 0.005;
+        }
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
-        gs += 0.001;
-        this.number = int(random(9)) + 1;
+        this.number = int(random(9)) + 4 + int(random(9)) + 4;
         this.color1 = random(50, 255);
         this.color2 = random(50, 255);
-        this.color3 = random(50, 255);
       }
     }
   }
