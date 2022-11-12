@@ -4,6 +4,8 @@ let pellets = [];
 let s = 1;
 let socket;
 let players = {};
+let game = 0;
+let namee = "";
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -37,52 +39,63 @@ function setup() {
   socket = io('https://api.thegamebox.ca');
   socket.on('mouse', newPlayer);
   textAlign(CENTER);
+  var inp = createInput('');
+  inp.position(windowWidth/2 - 50*(wh/500), windowHeight/2);
+  inp.size(100*(wh/500));
+  inp.input(myInputEvent);
 }
 
 function draw() {
   //background(220);
   scale(wh / 500);
-  imageMode(CENTER);
-  image(
-    back,
-    250 - (x % (37.44 / s)),
-    150 - (y % (37.44 / s)),
-    back.width / s,
-    back.height / s
-  );
-  strokeWeight(3);
-  showArray(pellets);
-  stroke(0);
-  fill(255);
-  circle(250, 150, 50);
-  let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
-  newvel.setMag(2.5 / s);
-  vel.lerp(newvel, 0.2);
-  pos.add(vel);
-  x = pos.x;
-  y = pos.y;
-  var data = {
-    x: x,
-    y: y
-  }
-  
-  b = Object.keys(players);
-  text(b.length, 250, 100)
-  noStroke();
-  fill(50);
-  rect(425, 225, 75, 75);
-  for (let i = 0; i < b.length; i++) {
+  if (game == 1) {
+    imageMode(CENTER);
+    image(
+      back,
+      250 - (x % (37.44 / s)),
+      150 - (y % (37.44 / s)),
+      back.width / s,
+      back.height / s
+    );
     strokeWeight(3);
+    showArray(pellets);
     stroke(0);
     fill(255);
-    circle(players[b[i]].x - x + 500, players[b[i]].y - y + 300, 50);
-    fill(255, 0, 0);
+    circle(250, 150, 50);
+    let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
+    newvel.setMag(2.5 / s);
+    vel.lerp(newvel, 0.2);
+    pos.add(vel);
+    x = pos.x;
+    y = pos.y;
+    var data = {
+      x: x,
+      y: y,
+      namee: namee
+    }
+    b = Object.keys(players);
+    strokeWeight(1);
+    text(namee, 250, 200)
     noStroke();
-    circle(((players[b[i]].x + 250)*0.075) + 425, ((players[b[i]].y + 150)*0.075) + 225, 50*0.075);
+    fill(50);
+    rect(425, 225, 75, 75);
+    for (let i = 0; i < b.length; i++) {
+      strokeWeight(3);
+      stroke(0);
+      fill(255);
+      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50);
+      strokeWeight(1);
+      text(players[b[i]].namee, players[b[i]].x - x + 250, players[b[i]].y - y + 200)
+      fill(255, 0, 0);
+      noStroke();
+      circle(players[b[i]].x/50 + 450, players[b[i]].y/50 + 250, 50*0.075);
+    }
+    fill(0, 0, 255);
+    circle(x/50 + 450, y/50 + 250, 50*0.075);
+    socket.emit('mouse', data);
+  } else {
+    text("Enter Name", 250, 100)
   }
-  fill(0, 0, 255);
-  circle(x*0.075 + 425, y*0.075 + 225, 50*0.075);
-  socket.emit('mouse', data);
 }
 
 class Pellet {
@@ -126,4 +139,15 @@ function showArray(arr) {
 
 function newPlayer(data) {
   players[data.id] = data;
+}
+
+function keyPressed() {
+  if (keyCode == ENTER) {
+    game = 1;
+    removeElements();
+  }
+}
+
+function myInputEvent() {
+  namee = this.value();
 }
