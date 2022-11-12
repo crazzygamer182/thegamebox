@@ -91,7 +91,7 @@ function draw() {
       strokeWeight(3);
       stroke(0);
       fill(255);
-      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50);
+      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50/s);
       strokeWeight(1);
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 200)
       fill(255, 0, 0);
@@ -180,16 +180,16 @@ class Player {
   show() {
     console.log(dist(this.x, this.y, this.gx, this.gy));
     if (this.gx > this.x) {
-      this.x += 2.5/s;
+      this.x += 2.5;
     }
     if (this.gx < this.x) {
-      this.x -= 2.5/s;
+      this.x -= 2.5;
     }
     if (this.gy > this.y) {
-      this.y += 2.5/s;
+      this.y += 2.5;
     }
     if (this.gy < this.y) {
-      this.y -= 2.5/s;
+      this.y -= 2.5;
     }
   }
 }
