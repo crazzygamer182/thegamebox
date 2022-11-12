@@ -49,7 +49,7 @@ function setup() {
   inp.input(myInputEvent);
   colorPicker = createColorPicker('#ed225d');
   colorPicker.size(80, 40);
-  colorPicker.position(wh/2 - 40, ht/1.5);
+  colorPicker.position(windowWidth/2 - 40, windowHeight/2 + 100);
   num = getItem('id');
    if (num === null || num < 100) {
      num = int(random(10)) + int(random(10))*10 + int(random(10))*100 + int(random(10))*1000 + int(random(10))*100000 + int(random(10))*1000000 + int(random(10))*10000000 + int(random(10))*100000000 + int(random(10))*1000000000;
@@ -74,6 +74,7 @@ function draw() {
     showArray(pellets);
     stroke(red(c)-50, green(c)-50, blue(c)-50);
     fill(c);
+    strokeWeight(3);
     circle(250, 150, 50);
     textSize(11);
     stroke(0);
@@ -136,16 +137,28 @@ class Pellet {
     this.noiseMax = 0.00001;
     this.phase = 0;
     this.zoff = 0;
+    this.number = int(random(9)) + 1;
   }
   show() {
     if (this.x - x > -300 && this.x - x < 300 && this.y - y > -200 && this.y - y < 200) {
       fill(this.color1, this.color2, this.color3);
       //stroke(this.color1 - 50, this.color2 - 50, this.color3 - 50);
+      noStroke();
       circle(this.x - x + 250, this.y - y + 150, 15 / s);
+      textAlign(CENTER, CENTER);
+      fill(255);
+      stroke(0);
+      strokeWeight(1);
+      textSize(8);
+      text(this.number, this.x - x + 250, this.y - y + 150);
       if (dist(this.x, this.y, x, y) < 25) {
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
         gs += 0.001;
+        this.number = int(random(9)) + 1;
+        this.color1 = random(50, 255);
+        this.color2 = random(50, 255);
+        this.color3 = random(50, 255);
       }
     }
   }
