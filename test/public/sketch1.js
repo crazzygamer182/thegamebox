@@ -35,8 +35,8 @@ function setup() {
   for (let i = 0; i < 2500; i++) {
     pellets.push(new Pellet());
   }
-  socket = io('http://localhost:3000');
-  //socket = io('http://216.250.122.152:3000');
+  //socket = io('http://localhost:3000');
+  socket = io('https://api.thegamebox.ca');
   socket.on('mouse', newPlayer);
   textAlign(CENTER);
 }
