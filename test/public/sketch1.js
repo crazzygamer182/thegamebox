@@ -131,7 +131,7 @@ class Pellet {
       if (dist(this.x, this.y, x, y) < 25) {
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
-        s += 0.1;
+        s += 0.001;
       }
     }
   }
