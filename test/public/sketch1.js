@@ -85,7 +85,7 @@ function draw() {
     stroke(0);
     fill(255);
     let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
-    newvel.setMag(1.5 / s);
+    newvel.setMag(1.8 / s);
     vel.lerp(newvel, 0.2);
     pos.add(vel);
     x = pos.x;
@@ -189,12 +189,12 @@ class Pellet {
       fill(this.color1, this.color2, this.color3);
       //stroke(this.color1 - 50, this.color2 - 50, this.color3 - 50);
       noStroke();
-      circle(this.x - x + 250, this.y - y + 150, 15 / s);
+      circle(this.x - x + 250, this.y - y + 150, 20 / s);
       textAlign(CENTER, CENTER);
       fill(255);
       stroke(0);
       strokeWeight(1);
-      textSize(8);
+      textSize(11);
       text(this.number, this.x - x + 250, this.y - y + 150);
       if (dist(this.x, this.y, x, y) < 25) {
         if (this.number == one + two) {
