@@ -6,6 +6,7 @@ let socket;
 let players = {};
 let game = 0;
 let namee = "";
+let num;
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -35,14 +36,20 @@ function setup() {
   for (let i = 0; i < 2500; i++) {
     pellets.push(new Pellet());
   }
-  //socket = io('http://localhost:3000');
-  socket = io('https://api.thegamebox.ca');
+  socket = io('http://localhost:3000');
+  //socket = io('https://api.thegamebox.ca');
   socket.on('mouse', newPlayer);
   textAlign(CENTER);
   var inp = createInput('');
   inp.position(windowWidth/2 - 50*(wh/500), windowHeight/2);
   inp.size(100*(wh/500));
   inp.input(myInputEvent);
+  num = getItem('id');
+   if (num === null || num < 100) {
+     num = int(random(10)) + int(random(10))*10 + int(random(10))*100 + int(random(10))*1000 + int(random(10))*100000 + int(random(10))*1000000 + int(random(10))*10000000 + int(random(10))*100000000 + int(random(10))*1000000000;
+     storeItem('id', num);
+   }
+   console.log(num);
 }
 
 function draw() {
@@ -71,7 +78,8 @@ function draw() {
     var data = {
       x: x,
       y: y,
-      namee: namee
+      namee: namee,
+      number: num
     }
     b = Object.keys(players);
     strokeWeight(1);
@@ -80,7 +88,16 @@ function draw() {
     fill(50);
     rect(425, 225, 75, 75);
     for (let i = 0; i < b.length; i++) {
-      players[b[i]].show(); 
+      strokeWeight(3);
+      stroke(0);
+      fill(255);
+      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50);
+      strokeWeight(1);
+      text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 200)
+      fill(255, 0, 0);
+      noStroke();
+      circle(players[b[i]].x/50 + 450, players[b[i]].y/50 + 250, 50*0.075);
+      players[b[i]].show();
     }
     fill(0, 0, 255);
     circle(x/50 + 450, y/50 + 250, 50*0.075);
@@ -130,11 +147,14 @@ function showArray(arr) {
 }
 
 function newPlayer(data) {
-  if (players[data.id]) {
-    players[data.id].goToX = data.x;
-    players[data.id].goToY = data.y;
+  if (players[data.number]) {
+      players[data.number].gx = data.x;
+      players[data.number].gy = data.y;
+  } else if (data.number != num) {
+    players[data.number] = new Player(data.x, data.y, data.namee);;
   } else {
-    players[data.id] = new Player(data.x, data.y, data.namee);
+    x = data.x;
+    y = data.y;
   }
 }
 
@@ -150,31 +170,26 @@ function myInputEvent() {
 }
 
 class Player {
-  constructor(x1, y1, nameee) {
-    this.x = x1;
-    this.y = y1;
-    this.goToX = x1;
-    this.goToY = y1;
-    this.name = nameee;
+  constructor(px, py, pn) {
+    this.x = px;
+    this.y = py;
+    this.n = pn;
+    this.gx = this.x;
+    this.gy = this.y;
   }
   show() {
-    if (this.goToX > this.x) {
-      this.x += 2.5 / s;
-    } else if (this.goToX < this.x) {
-      this.x -= 2.5 / s;
-    } else if (this.goToY > this.y) {
-      this.y += 2.5 / s;
-    } else if (this.goToY < this.y) {
-      this.y -= 2.5 / s;
+    console.log(dist(this.x, this.y, this.gx, this.gy));
+    if (this.gx > this.x) {
+      this.x += 2.5/s;
     }
-    strokeWeight(3);
-    stroke(0);
-    fill(255);
-    circle(this.x - x + 250, this.y - y + 150, 50);
-    strokeWeight(1);
-    text(this.name, this.x - x + 250, this.y - y + 200)
-    fill(255, 0, 0);
-    noStroke();
-    circle(this.x/50 + 450, this.y/50 + 250, 50*0.075);
+    if (this.gx < this.x) {
+      this.x -= 2.5/s;
+    }
+    if (this.gy > this.y) {
+      this.y += 2.5/s;
+    }
+    if (this.gy < this.y) {
+      this.y -= 2.5/s;
+    }
   }
 }
