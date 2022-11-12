@@ -134,7 +134,7 @@ function newPlayer(data) {
     players[data.id].goToX = data.x;
     players[data.id].goToY = data.y;
   } else {
-    players[data.id] = new Player(data.x, data.y, namee);
+    players[data.id] = new Player(data.x, data.y, data.namee);
   }
 }
 
