@@ -80,15 +80,7 @@ function draw() {
     fill(50);
     rect(425, 225, 75, 75);
     for (let i = 0; i < b.length; i++) {
-      strokeWeight(3);
-      stroke(0);
-      fill(255);
-      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50);
-      strokeWeight(1);
-      text(players[b[i]].namee, players[b[i]].x - x + 250, players[b[i]].y - y + 200)
-      fill(255, 0, 0);
-      noStroke();
-      circle(players[b[i]].x/50 + 450, players[b[i]].y/50 + 250, 50*0.075);
+      players[b[i]].show(); 
     }
     fill(0, 0, 255);
     circle(x/50 + 450, y/50 + 250, 50*0.075);
@@ -138,7 +130,12 @@ function showArray(arr) {
 }
 
 function newPlayer(data) {
-  players[data.id] = data;
+  if (players[data.id]) {
+    players[data.id].goToX = data.x;
+    players[data.id].goToY = data.y;
+  } else {
+    players[data.id] = new Player(data.x, data.y, namee);
+  }
 }
 
 function keyPressed() {
@@ -150,4 +147,34 @@ function keyPressed() {
 
 function myInputEvent() {
   namee = this.value();
+}
+
+class Player {
+  constructor(x1, y1, nameee) {
+    this.x = x1;
+    this.y = y1;
+    this.goToX = x1;
+    this.goToY = y1;
+    this.name = nameee;
+  }
+  show() {
+    if (this.goToX > this.x) {
+      this.x += 2.5 / s;
+    } else if (this.goToX < this.x) {
+      this.x -= 2.5 / s;
+    } else if (this.goToY > this.y) {
+      this.y += 2.5 / s;
+    } else if (this.goToY < this.y) {
+      this.y -= 2.5 / s;
+    }
+    strokeWeight(3);
+    stroke(0);
+    fill(255);
+    circle(this.x - x + 250, this.y - y + 150, 50);
+    strokeWeight(1);
+    text(this.namee, this.x - x + 250, this.y - y + 200)
+    fill(255, 0, 0);
+    noStroke();
+    circle(this.x/50 + 450, this.y/50 + 250, 50*0.075);
+  }
 }
