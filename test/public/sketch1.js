@@ -1,18 +1,19 @@
 let x = 0;
 let y = 0;
 let pellets = [];
-let s = 1;
+let s = 10000;
 let socket;
 let players = {};
 let game = 0;
 let namee = "";
 let num;
-let gs = 1;
+let gs = 10000;
 let fontt;
 let c;
 let one;
 let two;
 let wait = 0;
+let leaderBoard = [];
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -70,22 +71,22 @@ function draw() {
     imageMode(CENTER);
     image(
       back,
-      250 - (x % (37.44 / s)),
-      150 - (y % (37.44 / s)),
-      back.width / s,
-      back.height / s
+      250 - (x % (37.44)),
+      150 - (y % (37.44)),
+      back.width,
+      back.height
     );
     strokeWeight(3);
     showArray(pellets);
     stroke(red(c)-50, green(c)-50, blue(c)-50);
     fill(c);
     strokeWeight(3);
-    circle(250, 150, 50);
+    circle(250, 150, 50*s/10000);
     textSize(11);
     stroke(0);
     fill(255);
     let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
-    newvel.setMag(1.8 / s);
+    newvel.setMag(1.5 / (s/10000));
     vel.lerp(newvel, 0.2);
     pos.add(vel);
     x = pos.x;
@@ -108,28 +109,30 @@ function draw() {
       strokeWeight(3);
       stroke(red(players[b[i]].c)-50, green(players[b[i]].c)-50, blue(players[b[i]].c)-50);
       fill(players[b[i]].c);
-      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s)/s);
+      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s/10000));
       strokeWeight(1);
       stroke(0);
       fill(255);
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 150)
       fill(players[b[i]].c);
       noStroke();
-      circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s);
+      circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s/100);
       players[b[i]].show();
     }
     fill(c);
-    circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s);
+    circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s/10000);
     if (gs > s) {
-      s += 0.00001;
+      s += 10;
+    } else if (gs < s) {
+      s -= 10;
     }
     if (wait > 1) {
       wait--;
-      textSize(30);
+      textSize(35);
       stroke(0);
       strokeWeight(1);
       fill(50, 255, 25);
-      text(one + " + " + two, 250, 50);
+      text(one + " + " + two, 250, 65);
     } else if (wait == 1) {
       one = int(random(9)) + 4;
       two = int(random(9)) + 4;
@@ -137,36 +140,60 @@ function draw() {
       textSize(30);
       stroke(0);
       strokeWeight(1);
-      fill(200);
-      text(one + " + " + two, 250, 50);
+      fill(150);
+      text(one + " + " + two, 250, 65);
     } else if (wait == 0) {
       textSize(30);
       stroke(0);
       strokeWeight(1);
-      fill(200);
-      text(one + " + " + two, 250, 50);
+      fill(150);
+      text(one + " + " + two, 250, 65);
     }
     else if (wait < -1) {
       wait++;
-      textSize(30);
+      textSize(35);
       stroke(0);
       strokeWeight(1);
       fill(255, 25, 50);
-      text(one + " + " + two, 250, 50);
+      text(one + " + " + two, 250, 65);
     } else if (wait == -1) {
       wait++;
       textSize(30);
       stroke(0);
       strokeWeight(1);
-      fill(200);
-      text(one + " + " + two, 250, 50);
+      fill(150);
+      text(one + " + " + two, 250, 65);
     } else {
       textSize(30);
       stroke(0);
       strokeWeight(1);
-      fill(200);
-      text(one + " + " + two, 250, 50);
+      fill(150);
+      text(one + " + " + two, 250, 65);
     }
+    fill(100);
+    push();
+    angleMode(DEGREES);
+    translate(mouseX/(wh/500), mouseY/(wh/500));
+    rotate(-23);
+    noCursor();
+    triangle(-5, 5, 0, -5, 5, 5);
+    pop();
+    textAlign(RIGHT, TOP);
+    fill(0);
+    noStroke();
+    textSize(10);
+    text("Score: " + s, 490, 10);
+    leaderBoard = [];
+    for (let i = 0; i < players.length; i++) {
+      leaderBoard.push(players[i]);
+    }
+    leaderBoard.push(new Player(x, y, namee, s, c));
+    leaderBoard.sort(function(a, b){return a.s - b.s});
+    for (let i = 1; i < leaderBoard.length+1; i++) {
+      textAlign(LEFT, TOP);
+      text(i + ". " + leaderBoard[i-1].n + ": " + leaderBoard[i-1].s, 10, 10*1);
+    }
+    textAlign(CENTER, CENTER);
     socket.emit('mouse', data);
   } else {
     text("Enter Name", 250, 100)
@@ -189,20 +216,20 @@ class Pellet {
       fill(this.color1, this.color2, this.color3);
       //stroke(this.color1 - 50, this.color2 - 50, this.color3 - 50);
       noStroke();
-      circle(this.x - x + 250, this.y - y + 150, 20 / s);
+      circle(this.x - x + 250, this.y - y + 150, 20);
       textAlign(CENTER, CENTER);
       fill(255);
       stroke(0);
       strokeWeight(1);
       textSize(11);
       text(this.number, this.x - x + 250, this.y - y + 150);
-      if (dist(this.x, this.y, x, y) < 25) {
+      if (dist(this.x, this.y, x, y) < 25*s/10000) {
         if (this.number == one + two) {
           wait = 100;
-          gs += 0.01;
+          gs += 500;
         } else {
           wait = -100;
-          gs -= 0.005;
+          gs -= 100;
         }
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
