@@ -172,7 +172,7 @@ class Player {
     fill(255);
     circle(this.x - x + 250, this.y - y + 150, 50);
     strokeWeight(1);
-    text(this.namee, this.x - x + 250, this.y - y + 200)
+    text(this.name, this.x - x + 250, this.y - y + 200)
     fill(255, 0, 0);
     noStroke();
     circle(this.x/50 + 450, this.y/50 + 250, 50*0.075);
