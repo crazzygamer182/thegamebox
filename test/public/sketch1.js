@@ -118,7 +118,7 @@ function draw() {
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 150)
       fill(players[b[i]].c);
       noStroke();
-      circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s/100);
+      circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s/10000);
       players[b[i]].show();
     }
     fill(c);
