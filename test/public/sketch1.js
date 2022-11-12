@@ -79,7 +79,8 @@ function draw() {
       x: x,
       y: y,
       namee: namee,
-      number: num
+      number: num,
+      s: s
     }
     b = Object.keys(players);
     strokeWeight(1);
@@ -91,7 +92,7 @@ function draw() {
       strokeWeight(3);
       stroke(0);
       fill(255);
-      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50/s);
+      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s)/s);
       strokeWeight(1);
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 200)
       fill(255, 0, 0);
@@ -130,7 +131,7 @@ class Pellet {
       if (dist(this.x, this.y, x, y) < 25) {
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
-        s += 0.001;
+        s += 0.1;
       }
     }
   }
@@ -150,8 +151,9 @@ function newPlayer(data) {
   if (players[data.number]) {
       players[data.number].gx = data.x;
       players[data.number].gy = data.y;
+      players[data.number].s = data.s;
   } else if (data.number != num) {
-    players[data.number] = new Player(data.x, data.y, data.namee);;
+    players[data.number] = new Player(data.x, data.y, data.namee, data.s);;
   } else {
     x = data.x;
     y = data.y;
@@ -170,12 +172,13 @@ function myInputEvent() {
 }
 
 class Player {
-  constructor(px, py, pn) {
+  constructor(px, py, pn, s) {
     this.x = px;
     this.y = py;
     this.n = pn;
     this.gx = this.x;
     this.gy = this.y;
+    this.s = s;
   }
   show() {
     console.log(dist(this.x, this.y, this.gx, this.gy));
