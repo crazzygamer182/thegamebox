@@ -1,5 +1,3 @@
-
-
 let x = 0;
 let y = 0;
 let pellets = [];
@@ -35,8 +33,8 @@ function setup() {
   for (let i = 0; i < 2500; i++) {
     pellets.push(new Pellet());
   }
-  //socket = io('http://localhost:3000');
-  socket = io('https://api.thegamebox.ca');
+  socket = io('http://localhost:3000');
+  //socket = io('https://api.thegamebox.ca');
   socket.on('mouse', newPlayer);
   textAlign(CENTER);
 }
@@ -70,12 +68,20 @@ function draw() {
   
   b = Object.keys(players);
   text(b.length, 250, 100)
+  noStroke();
+  fill(50);
+  rect(425, 225, 75, 75);
   for (let i = 0; i < b.length; i++) {
     strokeWeight(3);
     stroke(0);
     fill(255);
-    circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, 50);
+    circle(players[b[i]].x - x + 500, players[b[i]].y - y + 300, 50);
+    fill(255, 0, 0);
+    noStroke();
+    circle(((players[b[i]].x + 250)*0.075) + 425, ((players[b[i]].y + 150)*0.075) + 225, 50*0.075);
   }
+  fill(0, 0, 255);
+  circle(x*0.075 + 425, y*0.075 + 225, 50*0.075);
   socket.emit('mouse', data);
 }
 
