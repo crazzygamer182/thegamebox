@@ -97,7 +97,9 @@ function draw() {
       namee: namee,
       number: num,
       s: s,
-      c: c
+      c1: red(c),
+      c2: green(c),
+      c3: blue(c)
     }
     b = Object.keys(players);
     strokeWeight(1);
@@ -257,9 +259,9 @@ function newPlayer(data) {
       players[data.number].gy = data.y;
       players[data.number].s = data.s;
       players[data.number].n = data.namee;
-      players[data.number].c = data.c;
+      players[data.number].c = color(data.c1, data.c2, data.c3);
   } else if (data.number != num) {
-    players[data.number] = new Player(data.x, data.y, data.namee, data.s, data.c);;
+    players[data.number] = new Player(data.x, data.y, data.namee, data.s, color(data.c1, data.c2, data.c3));;
   } else {
     x = data.x;
     y = data.y;
