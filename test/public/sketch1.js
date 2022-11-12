@@ -9,6 +9,7 @@ let namee = "";
 let num;
 let gs = 1;
 let fontt;
+let c;
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -46,6 +47,9 @@ function setup() {
   inp.position(windowWidth/2 - 50*(wh/500), windowHeight/2);
   inp.size(100*(wh/500));
   inp.input(myInputEvent);
+  colorPicker = createColorPicker('#ed225d');
+  colorPicker.size(80, 40);
+  colorPicker.position(wh/2 - 40, ht/1.5);
   num = getItem('id');
    if (num === null || num < 100) {
      num = int(random(10)) + int(random(10))*10 + int(random(10))*100 + int(random(10))*1000 + int(random(10))*100000 + int(random(10))*1000000 + int(random(10))*10000000 + int(random(10))*100000000 + int(random(10))*1000000000;
@@ -68,8 +72,8 @@ function draw() {
     );
     strokeWeight(3);
     showArray(pellets);
-    stroke(0, 86, 199);
-    fill(0, 98, 227);
+    stroke(red(c)-50, green(c)-50, blue(c)-50);
+    fill(c);
     circle(250, 150, 50);
     textSize(11);
     stroke(0);
@@ -85,7 +89,8 @@ function draw() {
       y: y,
       namee: namee,
       number: num,
-      s: s
+      s: s,
+      c: c
     }
     b = Object.keys(players);
     strokeWeight(1);
@@ -95,19 +100,19 @@ function draw() {
     rect(425, 225, 75, 75);
     for (let i = 0; i < b.length; i++) {
       strokeWeight(3);
-      stroke(199, 86, 0);
-      fill(227, 98, 0);
+      stroke(red(players[b[i]].c)-50, green(players[b[i]].c)-50, blue(players[b[i]].c)-50);
+      fill(players[b[i]].c);
       circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s)/s);
       strokeWeight(1);
       stroke(0);
       fill(255);
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 150)
-      fill(255, 0, 0);
+      fill(players[b[i]].c);
       noStroke();
       circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s);
       players[b[i]].show();
     }
-    fill(0, 0, 255);
+    fill(c);
     circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s);
     socket.emit('mouse', data);
   } else {
@@ -161,8 +166,10 @@ function newPlayer(data) {
       players[data.number].gx = data.x;
       players[data.number].gy = data.y;
       players[data.number].s = data.s;
+      players[data.number].n = data.namee;
+      players[data.number].c = data.c;
   } else if (data.number != num) {
-    players[data.number] = new Player(data.x, data.y, data.namee, data.s);;
+    players[data.number] = new Player(data.x, data.y, data.namee, data.s, data.c);;
   } else {
     x = data.x;
     y = data.y;
@@ -172,6 +179,7 @@ function newPlayer(data) {
 function keyPressed() {
   if (keyCode == ENTER) {
     game = 1;
+    c = colorPicker.color()
     removeElements();
   }
 }
@@ -181,13 +189,14 @@ function myInputEvent() {
 }
 
 class Player {
-  constructor(px, py, pn, s) {
+  constructor(px, py, pn, s, c1) {
     this.x = px;
     this.y = py;
     this.n = pn;
     this.gx = this.x;
     this.gy = this.y;
     this.s = s;
+    this.c = c1;
   }
   show() {
     console.log(dist(this.x, this.y, this.gx, this.gy));
