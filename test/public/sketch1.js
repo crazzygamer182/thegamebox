@@ -195,7 +195,7 @@ function draw() {
     leaderBoard.sort(function(a, b){return a.s - b.s});
     for (let i = 1; i < leaderBoard.length+1; i++) {
       textAlign(LEFT, TOP);
-      text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + ": " + leaderBoard[i-1].s, 15, 15*(1 + leaderBoard.length-i));
+      text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + "  " + leaderBoard[i-1].s, 15, 15*(1 + leaderBoard.length-i));
     }
     textAlign(CENTER, CENTER);
     socket.emit('mouse', data);
