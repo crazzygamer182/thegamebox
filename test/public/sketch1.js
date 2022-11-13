@@ -118,14 +118,12 @@ function draw() {
       stroke(0);
       fill(255);
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 150)
-      fill(players[b[i]].c);
+      fill(225, 25, 50);
       noStroke();
       circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s/10000);
       players[b[i]].show();
     }
-    fill(c);
-    stroke(0, 255, 0);
-    strokeWeight(1);
+    fill(25, 50, 225);
     circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s/10000);
     if (gs > s) {
       s += 10;
