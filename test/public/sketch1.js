@@ -47,7 +47,7 @@ function setup() {
   socket = io('https://api.thegamebox.ca');
   socket.on('mouse', newPlayer);
   textAlign(CENTER, CENTER);
-  var inp = createInput('');
+  var inp = createInput('').attribute('maxlength', 10);
   inp.position(windowWidth/2 - 50*(wh/500), windowHeight/2);
   inp.size(100*(wh/500));
   inp.input(myInputEvent);
@@ -103,7 +103,7 @@ function draw() {
     }
     b = Object.keys(players);
     strokeWeight(1);
-    textSize(11*s/10000);
+    textSize(9*s/10000);
     text(namee, 250, 150)
     noStroke();
     fill(200);
@@ -112,7 +112,7 @@ function draw() {
       strokeWeight(3);
       stroke(red(players[b[i]].c)-50, green(players[b[i]].c)-50, blue(players[b[i]].c)-50);
       fill(players[b[i]].c);
-      textSize(11*(players[b[i]].s/10000));
+      textSize(9*(players[b[i]].s/10000));
       circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s/10000));
       strokeWeight(1);
       stroke(0);
@@ -195,11 +195,18 @@ function draw() {
     leaderBoard.sort(function(a, b){return a.s - b.s});
     for (let i = 1; i < leaderBoard.length+1; i++) {
       textAlign(LEFT, TOP);
-      text(i + ". " + leaderBoard[i-1].n + ": " + leaderBoard[i-1].s, 10, 10*i);
+      text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + ": " + leaderBoard[i-1].s, 10, 10*(1 + leaderBoard.length-i));
     }
     textAlign(CENTER, CENTER);
     socket.emit('mouse', data);
   } else {
+    image(
+      back,
+      250 - (x % (37.44)),
+      150 - (y % (37.44)),
+      back.width,
+      back.height
+    );
     text("Enter Name", 250, 100)
   }
 }
@@ -230,10 +237,10 @@ class Pellet {
       if (dist(this.x, this.y, x, y) < 25*s/10000) {
         if (this.number == one + two) {
           wait = 100;
-          gs += 500;
+          gs += 300;
         } else {
           wait = -100;
-          gs -= 100;
+          gs -= 200;
         }
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
