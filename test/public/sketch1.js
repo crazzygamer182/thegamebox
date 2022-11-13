@@ -14,6 +14,8 @@ let one;
 let two;
 let wait = 0;
 let leaderBoard = [];
+let gameMode = "add";
+let instructions;
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -24,6 +26,7 @@ function centerCanvas() {
 function preload() {
   fontt = loadFont("Comfortaa-Regular.ttf");
   back = loadImage("back.png");
+  instructions = loadImage("i.png");
 }
 
 function setup() {
@@ -48,7 +51,7 @@ function setup() {
   socket.on('mouse', newPlayer);
   textAlign(CENTER, CENTER);
   var inp = createInput('').attribute('maxlength', 10);
-  inp.position(windowWidth/2 - 50*(wh/500), ht/2 - 40*(ht/300));
+  inp.position(windowWidth/2 - 50*(wh/500), windowHeight/2 - 40*(ht/300));
   inp.size(100*(wh/500), 7*(wh/500));
   inp.input(myInputEvent);
   colorPicker = createColorPicker('#ed225d');
@@ -60,8 +63,6 @@ function setup() {
      storeItem('id', num);
    }
    console.log(num);
-   one = int(random(9)) + 4;
-   two = int(random(9)) + 4;
 }
 
 function draw() {
@@ -120,11 +121,15 @@ function draw() {
       text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 150)
       fill(225, 25, 50);
       noStroke();
-      circle(players[b[i]].x/100 + 462.5, players[b[i]].y/100 + 262.5, 50*0.075*players[b[i]].s/10000);
+      if (players[b[i]].x > -5000 && players[b[i]].y > -5000 && players[b[i]].x < 5000 && players[b[i]].y < 5000) {
+        circle(players[b[i]].x*0.0075 + 462.5, players[b[i]].y*0.0075 + 262.5, 50*0.075*players[b[i]].s/10000);
+      }
       players[b[i]].show();
     }
     fill(25, 50, 225);
-    circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s/10000);
+    if (x < 5000 && x > -5000 && y > -5000 && y < 5000) {
+      circle(x*0.0075 + 462.5, y*0.0075 + 262.5, 50*0.075*s/10000);
+    }
     if (gs > s) {
       s += 10;
     } else if (gs < s) {
@@ -136,22 +141,21 @@ function draw() {
       stroke(0);
       strokeWeight(1);
       fill(50, 255, 25);
-      text(one + " + " + two, 250, 65);
+      drawProblem();
     } else if (wait == 1) {
-      one = int(random(9)) + 4;
-      two = int(random(9)) + 4;
+      newNums();
       wait--;
       textSize(30);
       stroke(0);
       strokeWeight(1);
       fill(150);
-      text(one + " + " + two, 250, 65);
+      drawProblem();
     } else if (wait == 0) {
       textSize(30);
       stroke(0);
       strokeWeight(1);
       fill(150);
-      text(one + " + " + two, 250, 65);
+      drawProblem();
     }
     else if (wait < -1) {
       wait++;
@@ -159,20 +163,20 @@ function draw() {
       stroke(0);
       strokeWeight(1);
       fill(255, 25, 50);
-      text(one + " + " + two, 250, 65);
+      drawProblem();
     } else if (wait == -1) {
       wait++;
       textSize(30);
       stroke(0);
       strokeWeight(1);
       fill(150);
-      text(one + " + " + two, 250, 65);
+      drawProblem();
     } else {
       textSize(30);
       stroke(0);
       strokeWeight(1);
       fill(150);
-      text(one + " + " + two, 250, 65);
+      drawProblem();
     }
     fill(100);
     push();
@@ -208,6 +212,7 @@ function draw() {
       back.width,
       back.height
     );
+    image(instructions, 250, 150, instructions.width/4, instructions.height/4);
     c = colorPicker.color()
     fill(0);
     noStroke();
@@ -226,13 +231,54 @@ function draw() {
     text(namee, 250, 150)
     fill(25, 225, 50);
     stroke(5, 150, 10);
-    strokeWeight(3);
+    strokeWeight(2);
     strokeJoin(ROUND);
-    rect(225, 185, 50, 20);
+    if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY > 185*(wh/500) && mouseY < 205*(wh/500)) {
+      rect(222.5, 183.75, 55, 22.5, 3, 3);
+      textSize(12);
+    } else {
+      rect(225, 185, 50, 20, 3, 3);
+      textSize(9);
+    }
     fill(0);
     stroke(255);
     strokeWeight(1);
     text("Start", 250, 195);
+    rectMode(CENTER);
+    stroke(50);
+    strokeWeight(2);
+    push();
+    translate(0, 55);
+    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
+      fill(125);
+      rect(230, 180, 35, 35, 5, 5);
+    } else {
+      fill(100);
+      rect(230, 180, 32, 32, 5, 5);
+    }
+    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
+      fill(125);
+      rect(270, 180, 35, 35, 5, 5);
+    } else {
+      fill(100);
+      rect(270, 180, 32, 32, 5, 5);
+    }
+    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
+      fill(125);
+      rect(230, 220, 35, 35, 5, 5);
+    } else {
+      fill(100);
+      rect(230, 220, 32, 32, 5, 5);
+    }
+    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
+      fill(125);
+      rect(270, 220, 35, 35, 5, 5);
+    } else {
+      fill(100);
+      rect(270, 220, 32, 32, 5, 5);
+    }
+    pop();
+    rectMode(CORNER);
   }
 }
 
@@ -245,7 +291,7 @@ class Pellet {
     this.color1 = random(50, 255);
     this.color2 = random(50, 255);
     this.color3 = random(50, 255);
-    this.number = int(random(17)) + 8;
+    this.number = newPelletNumber();
   }
   show() {
     if (this.x - x > -300 && this.x - x < 300 && this.y - y > -200 && this.y - y < 200) {
@@ -260,16 +306,42 @@ class Pellet {
       textSize(11);
       text(this.number, this.x - x + 250, this.y - y + 150);
       if (dist(this.x, this.y, x, y) < 25*s/10000) {
-        if (this.number == one + two) {
-          wait = 100;
-          gs += 300;
-        } else {
-          wait = -100;
-          gs -= 200;
+        if (gameMode == "add") {
+          if (this.number == one + two) {
+            wait = 100;
+            gs += 300;
+          } else {
+            wait = -100;
+            gs -= 200;
+          }
+        } else if (gameMode == "subtract") {
+          if (this.number == one - two) {
+            wait = 100;
+            gs += 300;
+          } else {
+            wait = -100;
+            gs -= 200;
+          }
+        } else if (gameMode == "multiply") {
+          if (this.number == one*two) {
+            wait = 100;
+            gs += 300;
+          } else {
+            wait = -100;
+            gs -= 200;
+          }
+        } else if (gameMode == "divide") {
+          if (this.number == one/two) {
+            wait = 100;
+            gs += 300;
+          } else {
+            wait = -100;
+            gs -= 200;
+          }
         }
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
-        this.number = int(random(9)) + 4 + int(random(9)) + 4;
+        this.number = newPelletNumber();
         this.color1 = random(50, 255);
         this.color2 = random(50, 255);
       }
@@ -282,6 +354,7 @@ function mousePressed() {
     game = 1;
     c = colorPicker.color()
     removeElements();
+    newNums();
   }
 }
 
@@ -337,5 +410,46 @@ class Player {
     if (abs(this.gx - this.x) > 50) {
       this.x = this.gx;
     }
+  }
+}
+
+function newPelletNumber() {
+  if (gameMode == "add") {
+    return int(random(17)) + 8;
+  } else if (gameMode == "subtract") {
+    return (int(random(10)) + 6) - (int(random(6)) + 1);
+  } else if (gameMode == "multiply") {
+    return (int(random(5)) + 2)*(int(random(5)) + 2);
+  } else if (gameMode == "divide") {
+    return (int(random(8)) + 2);
+  }
+}
+
+function newNums() {
+  if (gameMode == "add") {
+    one = int(random(9)) + 4;
+    two = int(random(9)) + 4;
+  } else if (gameMode == "subtract") {
+    one = int(random(10)) + 6
+    two = int(random(6)) + 1
+  } else if (gameMode == "multiply") {
+    one = int(random(5)) + 2;
+    two = int(random(5)) + 2;
+  } else if (gameMode == "divide") {
+    let second = int(random(5)) + 2;
+    one = (int(random(8)) + 2)*second;
+    two = second;
+  }
+}
+
+function drawProblem() {
+  if (gameMode == "add") {
+    text(one + " + " + two, 250, 65);
+  } else if (gameMode == "subtract") {
+    text(one + " - " + two, 250, 65);
+  } else if (gameMode == "multiply") {
+    text(one + " x " + two, 250, 65);
+  } else if (gameMode == "divide") {
+    text(one + " ÷ " + two, 250, 65);
   }
 }
