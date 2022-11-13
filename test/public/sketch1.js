@@ -112,7 +112,7 @@ function draw() {
       strokeWeight(3);
       stroke(red(players[b[i]].c)-50, green(players[b[i]].c)-50, blue(players[b[i]].c)-50);
       fill(players[b[i]].c);
-      textSize(players[b[i]].s/10000);
+      textSize(11*(players[b[i]].s/10000));
       circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s/10000));
       strokeWeight(1);
       stroke(0);
@@ -188,8 +188,8 @@ function draw() {
     textSize(10);
     text("Score: " + s, 490, 10);
     leaderBoard = [];
-    for (let i = 0; i < players.length; i++) {
-      leaderBoard.push(players[i]);
+    for (let i = 0; i < b.length; i++) {
+      leaderBoard.push(players[b[i]]);
     }
     leaderBoard.push(new Player(x, y, namee, s, c));
     leaderBoard.sort(function(a, b){return a.s - b.s});
