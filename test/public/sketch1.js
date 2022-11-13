@@ -124,6 +124,8 @@ function draw() {
       players[b[i]].show();
     }
     fill(c);
+    stroke(0, 255, 0);
+    strokeWeight(1);
     circle(x/100 + 462.5, y/100 + 262.5, 50*0.075*s/10000);
     if (gs > s) {
       s += 10;
