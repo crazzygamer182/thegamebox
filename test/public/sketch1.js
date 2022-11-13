@@ -48,12 +48,12 @@ function setup() {
   socket.on('mouse', newPlayer);
   textAlign(CENTER, CENTER);
   var inp = createInput('').attribute('maxlength', 10);
-  inp.position(windowWidth/2 - 50*(wh/500), windowHeight/2);
-  inp.size(100*(wh/500));
+  inp.position(windowWidth/2 - 50*(wh/500), ht/2 - 40*(ht/300));
+  inp.size(100*(wh/500), 7*(wh/500));
   inp.input(myInputEvent);
   colorPicker = createColorPicker('#ed225d');
-  colorPicker.size(80, 40);
-  colorPicker.position(windowWidth/2 - 40, windowHeight/2 + 100);
+  colorPicker.size(20*(ht/300), 45*(ht/300));
+  colorPicker.position(windowWidth/2 - 60*(ht/300), windowHeight/2 - 20*(ht/300));
   num = getItem('id');
    if (num === null || num < 100) {
      num = int(random(10)) + int(random(10))*10 + int(random(10))*100 + int(random(10))*1000 + int(random(10))*100000 + int(random(10))*1000000 + int(random(10))*10000000 + int(random(10))*100000000 + int(random(10))*1000000000;
@@ -195,11 +195,12 @@ function draw() {
     leaderBoard.sort(function(a, b){return a.s - b.s});
     for (let i = 1; i < leaderBoard.length+1; i++) {
       textAlign(LEFT, TOP);
-      text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + ": " + leaderBoard[i-1].s, 10, 10*(1 + leaderBoard.length-i));
+      text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + ": " + leaderBoard[i-1].s, 15, 15*(1 + leaderBoard.length-i));
     }
     textAlign(CENTER, CENTER);
     socket.emit('mouse', data);
   } else {
+    imageMode(CENTER);
     image(
       back,
       250 - (x % (37.44)),
@@ -207,7 +208,31 @@ function draw() {
       back.width,
       back.height
     );
-    text("Enter Name", 250, 100)
+    c = colorPicker.color()
+    fill(0);
+    noStroke();
+    textSize(40);
+    text("Agar.io", 250, 45)
+    textSize(11);
+    text("Choose name and color", 250, 95)
+    stroke(red(c)-50, green(c)-50, blue(c)-50);
+    fill(c);
+    strokeWeight(3);
+    circle(250, 150, 50*s/10000);
+    stroke(0);
+    fill(255);
+    strokeWeight(1);
+    textSize(9*s/10000);
+    text(namee, 250, 150)
+    fill(25, 225, 50);
+    stroke(5, 150, 10);
+    strokeWeight(3);
+    strokeJoin(ROUND);
+    rect(225, 185, 50, 20);
+    fill(0);
+    stroke(255);
+    strokeWeight(1);
+    text("Start", 250, 195);
   }
 }
 
@@ -253,7 +278,11 @@ class Pellet {
 }
 
 function mousePressed() {
-  //pellets.push(new Pellet());
+  if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY > 185*(wh/500) && mouseY < 205*(wh/500)) {
+    game = 1;
+    c = colorPicker.color()
+    removeElements();
+  }
 }
 
 function showArray(arr) {
@@ -274,14 +303,6 @@ function newPlayer(data) {
   } else {
     x = data.x;
     y = data.y;
-  }
-}
-
-function keyPressed() {
-  if (keyCode == ENTER) {
-    game = 1;
-    c = colorPicker.color()
-    removeElements();
   }
 }
 
