@@ -77,15 +77,7 @@ function draw() {
       back.width,
       back.height
     );
-    strokeWeight(3);
     showArray(pellets);
-    stroke(red(c)-50, green(c)-50, blue(c)-50);
-    fill(c);
-    strokeWeight(3);
-    circle(250, 150, 50*s/10000);
-    textSize(11);
-    stroke(0);
-    fill(255);
     let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
     newvel.setMag(1.5 / (s/10000));
     vel.lerp(newvel, 0.2);
@@ -103,28 +95,46 @@ function draw() {
       c3: blue(c)
     }
     b = Object.keys(players);
-    strokeWeight(1);
-    textSize(9*s/10000);
-    text(namee, 250, 150)
     noStroke();
     fill(200);
     rect(425, 225, 75, 75);
+    leaderBoard = [];
     for (let i = 0; i < b.length; i++) {
-      strokeWeight(3);
-      stroke(red(players[b[i]].c)-50, green(players[b[i]].c)-50, blue(players[b[i]].c)-50);
-      fill(players[b[i]].c);
-      textSize(9*(players[b[i]].s/10000));
-      circle(players[b[i]].x - x + 250, players[b[i]].y - y + 150, (50*players[b[i]].s/10000));
-      strokeWeight(1);
-      stroke(0);
-      fill(255);
-      text(players[b[i]].n, players[b[i]].x - x + 250, players[b[i]].y - y + 150)
-      fill(225, 25, 50);
-      noStroke();
-      if (players[b[i]].x > -5000 && players[b[i]].y > -5000 && players[b[i]].x < 5000 && players[b[i]].y < 5000) {
-        circle(players[b[i]].x*0.0075 + 462.5, players[b[i]].y*0.0075 + 262.5, 50*0.075*players[b[i]].s/10000);
+      leaderBoard.push(players[b[i]]);
+    }
+    leaderBoard.push(new Player(x, y, namee, s, c));
+    leaderBoard.sort(function(a, b){return a.s - b.s});
+    //sort array
+    for (let i = 0; i < leaderBoard.length; i++) {
+      if (leaderBoard[i].x != x || leaderBoard[i].y != y) {
+        strokeWeight(3);
+        stroke(red(leaderBoard[i].c)-50, green(leaderBoard[i].c)-50, blue(leaderBoard[i].c)-50);
+        fill(leaderBoard[i].c);
+        textSize(9*(leaderBoard[i].s/10000));
+        circle(leaderBoard[i].x - x + 250, leaderBoard[i].y - y + 150, (50*leaderBoard[i].s/10000));
+        strokeWeight(1);
+        stroke(0);
+        fill(255);
+        text(leaderBoard[i].n, leaderBoard[i].x - x + 250, leaderBoard[i].y - y + 150)
+        fill(225, 25, 50);
+        noStroke();
+        if (leaderBoard[i].x > -5000 && leaderBoard[i].y > -5000 && leaderBoard[i].x < 5000 && leaderBoard[i].y < 5000) {
+          circle(leaderBoard[i].x*0.0075 + 462.5, leaderBoard[i].y*0.0075 + 262.5, 50*0.075*leaderBoard[i].s/10000);
+        }
+        leaderBoard[i].show();
+      } else {
+        strokeWeight(3);
+        stroke(red(c)-50, green(c)-50, blue(c)-50);
+        fill(c);
+        strokeWeight(3);
+        circle(250, 150, 50*s/10000);
+        textSize(11);
+        stroke(0);
+        fill(255);
+        strokeWeight(1);
+        textSize(9*s/10000);
+        text(namee, 250, 150)
       }
-      players[b[i]].show();
     }
     fill(25, 50, 225);
     if (x < 5000 && x > -5000 && y > -5000 && y < 5000) {
@@ -182,7 +192,7 @@ function draw() {
     push();
     angleMode(DEGREES);
     translate(mouseX/(wh/500), mouseY/(wh/500));
-    rotate(-23);
+    rotate(-18.5);
     noCursor();
     triangle(-5, 5, 0, -5, 5, 5);
     pop();
@@ -191,15 +201,11 @@ function draw() {
     noStroke();
     textSize(10);
     text("Score: " + s, 490, 10);
-    leaderBoard = [];
-    for (let i = 0; i < b.length; i++) {
-      leaderBoard.push(players[b[i]]);
-    }
-    leaderBoard.push(new Player(x, y, namee, s, c));
-    leaderBoard.sort(function(a, b){return a.s - b.s});
     for (let i = 1; i < leaderBoard.length+1; i++) {
       textAlign(LEFT, TOP);
-      text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + "  " + leaderBoard[i-1].s, 15, 15*(1 + leaderBoard.length-i));
+      if (i < 11) {
+        text((1 + leaderBoard.length-i) + ". " + leaderBoard[i-1].n + "  " + leaderBoard[i-1].s, 15, 15*(1 + leaderBoard.length-i));
+      }
     }
     textAlign(CENTER, CENTER);
     socket.emit('mouse', data);
@@ -350,11 +356,15 @@ class Pellet {
 }
 
 function mousePressed() {
-  if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY > 185*(wh/500) && mouseY < 205*(wh/500)) {
-    game = 1;
-    c = colorPicker.color()
-    removeElements();
-    newNums();
+  if (gameMode == 0) {
+    if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY > 185*(wh/500) && mouseY < 205*(wh/500)) {
+      game = 1;
+      c = colorPicker.color()
+      removeElements();
+      newNums();
+      x = 0;
+      y = 0;
+    }
   }
 }
 
@@ -372,7 +382,7 @@ function newPlayer(data) {
       players[data.number].n = data.namee;
       players[data.number].c = color(data.c1, data.c2, data.c3);
   } else if (data.number != num) {
-    players[data.number] = new Player(data.x, data.y, data.namee, data.s, color(data.c1, data.c2, data.c3));;
+    players[data.number] = new Player(data.x, data.y, data.namee, data.s, color(data.c1, data.c2, data.c3));
   } else {
     x = data.x;
     y = data.y;
@@ -451,5 +461,19 @@ function drawProblem() {
     text(one + " x " + two, 250, 65);
   } else if (gameMode == "divide") {
     text(one + " ÷ " + two, 250, 65);
+  }
+}
+
+function eat() {
+  for (let i = 0; i < b.length; i++) {
+    if (dist(x, y, players[b[i]].gx, players[b[i]].gy)) {
+      if (s < players[b[i]].gx) {
+        x = -10000000;
+        y = -10000000;
+        gameMode = 2;
+        let x = 0;
+        let y = 0;
+      }
+    }
   }
 }
