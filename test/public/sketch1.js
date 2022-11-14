@@ -295,6 +295,25 @@ function draw() {
     text("Click anywhere to respawn", 250, 160)
     x = 100000;
     y = 100000;
+    var data = {
+      x: x,
+      y: y,
+      namee: namee,
+      number: num,
+      s: s,
+      c1: red(c),
+      c2: green(c),
+      c3: blue(c)
+    }
+    fill(100);
+    push();
+    angleMode(DEGREES);
+    translate(mouseX/(wh/500), mouseY/(wh/500));
+    rotate(-18.5);
+    noCursor();
+    triangle(-5, 5, 0, -5, 5, 5);
+    pop();
+    socket.emit('mouse', data);
   }
 }
 
@@ -372,8 +391,6 @@ function mousePressed() {
       c = colorPicker.color()
       removeElements();
       newNums();
-      x = 0;
-      y = 0;
     }
   } else if (game == 2) {
     location.reload()
