@@ -479,8 +479,6 @@ function eat() {
     if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < ((players[b[i]].s/2)/10000)*50) {
       console.log("PLAYER FOUND PLAYER FOUND PLAYER FOUND");
       if (s < players[b[i]].s) {
-        x = -100000;
-        y = -100000;
         game = 2;
         let x = 0;
         let y = 0;
