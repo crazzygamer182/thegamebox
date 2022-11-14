@@ -209,7 +209,7 @@ function draw() {
     textAlign(CENTER, CENTER);
     eat();
     socket.emit('mouse', data);
-  } else {
+  } else if (game == 0) {
     imageMode(CENTER);
     image(
       back,
@@ -285,6 +285,12 @@ function draw() {
     }
     pop();
     rectMode(CORNER);
+  } else {
+    background(50);
+    fill(225);
+    noStroke();
+    textSize(30);
+    text("You were eaten", 250, 75)
   }
 }
 
