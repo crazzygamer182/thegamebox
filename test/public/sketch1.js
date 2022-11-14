@@ -95,6 +95,7 @@ function draw() {
       c3: blue(c)
     }
     b = Object.keys(players);
+    eat();
     noStroke();
     fill(200);
     rect(425, 225, 75, 75);
@@ -207,7 +208,6 @@ function draw() {
       }
     }
     textAlign(CENTER, CENTER);
-    eat();
     socket.emit('mouse', data);
   } else if (game == 0) {
     imageMode(CENTER);
@@ -322,18 +322,18 @@ class Pellet {
       if (dist(this.x, this.y, x, y) < 25*s/10000) {
         if (gameMode == "add") {
           if (this.number == one + two) {
-            wait = 100;
+            wait = 50;
             gs += 300;
           } else {
-            wait = -100;
+            wait = -50;
             gs -= 200;
           }
         } else if (gameMode == "subtract") {
           if (this.number == one - two) {
-            wait = 100;
+            wait = 50;
             gs += 300;
           } else {
-            wait = -100;
+            wait = -50;
             gs -= 200;
           }
         } else if (gameMode == "multiply") {
