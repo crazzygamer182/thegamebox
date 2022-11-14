@@ -290,9 +290,11 @@ function draw() {
     fill(225);
     noStroke();
     textSize(30);
-    text("You were eaten", 250, 60)
-    textSize(20);
-    text("Click anywhere to respawn", 250, 80)
+    text("You were eaten", 250, 125)
+    textSize(15);
+    text("Click anywhere to respawn", 250, 160)
+    x = 100000;
+    y = 100000;
   }
 }
 
