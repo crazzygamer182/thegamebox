@@ -104,7 +104,6 @@ function draw() {
     }
     leaderBoard.push(new Player(x, y, namee, s, c));
     leaderBoard.sort(function(a, b){return a.s - b.s});
-    //sort array
     for (let i = 0; i < leaderBoard.length; i++) {
       if (leaderBoard[i].x != x || leaderBoard[i].y != y) {
         strokeWeight(3);
@@ -466,7 +465,7 @@ function drawProblem() {
 
 function eat() {
   for (let i = 0; i < b.length; i++) {
-    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < (players[b[i]].s/2)/10000) {
+    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < ((players[b[i]].s/2)/10000)*50) {
       if (s < players[b[i]].gx) {
         x = -10000000;
         y = -10000000;
