@@ -356,7 +356,7 @@ class Pellet {
 }
 
 function mousePressed() {
-  if (gameMode == 0) {
+  if (gameMode == 1) {
     if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY > 185*(wh/500) && mouseY < 205*(wh/500)) {
       game = 1;
       c = colorPicker.color()
