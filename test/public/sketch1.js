@@ -466,7 +466,7 @@ function drawProblem() {
 
 function eat() {
   for (let i = 0; i < b.length; i++) {
-    if (dist(x, y, players[b[i]].gx, players[b[i]].gy)) {
+    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < (players[b[i]].s/2)/10000) {
       if (s < players[b[i]].gx) {
         x = -10000000;
         y = -10000000;
