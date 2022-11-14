@@ -404,7 +404,6 @@ class Player {
     this.c = c1;
   }
   show() {
-    console.log(dist(this.x, this.y, this.gx, this.gy));
     if (this.gx > this.x) {
       this.x += 2.5;
     }
@@ -466,7 +465,9 @@ function drawProblem() {
 
 function eat() {
   for (let i = 0; i < b.length; i++) {
+    console.log("checking player");
     if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < ((players[b[i]].s/2)/10000)*50) {
+      console.log("PLAYER FOUND PLAYER FOUND PLAYER FOUND");
       if (s < players[b[i]].gx) {
         x = -10000000;
         y = -10000000;
