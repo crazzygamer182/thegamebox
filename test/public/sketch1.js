@@ -207,6 +207,7 @@ function draw() {
       }
     }
     textAlign(CENTER, CENTER);
+    eat();
     socket.emit('mouse', data);
   } else {
     imageMode(CENTER);
