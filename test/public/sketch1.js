@@ -322,18 +322,18 @@ class Pellet {
       if (dist(this.x, this.y, x, y) < 25*s/10000) {
         if (gameMode == "add") {
           if (this.number == one + two) {
-            wait = 50;
+            wait = 30;
             gs += 300;
           } else {
-            wait = -50;
+            wait = -30;
             gs -= 200;
           }
         } else if (gameMode == "subtract") {
           if (this.number == one - two) {
-            wait = 50;
+            wait = 30;
             gs += 300;
           } else {
-            wait = -50;
+            wait = -30;
             gs -= 200;
           }
         } else if (gameMode == "multiply") {
@@ -478,9 +478,9 @@ function eat() {
     console.log("checking player");
     if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < ((players[b[i]].s/2)/10000)*50) {
       console.log("PLAYER FOUND PLAYER FOUND PLAYER FOUND");
-      if (s < players[b[i]].s) {
-        x = -10000000;
-        y = -10000000;
+      if (gs < players[b[i]].gs) {
+        x = -100000;
+        y = -100000;
         game = 2;
         let x = 0;
         let y = 0;
