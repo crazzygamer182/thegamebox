@@ -290,7 +290,9 @@ function draw() {
     fill(225);
     noStroke();
     textSize(30);
-    text("You were eaten", 250, 75)
+    text("You were eaten", 250, 60)
+    textSize(20);
+    text("Click anywhere to respawn", 250, 80)
   }
 }
 
@@ -371,6 +373,8 @@ function mousePressed() {
       x = 0;
       y = 0;
     }
+  } else if (game == 2) {
+    location.reload()
   }
 }
 
