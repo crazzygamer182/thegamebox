@@ -14,8 +14,9 @@ let one;
 let two;
 let wait = 0;
 let leaderBoard = [];
-let gameMode = "add";
+let gameMode = ["add"];
 let instructions;
+let simplePellets = [];
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -45,6 +46,9 @@ function setup() {
   vel = createVector(0, 0);
   for (let i = 0; i < 5000; i++) {
     pellets.push(new Pellet());
+  }
+  for (let i = 0; i < 2500; i++) {
+    simplePellets.push(new SimplePellet());
   }
   //socket = io('http://localhost:3000');
   socket = io('https://api.thegamebox.ca');
@@ -77,6 +81,7 @@ function draw() {
       back.width,
       back.height
     );
+    showArray(simplePellets);
     showArray(pellets);
     let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
     newvel.setMag(1.5 / (s/10000));
@@ -255,28 +260,40 @@ function draw() {
     strokeWeight(2);
     push();
     translate(0, 55);
-    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
+    if (gameMode.includes("add")) {
+      fill(234, 203, 93);
+      rect(230, 180, 32, 32, 5, 5);
+    } else if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
       fill(125);
       rect(230, 180, 35, 35, 5, 5);
     } else {
       fill(100);
       rect(230, 180, 32, 32, 5, 5);
     }
-    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
+    if (gameMode.includes("sub")) {
+      fill(234, 203, 93);
+      rect(270, 180, 32, 32, 5, 5);
+    } else if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
       fill(125);
       rect(270, 180, 35, 35, 5, 5);
     } else {
       fill(100);
       rect(270, 180, 32, 32, 5, 5);
     }
-    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
+    if (gameMode.includes("mul")) {
+      fill(234, 203, 93);
+      rect(230, 220, 32, 32, 5, 5);
+    } else if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
       fill(125);
       rect(230, 220, 35, 35, 5, 5);
     } else {
       fill(100);
       rect(230, 220, 32, 32, 5, 5);
     }
-    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
+    if (gameMode.includes("div")) {
+      fill(234, 203, 93);
+      rect(270, 220, 32, 32, 5, 5);
+    } else if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
       fill(125);
       rect(270, 220, 35, 35, 5, 5);
     } else {
@@ -341,42 +358,69 @@ class Pellet {
       textSize(11);
       text(this.number, this.x - x + 250, this.y - y + 150);
       if (dist(this.x, this.y, x, y) < 25*s/10000) {
-        if (gameMode == "add") {
-          if (this.number == one + two) {
-            wait = 30;
-            gs += 300;
-          } else {
-            wait = -30;
-            gs -= 200;
-          }
-        } else if (gameMode == "subtract") {
-          if (this.number == one - two) {
-            wait = 30;
-            gs += 300;
-          } else {
-            wait = -30;
-            gs -= 200;
-          }
-        } else if (gameMode == "multiply") {
-          if (this.number == one*two) {
-            wait = 100;
-            gs += 300;
-          } else {
-            wait = -100;
-            gs -= 200;
-          }
-        } else if (gameMode == "divide") {
-          if (this.number == one/two) {
-            wait = 100;
-            gs += 300;
-          } else {
-            wait = -100;
-            gs -= 200;
-          }
+        if (choose == "add" && this.number == one + two) {
+          wait = 30;
+          gs += 300;
+        } else if (choose == "sub" && this.number == one - two) {
+          wait = 30;
+          gs += 300;
+        } else if (choose == "mul" && this.number == one * two) {
+          wait = 30;
+          gs += 300;
+        } else if (choose == "div" && this.number == one / two) {
+          wait = 30;
+          gs += 300;
+        } else {
+          wait = -30;
+          gs -= 200;
         }
         this.x = random(10000) - 5000;
         this.y = random(6000) - 3000;
         this.number = newPelletNumber();
+        this.color1 = random(50, 255);
+        this.color2 = random(50, 255);
+      }
+    } else if (x > -400 && x < 400 && y > -300 && y < 300) {
+      if (int(random(3000)) == 999 && x > -400 && x < 400 && y > -300 && y < 300) {
+        if (choose == "add") {
+          this.number = one + two;
+        } else if (choose == "sub") {
+          this.number = one - two;
+        } else if (choose == "mul") {
+          this.number = one * two;
+        } else if (choose == "div") {
+          this.number = one / two;
+        }
+      }
+    }
+  }
+}
+
+class SimplePellet {
+  constructor() {
+    //this.x = random(500) + x - 250;
+    //this.y = random(300) + y - 150;
+    this.x = random(10000) - 5000;
+    this.y = random(6000) - 3000;
+    this.color1 = random(50, 255);
+    this.color2 = random(50, 255);
+    this.color3 = random(50, 255);
+    this.s = int(random(4, 6));
+  }
+  show() {
+    if (this.x - x > -300 && this.x - x < 300 && this.y - y > -200 && this.y - y < 200) {
+      fill(this.color1, this.color2, this.color3);
+      //stroke(this.color1 - 50, this.color2 - 50, this.color3 - 50);
+      noStroke();
+      circle(this.x - x + 250, this.y - y + 150, this.s);
+      textAlign(CENTER, CENTER);
+      fill(255);
+      stroke(0);
+      strokeWeight(1);
+      if (dist(this.x, this.y, x, y) < 25*s/10000) {
+        gs += 10;
+        this.x = random(10000) - 5000;
+        this.y = random(6000) - 3000;
         this.color1 = random(50, 255);
         this.color2 = random(50, 255);
       }
@@ -391,6 +435,38 @@ function mousePressed() {
       c = colorPicker.color()
       removeElements();
       newNums();
+    }
+    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
+      if (gameMode.includes("add")) {
+        if (gameMode.length > 1)
+          gameMode.splice(gameMode.indexOf("add"), 1);
+      } else {
+        gameMode.push("add");
+      }
+    }
+    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 219*(wh/500) && mouseY < 251*(wh/500)) {
+      if (gameMode.includes("sub")) {
+        if (gameMode.length > 1)
+          gameMode.splice(gameMode.indexOf("sub"), 1);
+      } else {
+        gameMode.push("sub");
+      }
+    }
+    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
+      if (gameMode.includes("mul")) {
+        if (gameMode.length > 1)
+          gameMode.splice(gameMode.indexOf("mul"), 1);
+      } else {
+        gameMode.push("mul");
+      }
+    }
+    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY > 259*(wh/500) && mouseY < 291*(wh/500)) {
+      if (gameMode.includes("div")) {
+        if (gameMode.length > 1)
+          gameMode.splice(gameMode.indexOf("div"), 1);
+      } else {
+        gameMode.push("div");
+      }
     }
   } else if (game == 2) {
     location.reload()
@@ -452,42 +528,44 @@ class Player {
 }
 
 function newPelletNumber() {
-  if (gameMode == "add") {
-    return int(random(17)) + 8;
-  } else if (gameMode == "subtract") {
-    return (int(random(10)) + 6) - (int(random(6)) + 1);
-  } else if (gameMode == "multiply") {
+  pelletChoose = gameMode[int(random(gameMode.length))];
+  if (pelletChoose == "add") {
+    return int(random(18)) + 7;
+  } else if (pelletChoose == "sub") {
+    return (int(random(10)) + 6) - (int(random(7)));
+  } else if (pelletChoose == "mul") {
     return (int(random(5)) + 2)*(int(random(5)) + 2);
-  } else if (gameMode == "divide") {
-    return (int(random(8)) + 2);
+  } else if (pelletChoose == "div") {
+    return (int(random(10)));
   }
 }
 
 function newNums() {
-  if (gameMode == "add") {
+  choose = gameMode[int(random(gameMode.length))];
+  if (choose == "add") {
     one = int(random(9)) + 4;
     two = int(random(9)) + 4;
-  } else if (gameMode == "subtract") {
+  } else if (choose == "sub") {
     one = int(random(10)) + 6
     two = int(random(6)) + 1
-  } else if (gameMode == "multiply") {
+  } else if (choose == "mul") {
     one = int(random(5)) + 2;
     two = int(random(5)) + 2;
-  } else if (gameMode == "divide") {
-    let second = int(random(5)) + 2;
-    one = (int(random(8)) + 2)*second;
+  } else if (choose == "div") {
+    let second = int(random(4)) + 3;
+    one = (int(random(6)) + 4)*second;
     two = second;
   }
 }
 
 function drawProblem() {
-  if (gameMode == "add") {
+  if (choose == "add") {
     text(one + " + " + two, 250, 65);
-  } else if (gameMode == "subtract") {
+  } else if (choose == "sub") {
     text(one + " - " + two, 250, 65);
-  } else if (gameMode == "multiply") {
+  } else if (choose == "mul") {
     text(one + " x " + two, 250, 65);
-  } else if (gameMode == "divide") {
+  } else if (choose == "div") {
     text(one + " ÷ " + two, 250, 65);
   }
 }
