@@ -111,7 +111,7 @@ function draw() {
     fill(200);
     rect(425, 225, 75, 75);
     leaderBoard = [];
-    let miniMapSize = 10000;
+    let miniMapSize = 4000;
     for (let i = 0; i < b.length; i++) {
       leaderBoard.push(players[b[i]]);
     }
@@ -673,7 +673,7 @@ function eat() {
       } else if (s > players[b[i]].s) {
         s += int(players[b[i]].s/3);
         let temp = [];
-        for (let j = 0; j < player.length-1; j++) {
+        for (let j = 0; j < players.length-1; j++) {
           if (j != i) {
             temp.push(players[b[i]]);
           }
