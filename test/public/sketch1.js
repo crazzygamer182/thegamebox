@@ -664,7 +664,7 @@ function drawProblem() {
 function eat() {
   for (let i = 0; i < b.length; i++) {
     console.log("checking player");
-    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < (((players[b[i]].s/2)/10000)*50) + 5) {
+    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < (((players[b[i]].s/2)/10000)*50) + 10) {
       console.log("PLAYER FOUND PLAYER FOUND PLAYER FOUND");
       if (s < players[b[i]].s) {
         game = 2;
@@ -684,7 +684,7 @@ function eat() {
         }
         socket.emit('mouse', data);
       } else if (s > players[b[i]].s) {
-        s += int(players[b[i]].s/3);
+        s += int(players[b[i]].s/30);
       }
     }
   }
