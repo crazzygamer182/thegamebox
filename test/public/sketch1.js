@@ -131,7 +131,7 @@ function draw() {
         fill(225, 25, 50);
         noStroke();
         if (leaderBoard[i].x-x > -miniMapSize/2 && leaderBoard[i].y-y > -miniMapSize/2 && leaderBoard[i].x-x < miniMapSize/2 && leaderBoard[i].y-y < miniMapSize/2) {
-          circle(((leaderBoard[i].x - x + 250)*(75/miniMapSize)) + 462.5, ((leaderBoard[i].y - y + 150)*(75/miniMapSize)) + 262.5, (50*leaderBoard[i].s/10000)*(75/miniMapSize));
+          circle(((leaderBoard[i].x - x)*(75/miniMapSize)) + 462.5, ((leaderBoard[i].y - y)*(75/miniMapSize)) + 262.5, (50*leaderBoard[i].s/10000)*(75/miniMapSize));
         }
         leaderBoard[i].show();
       } else {
@@ -664,7 +664,7 @@ function drawProblem() {
 function eat() {
   for (let i = 0; i < b.length; i++) {
     console.log("checking player");
-    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < (((players[b[i]].s/2)/10000)*50) + 50) {
+    if (dist(x, y, players[b[i]].gx, players[b[i]].gy) < (((players[b[i]].s/2)/10000)*50) + 5) {
       console.log("PLAYER FOUND PLAYER FOUND PLAYER FOUND");
       if (s < players[b[i]].s) {
         game = 2;
