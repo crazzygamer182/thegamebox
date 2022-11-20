@@ -609,8 +609,11 @@ class Player {
     if (this.gy < this.y) {
       this.y -= 2.5;
     }
-    if (abs(this.gx - this.x) > 50) {
+    if (abs(this.gx - this.x) > 10) {
       this.x = this.gx;
+    }
+    if (abs(this.gy - this.y) > 10) {
+      this.y = this.gy;
     }
   }
 }
@@ -668,7 +671,14 @@ function eat() {
         let x = 0;
         let y = 0;
       } else if (s > players[b[i]].s) {
-        s += players[b[i]].s/3;
+        s += int(players[b[i]].s/3);
+        let temp = [];
+        for (let j = 0; j < player.length-1; j++) {
+          if (j != i) {
+            temp.push(players[b[i]]);
+          }
+        }
+        players = temp.slice();
       }
     }
   }
