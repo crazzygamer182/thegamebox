@@ -131,7 +131,7 @@ function draw() {
         fill(225, 25, 50);
         noStroke();
         if (leaderBoard[i].x-x > -miniMapSize/2 && leaderBoard[i].y-y > -miniMapSize/2 && leaderBoard[i].x-x < miniMapSize/2 && leaderBoard[i].y-y < miniMapSize/2) {
-          circle(leaderBoard[i].x - x + (250*(75/miniMapSize)) + 462.5, leaderBoard[i].y - y + (150*(75/miniMapSize)) + 262.5, (50*leaderBoard[i].s/10000)*(75/miniMapSize));
+          circle(((leaderBoard[i].x - x + 250)*(75/miniMapSize)) + 462.5, ((leaderBoard[i].y - y + 150)*(75/miniMapSize)) + 262.5, (50*leaderBoard[i].s/10000)*(75/miniMapSize));
         }
         leaderBoard[i].show();
       } else {
