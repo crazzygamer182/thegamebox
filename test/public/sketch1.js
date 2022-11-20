@@ -131,7 +131,7 @@ function draw() {
         fill(225, 25, 50);
         noStroke();
         if (leaderBoard[i].x-x > -miniMapSize/2 && leaderBoard[i].y-y > -miniMapSize/2 && leaderBoard[i].x-x < miniMapSize/2 && leaderBoard[i].y-y < miniMapSize/2) {
-          circle(leaderBoard[i].x*(75/miniMapSize) + 462.5, leaderBoard[i].y*(75/miniMapSize) + 262.5, 50*(75/miniMapSize)*leaderBoard[i].s/10000);
+          circle(leaderBoard[i].x - x + 250 + 462.5, leaderBoard[i].y - y + 150 + 262.5, (50*leaderBoard[i].s/10000)*(75/miniMapSize));
         }
         leaderBoard[i].show();
       } else {
@@ -670,15 +670,21 @@ function eat() {
         game = 2;
         let x = 0;
         let y = 0;
+        x = 100000;
+        y = 100000;
+        var data = {
+          x: x,
+          y: y,
+          namee: namee,
+          number: num,
+          s: s,
+          c1: red(c),
+          c2: green(c),
+          c3: blue(c)
+        }
+        socket.emit('mouse', data);
       } else if (s > players[b[i]].s) {
         s += int(players[b[i]].s/3);
-        let temp = [];
-        for (let j = 0; j < players.length-1; j++) {
-          if (j != i) {
-            temp.push(players[b[i]]);
-          }
-        }
-        players = temp.slice();
       }
     }
   }
