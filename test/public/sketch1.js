@@ -16,7 +16,7 @@ let wait = 0;
 let leaderBoard = [];
 let gameMode = ["add"];
 let instructions;
-let simplePellets = [];
+//let simplePellets = [];
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -47,9 +47,9 @@ function setup() {
   for (let i = 0; i < 5000; i++) {
     pellets.push(new Pellet());
   }
-  for (let i = 0; i < 2500; i++) {
-    simplePellets.push(new SimplePellet());
-  }
+  //for (let i = 0; i < 2500; i++) {
+    //simplePellets.push(new SimplePellet());
+  //}
   //socket = io('http://localhost:3000');
   socket = io('https://api.thegamebox.ca');
   socket.on('mouse', newPlayer);
@@ -87,7 +87,7 @@ function draw() {
       back.width,
       back.height
     );
-    showArray(simplePellets);
+    //showArray(simplePellets);
     showArray(pellets);
     let newvel = createVector(mouseX - width / 2, mouseY - height / 2);
     newvel.setMag(1.5 / (s/10000));
