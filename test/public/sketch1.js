@@ -401,7 +401,7 @@ function draw() {
       y: y,
       namee: namee,
       number: num,
-      s: s,
+      s: 0,
       c1: red(c),
       c2: green(c),
       c3: blue(c)
