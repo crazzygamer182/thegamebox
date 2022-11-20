@@ -465,7 +465,7 @@ class Pellet {
         this.color2 = random(50, 255);
       }
     } else if (this.x > -400 && this.x < 400 && this.y > -300 && this.y < 300) {
-      if (int(random(350)) == 100 && x > -400 && x < 400 && y > -300 && y < 300) {
+      if (int(random(250)) == 100 && x > -400 && x < 400 && y > -300 && y < 300) {
         if (choose == "add") {
           this.number = one + two;
         } else if (choose == "sub") {
