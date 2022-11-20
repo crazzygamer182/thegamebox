@@ -111,7 +111,7 @@ function draw() {
     fill(200);
     rect(425, 225, 75, 75);
     leaderBoard = [];
-    let miniMapSize = 1000;
+    let miniMapSize = 10000;
     for (let i = 0; i < b.length; i++) {
       leaderBoard.push(players[b[i]]);
     }
@@ -130,7 +130,7 @@ function draw() {
         text(leaderBoard[i].n, leaderBoard[i].x - x + 250, leaderBoard[i].y - y + 150)
         fill(225, 25, 50);
         noStroke();
-        if (leaderBoard[i].x-x > -miniMapSize && leaderBoard[i].y-y > -miniMapSize && leaderBoard[i].x-x < miniMapSize && leaderBoard[i].y-y < miniMapSize) {
+        if (leaderBoard[i].x-x > -miniMapSize/2 && leaderBoard[i].y-y > -miniMapSize/2 && leaderBoard[i].x-x < miniMapSize/2 && leaderBoard[i].y-y < miniMapSize/2) {
           circle(leaderBoard[i].x*(75/miniMapSize) + 462.5, leaderBoard[i].y*(75/miniMapSize) + 262.5, 50*(75/miniMapSize)*leaderBoard[i].s/10000);
         }
         leaderBoard[i].show();
