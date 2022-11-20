@@ -111,7 +111,7 @@ function draw() {
     fill(200);
     rect(425, 225, 75, 75);
     leaderBoard = [];
-    let miniMapSize = 4000;
+    let miniMapSize = 2000;
     for (let i = 0; i < b.length; i++) {
       leaderBoard.push(players[b[i]]);
     }
