@@ -684,7 +684,7 @@ function eat() {
         }
         socket.emit('mouse', data);
       } else if (s > players[b[i]].s) {
-        gs += int(players[b[i]].s/50);
+        gs += (int((players[b[i]].s/50)/10))*10;
       }
     }
   }
