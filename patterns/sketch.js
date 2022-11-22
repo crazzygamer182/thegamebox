@@ -2,6 +2,7 @@ let objects = [];
 let pattern = [];
 let dropBoxes = [];
 let bloxels = [];
+let wait = 0;
 
 function centerCanvas() {
   let cx = (windowWidth - width) / 2;
@@ -51,9 +52,10 @@ function draw() {
   }
   pop();
   fill(200);
-  rect(45*(wh/500), 155*(wh/500), 60*(wh/500), 138*(wh/500));
+  rect(10*(wh/500), 155*(wh/500), 60*(wh/500), 138*(wh/500));
+  m = 35*(wh/500);
   push();
-  translate(-wh/4, -ht/3.3);
+  translate((-wh/4) - m, -ht/3.3);
   fill(200, 100, 0);
   rect(wh/2 - 65*(wh/500), ht*(7/8) + 35*(wh/500), 30*(wh/500), 30*(wh/500));
   fill(0, 200, 100);
@@ -91,8 +93,65 @@ function draw() {
       dropBoxes[2].color = 0;
     }
   }
-  
-  //Find the pattern and recreate with the given shapes
+  textAlign(CENTER, CENTER);
+  textSize(14*(wh/500));
+  fill(0);
+  strokeWeight(0.5*(wh/500));
+  text("Place the shapes in the boxes to", 300*(wh/500), 130*(wh/500));
+  text("make what comes next in the pattern", 300*(wh/500), 155*(wh/500));
+  stroke(0);
+  strokeWeight(3*(wh/500));
+  if (mouseX > 205*(wh/500) && mouseX < 295*(wh/500) && mouseY > 252.5*(wh/500) && mouseY < 277.5*(wh/500)) {
+    fill(255, 125, 75);
+  } else {
+    fill(250, 75, 25);
+  }
+  rect(205*(wh/500), 252.5*(wh/500), 90*(wh/500), 25*(wh/500));
+  if (mouseX > 305*(wh/500) && mouseX < 395*(wh/500) && mouseY > 252.5*(wh/500) && mouseY < 277.5*(wh/500)) {
+    fill(100, 250, 100);
+  } else {
+    fill(25, 250, 25);
+  }
+  rect(305*(wh/500), 252.5*(wh/500), 90*(wh/500), 25*(wh/500));
+  fill(0);
+  strokeWeight(0.5*(wh/500));
+  text("Clear", 250*(wh/500), 265*(wh/500));
+  text("Done", 350*(wh/500), 265*(wh/500));
+  if (wait > 0) {
+    strokeWeight(5*(wh/500));
+    fill(0, 255, 0);
+    rectMode(CENTER);
+    rect(wh/2, ht/2, 300*(wh/500), 100*(wh/500));
+    textSize(30*(wh/500));
+    fill(0);
+    strokeWeight(1*(wh/500));
+    text("Correct", 250*(wh/500), 150*(wh/500));
+    rectMode(CORNER);
+    wait--;
+    if (wait == 1) {
+      bloxels = [];
+      for (let i = 0; i < pattern.length; i++) {
+        dropBoxes[i].inside = -1;
+      }
+      objects = [];
+    makePattern(3);
+    for (let i = 0; i < 10; i++) {
+      objects.push(new Block(pattern[int(i%pattern.length)], i));
+    }
+    }
+  }
+  if (wait < 0) {
+    strokeWeight(5*(wh/500));
+    fill(255, 0, 0);
+    rectMode(CENTER);
+    rect(wh/2, ht/2, 300*(wh/500), 100*(wh/500));
+    textSize(30*(wh/500));
+    fill(0);
+    strokeWeight(1*(wh/500));
+    text("Wrong", 250*(wh/500), 150*(wh/500));
+    rectMode(CORNER);
+    wait++;
+  }
 }
 
 class Block {
@@ -193,15 +252,30 @@ class DropBox {
 
 function mousePressed() {
   console.log(mouseX, mouseY);
-  if (mouseX > 243*(wh/1117) && mouseY > 420*(wh/1117) && mouseX < 314*(wh/1117) && mouseY < 489*(wh/1117)) {
+  if (mouseX > 243*(wh/1117)-m && mouseY > 420*(wh/1117) && mouseX < 314*(wh/1117)-m && mouseY < 489*(wh/1117)) {
     bloxels.push(new Bloxel(0));
   }
-  if (dist(183*(wh/731), 236*(wh/731), mouseX, mouseY) < 17*(wh/500)) {
+  if (dist(183*(wh/731)-m, 236*(wh/731), mouseX, mouseY) < 17*(wh/500)) {
     bloxels.push(new Bloxel(1));
   }
-  if (mouseX > 163*(wh/731) && mouseY > 345*(wh/731) && mouseX < 197*(wh/731) && mouseY < 382*(wh/731)) {
+  if (mouseX > 163*(wh/731)-m && mouseY > 345*(wh/731) && mouseX < 197*(wh/731)-m && mouseY < 382*(wh/731)) {
     bloxels.push(new Bloxel(2));
   }
+  if (mouseX > 205*(wh/500) && mouseX < 295*(wh/500) && mouseY > 252.5*(wh/500) && mouseY < 277.5*(wh/500)) {
+    bloxels = [];
+    for (let i = 0; i < pattern.length; i++) {
+      dropBoxes[i].inside = -1;
+    }
+  }
+  if (mouseX > 305*(wh/500) && mouseX < 395*(wh/500) && mouseY > 252.5*(wh/500) && mouseY < 277.5*(wh/500)) {
+    if (dropBoxes[2].inside == pattern[0] && dropBoxes[0].inside == pattern[1] && dropBoxes[1].inside == pattern[2]) {
+      console.log("correct!");
+      wait = 105;
+    } else {
+      wait = -75;
+    }
+  }
+  return false;
 }
 
 function mouseReleased() {
