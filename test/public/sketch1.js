@@ -252,7 +252,7 @@ function draw() {
     stroke(5, 150, 10);
     strokeWeight(2);
     strokeJoin(ROUND);
-    if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY+15 > 185*(wh/500) && mouseY+15 < 205*(wh/500)) {
+    if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY+15*(wh/500) > 185*(wh/500) && mouseY+15*(wh/500) < 205*(wh/500)) {
       rect(222.5, 183.75, 55, 22.5, 3, 3);
       textSize(12);
     } else {
@@ -279,7 +279,7 @@ function draw() {
       noStroke();
       textSize(25);
       text("+", 230, 178);
-    } else if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10 > 219*(wh/500) && mouseY+10 < 251*(wh/500)) {
+    } else if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10*(wh/500) > 219*(wh/500) && mouseY+10*(wh/500) < 251*(wh/500)) {
       fill(125);
       stroke(50);
       rect(230, 180, 35, 35, 5, 5);
@@ -304,7 +304,7 @@ function draw() {
       noStroke();
       textSize(25);
       text("-", 270, 177);
-    } else if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10 > 219*(wh/500) && mouseY+10 < 251*(wh/500)) {
+    } else if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10*(wh/500) > 219*(wh/500) && mouseY+10*(wh/500) < 251*(wh/500)) {
       fill(125);
       stroke(50);
       rect(270, 180, 35, 35, 5, 5);
@@ -330,7 +330,7 @@ function draw() {
       stroke(0);
       textSize(20);
       text("x", 230, 217);
-    } else if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10 > 259*(wh/500) && mouseY+10 < 291*(wh/500)) {
+    } else if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10*(wh/500) > 259*(wh/500) && mouseY+10*(wh/500) < 291*(wh/500)) {
       fill(125);
       stroke(50);
       strokeWeight(2);
@@ -361,7 +361,7 @@ function draw() {
       textSize(23);
       fill(0);
       text("÷", 270, 219);
-    } else if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10 > 259*(wh/500) && mouseY+10 < 291*(wh/500)) {
+    } else if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10*(wh/500) > 259*(wh/500) && mouseY+10*(wh/500) < 291*(wh/500)) {
       fill(125);
       stroke(50);
       strokeWeight(2);
@@ -465,7 +465,7 @@ class Pellet {
         this.color2 = random(50, 255);
       }
     } else if (this.x-x > -400 && this.x-x < 400 && this.y-y > -300 && this.y-y < 300) {
-      if (int(random(300)) == 100) {
+      if (int(random(350)) == 100) {
         if (choose == "add") {
           this.number = one + two;
         } else if (choose == "sub") {
@@ -514,7 +514,7 @@ class SimplePellet {
 
 function mousePressed() {
   if (game == 0) {
-    if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY+15 > 185*(wh/500) && mouseY+15 < 205*(wh/500)) {
+    if (mouseX > 225*(wh/500) && mouseX < 275*(wh/500) && mouseY+15*(wh/500) > 185*(wh/500) && mouseY+15*(wh/500) < 205*(wh/500)) {
       game = 1;
       c = colorPicker.color()
       removeElements();
@@ -524,7 +524,7 @@ function mousePressed() {
       storeItem("color2", green(c));
       storeItem("color3", blue(c));
     }
-    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10 > 219*(wh/500) && mouseY+10 < 251*(wh/500)) {
+    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10*(wh/500) > 219*(wh/500) && mouseY+10*(wh/500) < 251*(wh/500)) {
       if (gameMode.includes("add")) {
         if (gameMode.length > 1)
           gameMode.splice(gameMode.indexOf("add"), 1);
@@ -532,7 +532,7 @@ function mousePressed() {
         gameMode.push("add");
       }
     }
-    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10 > 219*(wh/500) && mouseY+10 < 251*(wh/500)) {
+    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10*(wh/500) > 219*(wh/500) && mouseY+10*(wh/500) < 251*(wh/500)) {
       if (gameMode.includes("sub")) {
         if (gameMode.length > 1)
           gameMode.splice(gameMode.indexOf("sub"), 1);
@@ -540,7 +540,7 @@ function mousePressed() {
         gameMode.push("sub");
       }
     }
-    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10 > 259*(wh/500) && mouseY+10 < 291*(wh/500)) {
+    if (mouseX > 214*(wh/500) && mouseX < 246*(wh/500) && mouseY+10*(wh/500) > 259*(wh/500) && mouseY+10*(wh/500) < 291*(wh/500)) {
       if (gameMode.includes("mul")) {
         if (gameMode.length > 1)
           gameMode.splice(gameMode.indexOf("mul"), 1);
@@ -548,7 +548,7 @@ function mousePressed() {
         gameMode.push("mul");
       }
     }
-    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10 > 259*(wh/500) && mouseY+10 < 291*(wh/500)) {
+    if (mouseX > 254*(wh/500) && mouseX < 286*(wh/500) && mouseY+10*(wh/500) > 259*(wh/500) && mouseY+10*(wh/500) < 291*(wh/500)) {
       if (gameMode.includes("div")) {
         if (gameMode.length > 1)
           gameMode.splice(gameMode.indexOf("div"), 1);
