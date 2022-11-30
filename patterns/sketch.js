@@ -18,7 +18,7 @@ function setup() {
   angleMode(DEGREES);
   textFont(fontt);
   if (500 * (windowHeight / 300) < windowWidth) {
-    wh = 500 * (windowHeight / 30);
+    wh = 500 * (windowHeight / 300);
     ht = windowHeight;
   } else {
     wh = windowWidth;
