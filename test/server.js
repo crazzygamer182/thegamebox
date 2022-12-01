@@ -8,11 +8,11 @@ app.use(express.static('public'));
 
 console.log("server is running...");
 
-io.sockets.on('connection', newConnection);
+var socket = require('socket.io');
 
-//app.use(cors({
-   // methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
-//}));
+var io = socket(server);
+
+io.sockets.on('connection', newConnection);
 
 function newConnection(socket) {
     console.log('new connection ' + socket.id);
