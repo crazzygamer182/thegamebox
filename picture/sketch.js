@@ -63,6 +63,7 @@ function mousePressed() {
           answer = response.name;
         }
       );
+      type = "movie";
       stage = 1;
     } else if (
       mouseX > 262 * fixer &&
@@ -80,6 +81,7 @@ function mousePressed() {
           answer = response.name;
         }
       );
+      type = "movie";
       stage = 1;
     } else if (
       mouseX > 40 * fixer &&
@@ -95,6 +97,7 @@ function mousePressed() {
           answer = response.name;
         }
       );
+      type = "movie";
       stage = 1;
     } else if (
       mouseX > 262 * fixer &&
@@ -110,6 +113,7 @@ function mousePressed() {
           answer = response.name;
         }
       );
+      type = "character";
       stage = 1;
     } else if (
       mouseX > 40 * fixer &&
@@ -125,6 +129,7 @@ function mousePressed() {
           answer = response.name;
         }
       );
+      type = "idiom";
       stage = 1;
     } else if (
       mouseX > 262 * fixer &&
@@ -140,6 +145,7 @@ function mousePressed() {
           answer = response.name;
         }
       );
+      type = "random";
       stage = 1;
     }
   } else {
