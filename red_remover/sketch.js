@@ -205,6 +205,11 @@ function draw() {
   }
 }
 
+function touchStarted() {
+  mousePressed();
+  return false;
+}
+
 function mousePressed() {
   if (passing) {
     if (
