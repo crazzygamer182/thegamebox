@@ -394,6 +394,7 @@ function mousePressed() {
     }
     cnv = createCanvas(wh, ht);
     centerCanvas();
+    f = true;
   }
   if (level == -1) {
     if (
