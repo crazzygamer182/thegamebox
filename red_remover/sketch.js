@@ -8,7 +8,14 @@ let scaredface;
 let mfaces = [];
 let hfaces = [];
 let nfaces = [];
-let bolt;
+let l = [];
+let m = [];
+let blocks = [];
+let dragged = -1;
+let open = 0;
+let shape = "r";
+let playing = false;
+let music;
 
 function preload() {
   font = loadFont("FredokaOne.ttf");
@@ -22,10 +29,11 @@ function preload() {
   hfaces.push(loadImage("h4.png"));
   hfaces.push(loadImage("h5.png"));
   scaredface = loadImage("scaredface.png");
+  back = loadImage("back.png");
   for (let i = 1; i < 13; i++) {
     nfaces.push(loadImage("n" + i + ".png"));
   }
-  bolt = loadImage("scaredface.png");
+  music = loadSound("music.wav");
 }
 
 function setup() {
@@ -41,9 +49,13 @@ function setup() {
   nextLevel(false);
   textFont(font);
   textAlign(CENTER, CENTER);
-  levels.push("u");
-  for (let i = 1; i < 21; i++) {
+  if (getItem("levels") == null) {
     levels.push("u");
+    for (let i = 1; i < 21; i++) {
+      levels.push("l");
+    }
+  } else {
+    levels = getItem("levels");
   }
 }
 
@@ -54,214 +66,747 @@ function centerCanvas() {
 }
 
 function draw() {
-  background(200, 230, 255);
-  passed = true;
-  if (checkIfStill()) {
-    for (let i = 0; i < les.length; i++) {
-      if (les[i].type == "sr" || les[i].type == "r" || les[i].type == "dr") {
-        if (les[i].sprite.y < 300 && les[i].sprite.y > 0 && les[i].sprite.x < 500 && les[i].sprite.x > 0) {
-          passed = false;
+  if (music.isPlaying() == false) {
+    music.play();
+  }
+  if (level != -1 || playing == true) {
+    background(200, 230, 255);
+    passed = true;
+    if (checkIfStill()) {
+      for (let i = 0; i < les.length; i++) {
+        if (les[i].type == "sr" || les[i].type == "r" || les[i].type == "dr") {
+          if (
+            les[i].sprite.y < 300 &&
+            les[i].sprite.y > 0 &&
+            les[i].sprite.x < 500 &&
+            les[i].sprite.x > 0
+          ) {
+            passed = false;
+          }
+        } else if (les[i].type == "g" || les[i].type == "dg") {
+          if (
+            les[i].sprite.y > 400 ||
+            les[i].sprite.y < -100 ||
+            les[i].sprite.x > 600 ||
+            les[i].sprite.x < -100
+          ) {
+            passed = false;
+            nextLevel(false);
+          }
         }
-      } else if (les[i].type == "g" || les[i].type == "dg") {
-        if (les[i].sprite.y > 400 || les[i].sprite.y < -100 || les[i].sprite.x > 600 || les[i].sprite.x < -100) {
-          passed = false;
-          nextLevel(false);
+      }
+      if (passed == true) {
+        if (level > 0) {
+          passing = true;
+          resetLevel();
+          if (levels[level] == "l") {
+            levels[level] = "u";
+          }
+          levels[level - 1] = "d";
+          storeItem("levels", levels);
+        } else {
+          passing = true;
+          resetLevel();
         }
       }
     }
-    if (passed == true) {
-      passing = true;
-      resetLevel();
-      levels[level] = "u";
-      levels[level - 1] = "d";
+    for (let i = 0; i < les.length; i++) {
+      if (level != -1) {
+        if (les[i].sprite.y > 600 && les[i].type == "g") {
+          resetLevel();
+          nextLevel(false);
+          break;
+        }
+        if (les[i].sprite.y < -600 && les[i].type == "g") {
+          resetLevel();
+          nextLevel(false);
+          break;
+        }
+        if (les[i].sprite.x > 800 && les[i].type == "g") {
+          resetLevel();
+          nextLevel(false);
+          break;
+        }
+        if (les[i].sprite.x < -800 && les[i].type == "g") {
+          resetLevel();
+          nextLevel(false);
+          break;
+        }
+      } else {
+        if (les[i].sprite.y > 400 && les[i].type == "g") {
+          resetLevel();
+          let coded = code();
+          playing = true;
+          decode(coded);
+          break;
+        }
+        if (les[i].sprite.y < -400 && les[i].type == "g") {
+          resetLevel();
+          let coded = code();
+          playing = true;
+          decode(coded);
+          break;
+        }
+        if (les[i].sprite.x > 600 && les[i].type == "g") {
+          resetLevel();
+          let coded = code();
+          playing = true;
+          decode(coded);
+          break;
+        }
+        if (les[i].sprite.x < -600 && les[i].type == "g") {
+          resetLevel();
+          let coded = code();
+          playing = true;
+          decode(coded);
+          break;
+        }
+      }
     }
-  }
-  camera.x = 250;
-  camera.y = 150;
-  if (passing) {
-    push();
-    scale(wh / 500);
-    fill(243, 224, 207);
-    rect(50, 50, 400, 200);
-    fill(0);
-    textSize(35);
-    text("Level Passed!", 250, 100);
-    if (
-      mouseX > 125 * (wh / 500) &&
-      mouseX < 245 * (wh / 500) &&
-      mouseY > 150 * (wh / 500) &&
-      mouseY < 200 * (wh / 500)
-    ) {
-      fill(213, 194, 177);
-    } else {
-      fill(253, 244, 227);
-    }
-    rect(125, 150, 120, 50);
-    if (
-      mouseX > 255 * (wh / 500) &&
-      mouseX < 375 * (wh / 500) &&
-      mouseY > 150 * (wh / 500) &&
-      mouseY < 200 * (wh / 500)
-    ) {
-      fill(213, 194, 177);
-    } else {
-      fill(253, 244, 227);
-    }
-    rect(255, 150, 120, 50);
-    textSize(20);
-    fill(0);
-    let move = 65;
-    text("All levels", 183.5, 172);
-    text("Next level", 314, 172);
-    pop();
-  } else if (level == 0) {
-    push();
-    scale(wh / 500);
-    fill(243, 224, 207);
-    rect(0, 0, 500, 300);
-    fill(0);
-    textSize(40);
-    text("Red Remover", 250, 48);
-    fill(232, 59, 46);
-    text("Red", 160.1, 48);
-    strokeWeight(4);
-    stroke(50, 50, 0);
-    drawLevels();
-    pop();
-  } else if (level == 1) {
-    push();
-    scale(wh / 500);
-    fill(0);
-    textSize(18);
-    text("Red shapes are miserable", 250, 35);
-    textSize(16);
-    text("Remove them all by clicking on them", 250, 70);
-    pop();
-  } else if (level == 2) {
-    push();
-    scale(wh / 500);
-    fill(0);
-    textSize(16);
-    text("Dark red shapes are strong - you cant click them", 250, 35);
-    textSize(17);
-    text("Make them fall off the screen instead", 250, 70);
-    pop();
-  } else if (level == 3) {
-    push();
-    scale(wh / 500);
-    fill(0);
-    textSize(16);
-    text("Green shapes are lovely!", 250, 35);
-    textSize(17);
-    text("Keep them on the screen", 250, 70);
-    pop();
-  } else if (level == 6) {
-    push();
-    scale(wh / 500);
-    fill(0);
-    textSize(17);
-    text("Blue shapes are neutral", 250, 35);
-    textSize(16);
-    text("It doesn't matter if they stay or go", 250, 70);
-    pop();
-  } else if (level == 12) {
-    push();
-    scale(wh / 500);
-    fill(0);
-    textSize(17);
-    text("There are 4 planes of gravity!", 250, 35);
-    textSize(16);
-    text("Look at the shapes faces to see which way they will fall", 250, 70);
-    pop();
-  }
-  if (level == 2) {
-    camera.zoom = wh / 700;
-    camera.y = 110;
-  } else if (level == 11) {
-    camera.zoom = wh / 625;
+    camera.x = 250;
     camera.y = 150;
-  } else if (level == 12) { 
-    camera.y = 120;
-  } else {
-    camera.zoom = wh / 550;
-    camera.y = 150;
-  }
-  if (passing == false && level > 0) {
-    push();
-    scale(wh / 500);
-    fill(255);
-    if (level > 2) {
-      rect(-5, 280, 70, 40, 5, 5);
+    if (passing) {
+      push();
+      scale(wh / 500);
+      fill(243, 224, 207);
+      rect(50, 50, 400, 200);
+      fill(0);
+      textSize(35);
+      text("Level Passed!", 250, 100);
+      if (
+        mouseX > 125 * (wh / 500) &&
+        mouseX < 245 * (wh / 500) &&
+        mouseY > 150 * (wh / 500) &&
+        mouseY < 200 * (wh / 500)
+      ) {
+        fill(213, 194, 177);
+      } else {
+        fill(253, 244, 227);
+      }
+      rect(125, 150, 120, 50);
+      if (
+        mouseX > 255 * (wh / 500) &&
+        mouseX < 375 * (wh / 500) &&
+        mouseY > 150 * (wh / 500) &&
+        mouseY < 200 * (wh / 500)
+      ) {
+        fill(213, 194, 177);
+      } else {
+        fill(253, 244, 227);
+      }
+      rect(255, 150, 120, 50);
+      textSize(20);
+      fill(0);
+      let move = 65;
+      text("All levels", 183.5, 172);
+      if (level == -1) {
+        text("Edit", 314, 172);
+      } else {
+        text("Next level", 314, 172);
+      }
+      pop();
+    } else if (level == 0) {
+      push();
+      scale(wh / 500);
+      fill(243, 224, 207);
+      rect(0, 0, 500, 300);
+      fill(0);
+      textSize(40);
+      push();
+      translate(0, -15);
+      text("Red Remover", 250, 48);
+      fill(232, 59, 46);
+      text("Red", 160.1, 48);
+      pop();
+      strokeWeight(4);
+      stroke(214 / 3, 153 / 3, 56 / 3);
+      drawLevels();
+      pop();
+    } else if (level == 1) {
+      push();
+      scale(wh / 500);
+      fill(0);
+      textSize(18);
+      text("Red shapes are miserable", 250, 35);
+      textSize(16);
+      text("Remove them all by clicking on them", 250, 70);
+      pop();
+    } else if (level == 2) {
+      push();
+      scale(wh / 500);
+      fill(0);
+      textSize(16);
+      text("Dark red shapes are strong - you cant click them", 250, 35);
+      textSize(17);
+      text("Make them fall off the screen instead", 250, 70);
+      pop();
+    } else if (level == 3) {
+      push();
+      scale(wh / 500);
+      fill(0);
+      textSize(16);
+      text("Green shapes are lovely!", 250, 35);
+      textSize(17);
+      text("Keep them on the screen", 250, 70);
+      pop();
+    } else if (level == 6) {
+      push();
+      scale(wh / 500);
+      fill(0);
+      textSize(17);
+      text("Blue shapes are neutral", 250, 35);
+      textSize(16);
+      text("It doesn't matter if they stay or go", 250, 70);
+      pop();
+    } else if (level == 12) {
+      push();
+      scale(wh / 500);
+      fill(0);
+      textSize(17);
+      text("There are 4 planes of gravity!", 250, 35);
+      textSize(16);
+      text("Look at the shapes faces to see which way they will fall", 250, 70);
+      pop();
+    }
+    if (level == 2) {
+      camera.zoom = wh / 700;
+      camera.y = 110;
+    } else if (level == 11) {
+      camera.zoom = wh / 625;
+      camera.y = 150;
+    } else if (level == 12) {
+      camera.y = 120;
+    } else {
+      camera.zoom = wh / 550;
+      camera.y = 150;
+    }
+    if ((passing == false && level > 0) || playing == true) {
+      push();
+      scale(wh / 500);
+      fill(255);
+      if (level > 2 || playing == true) {
+        rect(-5, 280, 70, 40, 5, 5);
+        fill(0);
+        textSize(15);
+        text("Reset", 32, 288.5);
+      }
+      fill(255);
+      rect(445, 280, 70, 40, 5, 5);
       fill(0);
       textSize(15);
-      text("Reset", 32, 288.5);
+      if (level != -1) {
+        text("Exit", 473, 288.5);
+      } else {
+        text("Edit", 473, 288.5);
+      }
+      pop();
     }
-    fill(255);
-    rect(445, 280, 70, 40, 5, 5);
-    fill(0);
-    textSize(15);
-    text("Exit", 473, 288.5);
+  } else if (level == -1) {
+    background(200, 230, 255);
+    if (dragged > -1) {
+      blocks[dragged].x = mouseX / (wh / 550);
+      blocks[dragged].y = mouseY / (wh / 550);
+    }
+    if (playing == 0) {
+      for (let i = 0; i < blocks.length; i++) {
+        if (dragged != i) {
+          blocks[i].show();
+        }
+      }
+    }
+    push();
+    scale(wh / 500);
+    fill(214, 153, 56);
+    circle(40, 260, 50);
+    imageMode(CENTER);
+    image(hfaces[0], 40, 260, hfaces[0].width / 15, hfaces[0].height / 15);
+    rectMode(CENTER);
+    if (open == 1) {
+      fill(255, 100, 100);
+      rect(100, 260, 35, 35);
+      drawFace("r", 100, 260);
+      fill(255, 135, 135);
+      rect(300, 260, 35, 35);
+      makeScrews(300, 260, 35, 35);
+      fill(225, 10, 10);
+      rect(150, 260, 35, 35);
+      drawFace("r", 150, 260);
+      fill(200, 255, 200);
+      rect(350, 260, 35, 35);
+      makeScrews(350, 260, 35, 35);
+      fill(125, 255, 125);
+      rect(200, 260, 35, 35);
+      drawFace("g", 200, 260);
+      fill(200, 200, 255);
+      rect(400, 260, 35, 35);
+      makeScrews(400, 260, 35, 35);
+      fill(150, 150, 255);
+      rect(250, 260, 35, 35);
+      drawFace("b", 250, 260);
+    }
+    strokeWeight(4);
+    stroke(75, 0, 0);
+    fill(255, 120, 120);
+    circle(35, 35, 40);
+    stroke(0, 75, 0);
+    fill(120, 255, 120);
+    circle(465, 35, 40);
+    image(back, 35, 35, back.width / 17, back.height / 17);
     pop();
+    if (dragged >= 0 && playing == 0) {
+      blocks[dragged].show();
+    }
+    camera.x = 250;
+    camera.y = 150;
+    camera.zoom = wh / 550;
+  } else {
+    background(0);
   }
 }
 
-function touchStarted() {
-  mousePressed();
-  return false;
+function mouseReleased() {
+  if (level == -1 && playing == false) {
+    for (let i = blocks.length - 1; i > -1; i--) {
+      if (blocks[i].y > 250 && open == 1 && dragged == i) {
+        blocks.splice(i, 1);
+      } else {
+        blocks[i].scaling = false;
+        if (dist(blocks[i].x, 0, 275, 0) < 10) {
+          blocks[i].x = 275;
+        }
+      }
+    }
+    dragged = -1;
+  }
 }
 
 function mousePressed() {
-  if (passing) {
+  if (level == -1) {
     if (
-      mouseX > 125 * (wh / 500) &&
-      mouseX < 245 * (wh / 500) &&
-      mouseY > 150 * (wh / 500) &&
-      mouseY < 200 * (wh / 500)
-    ) {
-      level = 0;
-    }
-    rect(125, 150, 120, 50);
-    if (
-      mouseX > 255 * (wh / 500) &&
-      mouseX < 375 * (wh / 500) &&
-      mouseY > 150 * (wh / 500) &&
-      mouseY < 200 * (wh / 500)
-    ) {
-      nextLevel(true);
-    }
-    passing = false;
-  } else if (level > 0) {
-    for (let i = les.length - 1; i > -1; i--) {
-      if (
-        les[i].sprite.mouse.pressing() &&
-        (les[i].type == "sr" ||
-          les[i].type == "sb" ||
-          les[i].type == "r" ||
-          les[i].type == "b")
-      ) {
-        allSprites[i].remove();
-        les.splice(i, 1);
-      }
-    }
-    if (
-      level > 2 &&
-      mouseX > 0 &&
-      mouseX < 65 * (wh / 500) &&
-      mouseY > 280 * (wh / 500) &&
-      mouseY < 300 * (wh / 500)
-    ) {
-      nextLevel(false);
-    } else if (
-      mouseX > 473 &&
-      mouseX < 500 * (wh / 500) &&
-      mouseY > 280 * (wh / 500) &&
-      mouseY < 300 * (wh / 500)
+      dist(mouseX, mouseY, 35 * (wh / 500), 35 * (wh / 500)) <
+      20 * (wh / 500)
     ) {
       level = 0;
       resetLevel();
     }
-  } else if (level == 0) {
-    levelSelect();
+  }
+  if (level == -1 && playing == false) {
+    if (
+      dist(40 * (wh / 500), 260 * (wh / 500), mouseX, mouseY) <
+      25 * (wh / 500)
+    ) {
+      if (open == 0) {
+        open = 1;
+      } else {
+        open = 0;
+      }
+    } else if (mouseY < 228 * (wh / 500) || open == 0) {
+      let scaling = false;
+      for (let i = 0; i < blocks.length; i++) {
+        if (blocks[i].shape != "c") {
+          if (
+            dist(
+              mouseX / (wh / 550),
+              mouseY / (wh / 550),
+              blocks[i].x - blocks[i].w / 2,
+              blocks[i].y - blocks[i].h / 2
+            ) < 5
+          ) {
+            scaling = true;
+            blocks[i].scaling = 1;
+            blocks[i].fmx = mouseX;
+            blocks[i].fmy = mouseY;
+          } else if (
+            dist(
+              mouseX / (wh / 550),
+              mouseY / (wh / 550),
+              blocks[i].x + blocks[i].w / 2,
+              blocks[i].y - blocks[i].h / 2
+            ) < 5
+          ) {
+            scaling = true;
+            blocks[i].scaling = 2;
+            blocks[i].fmx = mouseX;
+            blocks[i].fmy = mouseY;
+          } else if (
+            dist(
+              mouseX / (wh / 550),
+              mouseY / (wh / 550),
+              blocks[i].x + blocks[i].w / 2,
+              blocks[i].y + blocks[i].h / 2
+            ) < 5
+          ) {
+            scaling = true;
+            blocks[i].scaling = 3;
+            blocks[i].fmx = mouseX;
+            blocks[i].fmy = mouseY;
+          } else if (
+            dist(
+              mouseX / (wh / 550),
+              mouseY / (wh / 550),
+              blocks[i].x - blocks[i].w / 2,
+              blocks[i].y + blocks[i].h / 2
+            ) < 5
+          ) {
+            scaling = true;
+            blocks[i].scaling = 4;
+            blocks[i].fmx = mouseX;
+            blocks[i].fmy = mouseY;
+          }
+        } else if (
+          dist(
+            mouseX / (wh / 550),
+            mouseY / (wh / 550),
+            blocks[i].x + blocks[i].w / 2,
+            blocks[i].y
+          ) < 5
+        ) {
+          scaling = true;
+          blocks[i].scaling = 1;
+          blocks[i].fmx = mouseX;
+          blocks[i].fmy = mouseY;
+        }
+      }
+      if (scaling == false) {
+        for (let i = 0; i < blocks.length; i++) {
+          if (
+            mouseX / (wh / 550) > blocks[i].x - blocks[i].w / 2 &&
+            mouseX / (wh / 550) < blocks[i].x + blocks[i].w / 2 &&
+            mouseY / (wh / 550) > blocks[i].y - blocks[i].h / 2 &&
+            mouseY / (wh / 550) < blocks[i].y + blocks[i].h / 2
+          ) {
+            dragged = i;
+            break;
+          }
+        }
+      }
+    } else if (open == 1) {
+      let type = " ";
+      if (
+        mouseX > 81 * (wh / 500) &&
+        mouseX < 117 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "r";
+      }
+      if (
+        mouseX > 132 * (wh / 500) &&
+        mouseX < 168 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "dr";
+      }
+      if (
+        mouseX > 182 * (wh / 500) &&
+        mouseX < 218 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "g";
+      }
+      if (
+        mouseX > 232 * (wh / 500) &&
+        mouseX < 267 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "b";
+      }
+      if (
+        mouseX > 282 * (wh / 500) &&
+        mouseX < 317 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "sr";
+      }
+      if (
+        mouseX > 332 * (wh / 500) &&
+        mouseX < 367 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "sg";
+      }
+      if (
+        mouseX > 382 * (wh / 500) &&
+        mouseX < 418 * (wh / 500) &&
+        mouseY > 242 * (wh / 500) &&
+        mouseY < 278 * (wh / 500)
+      ) {
+        type = "sb";
+      }
+      if (type != " ") {
+        blocks.push(
+          new MakerBlock(
+            type,
+            mouseX / (wh / 550),
+            mouseY / (wh / 550),
+            35,
+            35,
+            1,
+            shape
+          )
+        );
+        dragged = blocks.length - 1;
+      }
+    }
+  } else {
+    if (passing) {
+      if (
+        mouseX > 125 * (wh / 500) &&
+        mouseX < 245 * (wh / 500) &&
+        mouseY > 150 * (wh / 500) &&
+        mouseY < 200 * (wh / 500)
+      ) {
+        if (level == -1) {
+          //save
+        } else {
+          level = 0;
+        }
+      }
+      if (
+        mouseX > 255 * (wh / 500) &&
+        mouseX < 375 * (wh / 500) &&
+        mouseY > 150 * (wh / 500) &&
+        mouseY < 200 * (wh / 500)
+      ) {
+        if (level == -1) {
+          //edit
+          playing = false;
+        } else {
+          nextLevel(true);
+        }
+      }
+      passing = false;
+    } else if (level > 0 || playing == true) {
+      for (let i = les.length - 1; i > -1; i--) {
+        if (
+          les[i].sprite.mouse.pressing() &&
+          (les[i].type == "sr" ||
+            les[i].type == "sb" ||
+            les[i].type == "r" ||
+            les[i].type == "b")
+        ) {
+          allSprites[i].remove();
+          les.splice(i, 1);
+        }
+      }
+      if (
+        (level > 2 || playing == true) &&
+        mouseX > 0 &&
+        mouseX < 65 * (wh / 500) &&
+        mouseY > 280 * (wh / 500) &&
+        mouseY < 300 * (wh / 500)
+      ) {
+        resetLevel();
+        nextLevel(false);
+        if (level == -1) {
+          let coded = code();
+          playing = true;
+          decode(coded);
+        }
+      } else if (
+        mouseX > 473 &&
+        mouseX < 500 * (wh / 500) &&
+        mouseY > 280 * (wh / 500) &&
+        mouseY < 300 * (wh / 500)
+      ) {
+        resetLevel();
+        if (level == -1) {
+          playing = false;
+        } else {
+          level = 0;
+        }
+      }
+    } else if (level == 0) {
+      levelSelect();
+    }
+  }
+}
+
+class MakerBlock {
+  constructor(type, x, y, w, h, gravity, shape) {
+    this.type = type;
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.scaling = 0;
+    this.fmx = 0;
+    this.fmy = 0;
+    this.gravity = gravity;
+    if (shape == null) {
+      this.shape = "r";
+    } else {
+      this.shape = shape;
+    }
+  }
+  show() {
+    if (this.shape == "c") {
+      this.h = this.w;
+    }
+    if (this.type == "sr") {
+      fill(255, 135, 135);
+    } else if (this.type == "r") {
+      fill(255, 100, 100);
+    } else if (this.type == "dr") {
+      fill(225, 10, 10);
+    } else if (this.type == "g") {
+      fill(125, 255, 125);
+    } else if (this.type == "sg") {
+      fill(200, 255, 200);
+    } else if (this.type == "b") {
+      fill(150, 150, 255);
+    } else if (this.type == "sb") {
+      fill(200, 200, 255);
+    }
+    push();
+    scale(wh / 550);
+    translate(this.x, this.y);
+    rectMode(CENTER);
+    if (this.shape != "c") {
+      if (dist(this.x, 0, 275, 0) < 10 && dragged >= 0) {
+        push();
+        translate(-this.x, -this.y);
+        rect(275, this.y, this.w, this.h);
+        fill(150, 0, 0);
+        noStroke();
+        rect(275, 165, 1, 330);
+        pop();
+      } else {
+        rect(0, 0, this.w, this.h);
+      }
+    } else {
+      if (dist(this.x, 0, 275, 0) < 10 && dragged >= 0) {
+        push();
+        translate(-this.x, -this.y);
+        if (this.type == "sr") {
+          fill(255, 135, 135);
+        } else if (this.type == "r") {
+          fill(255, 100, 100);
+        } else if (this.type == "dr") {
+          fill(225, 10, 10);
+        } else if (this.type == "g") {
+          fill(125, 255, 125);
+        } else if (this.type == "sg") {
+          fill(200, 255, 200);
+        } else if (this.type == "b") {
+          fill(150, 150, 255);
+        } else if (this.type == "sb") {
+          fill(200, 200, 255);
+        }
+        circle(275, this.y, this.w);
+        fill(150, 0, 0);
+        noStroke();
+        rect(275, 165, 1, 330);
+        pop();
+      } else {
+        circle(0, 0, this.w);
+      }
+    }
+    fill(215, 215, 220);
+    push();
+    if (dist(this.x, 0, 275, 0) < 10 && dragged >= 0) {
+      translate(-this.x, 0);
+      translate(275, 0);
+    }
+    if (this.shape != "c") {
+      circle(-this.w / 2, -this.h / 2, 6);
+      circle(this.w / 2, -this.h / 2, 6);
+      circle(-this.w / 2, this.h / 2, 6);
+      circle(this.w / 2, this.h / 2, 6);
+    } else {
+      circle(this.w / 2, 0, 6);
+    }
+    fill(235);
+    if (this.type == "sb" || this.type == "sr" || this.type == "sg") {
+      makeScrews(0, 0, this.w - 2 * (wh / 500), this.h - 2 * (wh / 500));
+    } else {
+      push();
+      imageMode(CENTER);
+      angleMode(DEGREES);
+      rotate(90 * (this.gravity - 1));
+      if (this.type != "dr") {
+        drawFace(this.type, 0, 0);
+      } else {
+        drawFace("r", 0, 0);
+      }
+      pop();
+    }
+    pop();
+    pop();
+    if (this.shape != "c") {
+      if (this.scaling == 1) {
+        if (this.w - (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.w -= (mouseX - this.fmx) / (wh / 550);
+        }
+        if (this.h - (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.h -= (mouseY - this.fmy) / (wh / 550);
+        }
+        if (this.w - (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.x += (mouseX - this.fmx) / 2 / (wh / 550);
+        }
+        if (this.h - (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.y += (mouseY - this.fmy) / 2 / (wh / 550);
+        }
+        this.fmx = mouseX;
+        this.fmy = mouseY;
+      } else if (this.scaling == 2) {
+        if (this.w + (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.w += (mouseX - this.fmx) / (wh / 550);
+        }
+        if (this.h - (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.h -= (mouseY - this.fmy) / (wh / 550);
+        }
+        if (this.w + (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.x += (mouseX - this.fmx) / 2 / (wh / 550);
+        }
+        if (this.y - (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.y += (mouseY - this.fmy) / 2 / (wh / 550);
+        }
+        this.fmx = mouseX;
+        this.fmy = mouseY;
+      } else if (this.scaling == 3) {
+        if (this.w + (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.w += (mouseX - this.fmx) / (wh / 550);
+        }
+        if (this.h + (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.h += (mouseY - this.fmy) / (wh / 550);
+        }
+        if (this.w + (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.x += (mouseX - this.fmx) / 2 / (wh / 550);
+        }
+        if (this.h + (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.y += (mouseY - this.fmy) / 2 / (wh / 550);
+        }
+        this.fmx = mouseX;
+        this.fmy = mouseY;
+      } else if (this.scaling == 4) {
+        if (this.w - (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.w -= (mouseX - this.fmx) / (wh / 550);
+        }
+        if (this.h + (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.h += (mouseY - this.fmy) / (wh / 550);
+        }
+        if (this.w - (mouseX - this.fmx) / (wh / 550) > 20) {
+          this.x += (mouseX - this.fmx) / 2 / (wh / 550);
+        }
+        if (this.h + (mouseY - this.fmy) / (wh / 550) > 20) {
+          this.y += (mouseY - this.fmy) / 2 / (wh / 550);
+        }
+        this.fmx = mouseX;
+        this.fmy = mouseY;
+      }
+    } else if (this.scaling == 1) {
+      if (this.w + (mouseX - this.fmx) / (wh / 550) > 20) {
+        this.w += (mouseX - this.fmx) / (wh / 1100);
+      }
+      this.fmx = mouseX;
+      this.fmy = mouseY;
+    }
   }
 }
 
@@ -319,39 +864,63 @@ class Block {
       }
       if (this.type == "sr" || this.type == "sg" || this.type == "sb") {
         fill(100);
-        circle(0-this.sprite.w/2 + 4, 0-this.sprite.height/2 + 4, 3, 3);
-        circle(0+this.sprite.w/2 - 4, 0-this.sprite.height/2 + 4, 3, 3);
-        circle(0-this.sprite.w/2 + 4, 0+this.sprite.height/2 - 4, 3, 3);
-        circle(0+this.sprite.w/2 - 4, 0+this.sprite.height/2 - 4, 3, 3);
+        circle(0 - this.sprite.w / 2 + 4, 0 - this.sprite.height / 2 + 4, 3, 3);
+        circle(0 + this.sprite.w / 2 - 4, 0 - this.sprite.height / 2 + 4, 3, 3);
+        circle(0 - this.sprite.w / 2 + 4, 0 + this.sprite.height / 2 - 4, 3, 3);
+        circle(0 + this.sprite.w / 2 - 4, 0 + this.sprite.height / 2 - 4, 3, 3);
       } else {
         push();
         rotate(-this.sprite.rotation);
         rotate(90 * (this.gravity - 1));
         if (type == "r" || type == "dr") {
           if (int(random(300)) == 0 || this.image == null) {
-              this.image = mfaces[int(random(mfaces.length))];
+            this.image = mfaces[int(random(mfaces.length))];
           }
-          if (abs(this.sprite.vel.y) > 1 || abs(this.sprite.vel.x) > 1 ) {
+          if (abs(this.sprite.vel.y) > 1 || abs(this.sprite.vel.x) > 1) {
             image(hfaces[0], 0, 0, hfaces[0].width / 18, hfaces[0].height / 18);
             this.image = mfaces[int(random(mfaces.length))];
           } else {
-            image(this.image, 0, 0, this.image.width / 18, this.image.height / 18);
+            image(
+              this.image,
+              0,
+              0,
+              this.image.width / 18,
+              this.image.height / 18
+            );
           }
         } else if (type == "g") {
           if (int(random(300)) == 0 || this.image == null) {
-              this.image = hfaces[int(random(hfaces.length))];
+            this.image = hfaces[int(random(hfaces.length))];
           }
-          if (abs(this.sprite.vel.y) > 1 || abs(this.sprite.vel.x) > 1 ) {
-            image(scaredface, 0, 0, scaredface.width / 18, scaredface.height / 18);
+          if (abs(this.sprite.vel.y) > 1 || abs(this.sprite.vel.x) > 1) {
+            image(
+              scaredface,
+              0,
+              0,
+              scaredface.width / 18,
+              scaredface.height / 18
+            );
             this.image = hfaces[int(random(hfaces.length))];
           } else {
-            image(this.image, 0, 0, this.image.width / 18, this.image.height / 18);
+            image(
+              this.image,
+              0,
+              0,
+              this.image.width / 18,
+              this.image.height / 18
+            );
           }
         } else if (this.type == "b") {
           if (int(random(300)) == 0 || this.image == null) {
-              this.image = nfaces[int(random(nfaces.length))];
+            this.image = nfaces[int(random(nfaces.length))];
           }
-            image(this.image, 0, 0, this.image.width / 18, this.image.height / 18);
+          image(
+            this.image,
+            0,
+            0,
+            this.image.width / 18,
+            this.image.height / 18
+          );
         }
         pop();
       }
@@ -573,12 +1142,67 @@ function nextLevel(won) {
     les.push(new Block("sb", 50, 250, 40, 40));
     les.push(new Block("g", 50, 210, 40, 40));
     les.push(new Block("sb", 210, 210, 40, 40));
-    les.push(new Block("r", 253, 210, 40, 40, 2));
+    les.push(new Block("dr", 253, 210, 40, 40, 2));
     les.push(new Block("sb", 255, 100, 40, 40));
     les.push(new Block("b", 255, 57, 40, 40));
     les.push(new Block("b", 212, 100, 40, 40, 4));
   } else if (level == 17) {
-    
+    les.push(new Block("sb", 275, 250, 40, 40));
+    les.push(new Block("g", 315, 250, 40, 40, 2));
+    les.push(new Block("sg", 125, 75, 200, 20, 2));
+    les[2].sprite.rotation = 10;
+    les.push(new Block("dr", 50, 0, 40));
+    les.push(new Block("sb", 100, 50, 20, 20));
+    les[4].sprite.rotation = 10;
+    les.push(new Block("sb", 375, 150, 20, 40));
+    les.push(new Block("b", 415, 150, 40, 40, 2));
+  } else if (level == 18) {
+    les.push(new Block("sg", 250, 150, 40, 40));
+    les.push(new Block("dr", 25, 190, 40, 40, 4, "c"));
+    les.push(new Block("dr", 475, 110, 40, 40, 2, "c"));
+    les.push(new Block("dr", 250, 25, 40, 40));
+    les.push(new Block("dr", 250, 275, 40, 40, 3));
+    les.push(new Block("sb", 55, 190, 20, 40));
+    les.push(new Block("sb", 445, 110, 20, 40));
+    les.push(new Block("sb", 250, 55, 40, 20));
+    les.push(new Block("sb", 250, 245, 40, 20));
+  } else if (level == 19) {
+    les.push(new Block("sg", 300, 100, 150, 25));
+    les.push(new Block("sg", 200, 200, 150, 25));
+    les.push(new Block("sg", 328, 204.5, 100, 25));
+    les.push(new Block("sb", 100, 185, 40, 20));
+    les.push(new Block("sb", 300, 155, 40, 15));
+    les.push(new Block("b", 300, 135, 40, 20));
+    les.push(new Block("dr", 100, 215, 40, 40, 3));
+    les.push(new Block("g", 350, 50, 25));
+    les[0].sprite.rotation = -10;
+    les[1].sprite.rotation = 10;
+    les[2].sprite.rotation = -10;
+  } else if (level == 20) {
+    les.push(new Block("r", 250, 250, 70, 70, 3));
+    les.push(new Block("sr", 250, 205, 70, 20));
+    les.push(new Block("g", 250, 170, 25));
+    les.push(new Block("sg", 125, 125, 200, 20));
+    les.push(new Block("sg", 375, 125, 200, 20));
+    les[4].sprite.rotation = 3;
+    les.push(new Block("sg", 485, 65, 20, 100));
+    les.push(new Block("r", 50, 65, 70, 70, 4));
+    les.push(new Block("sr", 100, 65, 25, 70));
+  } else if (level == 21) {
+    les.push(new Block("r", 50, 90, 70, 70, 4));
+    les.push(new Block("r", 50, 210, 70, 70, 4));
+    les.push(new Block("g", 125, 90, 20, 20, 2));
+    les.push(new Block("g", 125, 210, 20, 20, 2));
+    les.push(new Block("sr", 100, 90, 20, 70));
+    les.push(new Block("sr", 100, 210, 20, 70));
+    les.push(new Block("sb", 300, 150, 20, 80));
+    les.push(new Block("sb", 300, 30, 20, 80));
+    les.push(new Block("sb", 300, 270, 20, 80));
+    les.push(new Block("sb", 320, 240, 20, 20));
+    les.push(new Block("sb", 320, 180, 20, 20));
+    les.push(new Block("sb", 320, 60, 20, 20));
+    les.push(new Block("b", 320, 10, 20, 65));
+    les.push(new Block("b", 320, 130, 21, 55));
   }
 }
 
@@ -594,7 +1218,13 @@ function checkIfStill() {
     return false;
   }
   for (let i = 0; i < allSprites.length; i++) {
-    if (allSprites[i].sleeping == true && allSprites[i].y < 600 && allSprites[i].y > -300 && allSprites[i].x < 800 && allSprites[i].x > -300) {
+    if (
+      allSprites[i].sleeping == true &&
+      allSprites[i].y < 600 &&
+      allSprites[i].y > -300 &&
+      allSprites[i].x < 800 &&
+      allSprites[i].x > -300
+    ) {
       return false;
     }
   }
@@ -607,14 +1237,22 @@ function levelSelect() {
       if (
         mouseX > (60 * i - 10) * (wh / 500) &&
         mouseX < (60 * i + 30) * (wh / 500) &&
-        mouseY > (60 * j + 36) * (wh / 500) &&
-        mouseY < (60 * j + 76) * (wh / 500) &&
+        mouseY + 18 * (wh / 500) > (60 * j + 36) * (wh / 500) &&
+        mouseY + 18 * (wh / 500) < (60 * j + 76) * (wh / 500) &&
         levels[i + (j - 1) * 7 - 1] != "l"
       ) {
         goToLevel(i + (j - 1) * 7);
         break;
       }
     }
+  }
+  if (
+    mouseX > (160 - 82.5) * (wh / 500) &&
+    mouseX < (160 + 82.5) * (wh / 500) &&
+    mouseY > (270 - 15) * (wh / 500) &&
+    mouseY < (270 + 15) * (wh / 500)
+  ) {
+    level = -1;
   }
 }
 
@@ -624,18 +1262,21 @@ function goToLevel(l) {
 }
 
 function drawLevels() {
+  push();
+  translate(0, -18);
   for (let j = 1; j < 4; j++) {
     for (let i = 1; i < 8; i++) {
       if (
         mouseX > (60 * i - 10) * (wh / 500) &&
         mouseX < (60 * i + 30) * (wh / 500) &&
-        mouseY > (60 * j + 36) * (wh / 500) &&
-        mouseY < (60 * j + 76) * (wh / 500)
+        mouseY + 18 * (wh / 500) > (60 * j + 36) * (wh / 500) &&
+        mouseY + 18 * (wh / 500) < (60 * j + 76) * (wh / 500)
       ) {
         fill(234, 173, 76);
       } else {
         fill(214, 153, 56);
       }
+      stroke(214 / 3, 153 / 3, 56 / 3);
       rect(60 * i - 10, 60 * j + 36, 40, 40, 10, 10);
       rectMode(CENTER);
       rect(60 * i - 10, 60 * j + 38, 25, 25, 11, 11);
@@ -657,10 +1298,7 @@ function drawLevels() {
         noStroke();
         fill(75);
         rect(60 * i + 3.75, 60 * j + 52, 14, 14, 2, 2);
-      } else if (
-        levels[i + (j - 1) * 7 - 1] == "u" ||
-        levels[i + (j - 1) * 7 - 1] == "d"
-      ) {
+      } else if (levels[i + (j - 1) * 7 - 1] == "u") {
         push();
         fill(100, 200, 100);
         strokeJoin(ROUND);
@@ -668,6 +1306,12 @@ function drawLevels() {
         scale(0.5, 0.5);
         triangle(0, 0, 25, 20, 0, 35);
         strokeJoin(CORNER);
+        pop();
+      } else {
+        push();
+        translate(i * 60 + 10.5, j * 60 + 57);
+        imageMode(CENTER);
+        image(hfaces[0], 0, 0, hfaces[0].width / 20, hfaces[0].height / 20);
         pop();
       }
       strokeWeight(4);
@@ -678,4 +1322,111 @@ function drawLevels() {
       stroke(50, 50, 0);
     }
   }
+  pop();
+  if (
+    mouseX > (160 - 82.5) * (wh / 500) &&
+    mouseX < (160 + 82.5) * (wh / 500) &&
+    mouseY > (270 - 15) * (wh / 500) &&
+    mouseY < (270 + 15) * (wh / 500)
+  ) {
+    fill(234, 173, 76);
+  } else {
+    fill(214, 153, 56);
+  }
+  rectMode(CENTER);
+  stroke(214 / 3, 153 / 3, 56 / 3);
+  rect(160, 270, 165, 30, 10, 10);
+  textSize(17);
+  fill(0);
+  noStroke();
+  text("Level Maker", 160, 268);
+  stroke(214 / 3, 153 / 3, 56 / 3);
+  if (
+    mouseX > (340 - 82.5) * (wh / 500) &&
+    mouseX < (340 + 82.5) * (wh / 500) &&
+    mouseY > (270 - 15) * (wh / 500) &&
+    mouseY < (270 + 15) * (wh / 500)
+  ) {
+    fill(234, 173, 76);
+  } else {
+    fill(214, 153, 56);
+  }
+  rect(340, 270, 165, 30, 10, 10);
+  rectMode(CORNER);
+  fill(0);
+  noStroke();
+  textSize(19);
+  text("Exit", 340, 268);
+}
+
+function decode(le) {
+  l = [];
+  m = [];
+  l = le.split("/");
+  for (let i = 0; i < l.length; i++) {
+    m.push(l[i].split("."));
+  }
+  for (let i = 0; i < m.length; i++) {
+    les.push(
+      new Block(
+        m[i][0],
+        parseInt(m[i][1]) - 25,
+        parseInt(m[i][2]) - 15,
+        parseInt(m[i][3]),
+        parseInt(m[i][4]),
+        parseInt(m[i][5]),
+        m[i][6]
+      )
+    );
+  }
+}
+
+function code() {
+  let codedLevel = "";
+  for (let i = 0; i < blocks.length; i++) {
+    codedLevel = codedLevel + blocks[i].type + ".";
+    codedLevel = codedLevel + int(blocks[i].x) + ".";
+    codedLevel = codedLevel + int(blocks[i].y) + ".";
+    codedLevel = codedLevel + int(blocks[i].w) + ".";
+    codedLevel = codedLevel + int(blocks[i].h) + ".";
+    codedLevel = codedLevel + blocks[i].gravity + ".";
+    if (i != blocks.length - 1) {
+      codedLevel = codedLevel + blocks[i].shape + "/";
+    } else {
+      codedLevel = codedLevel + blocks[i].shape;
+    }
+  }
+  console.log(codedLevel);
+  return codedLevel;
+}
+
+function makeScrews(xx, yy, ww, hh) {
+  fill(100);
+  circle(xx - ww / 2 + 4, yy - hh / 2 + 4, 3);
+  circle(xx + ww / 2 - 4, yy - hh / 2 + 4, 3);
+  circle(xx - ww / 2 + 4, yy + hh / 2 - 4, 3);
+  circle(xx + ww / 2 - 4, yy + hh / 2 - 4, 3);
+}
+
+function drawFace(style, x, y) {
+  if (style == "r") {
+    image(mfaces[0], x, y, hfaces[0].width / 18, hfaces[0].height / 18);
+  } else if (style == "b") {
+    image(nfaces[6], x, y, hfaces[0].width / 18, hfaces[0].height / 18);
+  } else if (style == "g") {
+    image(hfaces[0], x, y, hfaces[0].width / 18, hfaces[0].height / 18);
+  }
+}
+
+function playy() {
+  if (blocks.length > 0) {
+    resetLevel();
+    let coded = code();
+    playing = true;
+    decode(coded);
+  }
+}
+
+function keyPressed() {
+  playy();
 }
