@@ -16,6 +16,7 @@ let open = 0;
 let shape = "r";
 let playing = false;
 let music;
+let f = true;
 
 function preload() {
   font = loadFont("FredokaOne.ttf");
@@ -381,8 +382,19 @@ function mouseReleased() {
 }
 
 function mousePressed() {
-  let fs = fullscreen();
-    fullscreen(fs);
+  if (f) {
+    let fs = fullscreen();
+    fullscreen(!fs);
+    if (500 * (windowHeight / 300) < windowWidth) {
+      wh = 500 * (windowHeight / 300);
+      ht = windowHeight;
+    } else {
+      wh = windowWidth;
+      ht = 300 * (windowWidth / 500);
+    }
+    cnv = createCanvas(wh, ht);
+    centerCanvas();
+  }
   if (level == -1) {
     if (
       dist(mouseX, mouseY, 35 * (wh / 500), 35 * (wh / 500)) <
