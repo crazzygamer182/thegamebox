@@ -73,6 +73,18 @@ function draw() {
   if (level != -1 || playing == true) {
     background(200, 230, 255);
     passed = true;
+    for (let i = les.length - 1; i > -1; i--) {
+        if (
+          les[i].sprite.mouse.presses() &&
+          (les[i].type == "sr" ||
+            les[i].type == "sb" ||
+            les[i].type == "r" ||
+            les[i].type == "b")
+        ) {
+          allSprites[i].remove();
+          les.splice(i, 1);
+        }
+      }
     if (checkIfStill()) {
       for (let i = 0; i < les.length; i++) {
         if (les[i].type == "sr" || les[i].type == "r" || les[i].type == "dr") {
@@ -352,6 +364,15 @@ function draw() {
     stroke(0, 75, 0);
     fill(120, 255, 120);
     circle(465, 35, 40);
+    push();
+    stroke(0);
+    fill(100, 200, 100);
+    strokeJoin(ROUND);
+    translate(465, 35);
+    scale(0.5, 0.5);
+    triangle(0, 0, 25, 20, 0, 35);
+    strokeJoin(CORNER);
+    pop();
     image(back, 35, 35, back.width / 17, back.height / 17);
     pop();
     if (dragged >= 0 && playing == 0) {
@@ -382,20 +403,6 @@ function mouseReleased() {
 }
 
 function mousePressed() {
-  if (f) {
-    let fs = fullscreen();
-    fullscreen(!fs);
-    if (500 * (windowHeight / 300) < windowWidth) {
-      wh = 500 * (windowHeight / 300);
-      ht = windowHeight;
-    } else {
-      wh = windowWidth;
-      ht = 300 * (windowWidth / 500);
-    }
-    cnv = createCanvas(wh, ht);
-    centerCanvas();
-    f = true;
-  }
   if (level == -1) {
     if (
       dist(mouseX, mouseY, 35 * (wh / 500), 35 * (wh / 500)) <
@@ -597,18 +604,6 @@ function mousePressed() {
       }
       passing = false;
     } else if (level > 0 || playing == true) {
-      for (let i = les.length - 1; i > -1; i--) {
-        if (
-          les[i].sprite.mouse.pressing() &&
-          (les[i].type == "sr" ||
-            les[i].type == "sb" ||
-            les[i].type == "r" ||
-            les[i].type == "b")
-        ) {
-          allSprites[i].remove();
-          les.splice(i, 1);
-        }
-      }
       if (
         (level > 2 || playing == true) &&
         mouseX > 0 &&
