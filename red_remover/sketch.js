@@ -75,7 +75,7 @@ function draw() {
     passed = true;
     for (let i = les.length - 1; i > -1; i--) {
         if (
-          les[i].sprite.mouse.presses() &&
+          les[i].sprite.mouse.pressing() &&
           (les[i].type == "sr" ||
             les[i].type == "sb" ||
             les[i].type == "r" ||
