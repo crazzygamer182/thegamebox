@@ -6361,6 +6361,8 @@ canvas {
 	this._ontouchstart = function (e) {
 		__onmousedown.call(this, 'left');
 		_ontouchstart.call(this, e);
+		__onmousedown.call(this, 'left');
+		_ontouchstart.call(this, e);
 	};
 
 	const _onmouseup = this._onmouseup;
