@@ -382,7 +382,7 @@ function mouseReleased() {
 
 function mousePressed() {
   let fs = fullscreen();
-    fullscreen(!fs);
+    fullscreen(fs);
   if (level == -1) {
     if (
       dist(mouseX, mouseY, 35 * (wh / 500), 35 * (wh / 500)) <
