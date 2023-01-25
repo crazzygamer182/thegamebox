@@ -143,7 +143,7 @@ function draw() {
   textSize(60)
   text(number, 570, 200)
   fill(0, 100, 255)
-  rect(50, height*(wh/1200) - 100, 100, 50)
+  rect(50, height*(wh/800) - 100, 100, 50)
   rect(1035, 16, 150, 66)
   if (isDecimal) {
     fill(0)
@@ -151,14 +151,14 @@ function draw() {
   }
 
   fill(200)
-  rect(178, height*(wh/1200) - 100, 100, 50)
+  rect(178, height*(wh/800) - 100, 100, 50)
   fill(0)
   textSize(40)
-  text('Clear', 52, height*(wh/1200) - 63)
+  text('Clear', 52, height*(wh/800) - 63)
   textSize(50)
   text('Undo', 1050, 65)
   textSize(40)
-  text('Next', 186.5, height*(wh/1200) - 63)
+  text('Next', 186.5, height*(wh/800) - 63)
   image(thousands, 40, 40)
   image(hundreds, 245, 50)
   image(tens, 410, 50)
@@ -229,13 +229,13 @@ function mousePressed() {
         if (mouseX/(wh/1200) > 50 && mouseX/(wh/1200) < 199 && mouseY/(wh/1200) > 50 && mouseY/(wh/1200) < 198) {
           createNewBlock(thousands, 1000)
         } else {
-          if (mouseX/(wh/1200) > 50 && mouseX/(wh/1200) < 149 && mouseY/(wh/1200) < height*(wh/1200) - 50 && mouseY/(wh/1200) > height*(wh/1200) - 100) {
+          if (mouseX/(wh/1200) > 50 && mouseX/(wh/1200) < 149 && mouseY/(wh/1200) < height*(wh/800) - 50 && mouseY/(wh/1200) > height*(wh/800) - 100) {
             blocks.length = 0
             number = 0
           } else if (mouseX/(wh/1200) > 1035 && mouseX/(wh/1200) < 1185 && mouseY/(wh/1200) > 15 && mouseY/(wh/1200) < 81) {
             undo()
           } else {
-            if (mouseX/(wh/1200) > 176 && mouseX/(wh/1200) < 277 && mouseY/(wh/1200) < height*(wh/1200) - 50 && mouseY/(wh/1200) > height*(wh/1200) - 100) {
+            if (mouseX/(wh/1200) > 176 && mouseX/(wh/1200) < 277 && mouseY/(wh/1200) < height*(wh/800) - 50 && mouseY/(wh/1200) > height*(wh/800) - 100) {
               newQuestion()
             }
           }
