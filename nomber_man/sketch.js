@@ -812,8 +812,8 @@ function mousePressed() {
   }
   if (gameStart == "startScreen") {
     gameStart = "choose";
-    let fs = fullscreen();
-    fullscreen(!fs);
+    //let fs = fullscreen();
+    //fullscreen(!fs);
     cnv = createCanvas(700, 600);
     cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
   }

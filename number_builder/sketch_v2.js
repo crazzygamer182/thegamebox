@@ -56,10 +56,24 @@ function setup() {
   if (params.decimal == 'true') {
     isDecimal = true
   }
-  createCanvas(1200, 800);
+  if (1200 * (windowHeight / 800) < windowWidth) {
+    wh = 1200 * (windowHeight / 800);
+    ht = windowHeight;
+  } else {
+    wh = windowWidth;
+    ht = 800 * (windowWidth / 1200);
+  }
+  cnv = createCanvas(wh, ht);
+  centerCanvas();
   newQuestion()
   block1 = new Block(10)
   block1.mousePressed = 0
+}
+
+function centerCanvas() {
+  let cx = (windowWidth - width) / 2;
+  let cy = (windowHeight - height) / 2;
+  cnv.position(cx, cy);
 }
 
 function preload() {
@@ -85,6 +99,7 @@ function preload() {
 }
 
 function draw() {
+  scale(wh/1200);
   imageMode(CORNER)
   if (number == 'NaN') {
     number = 0
@@ -199,26 +214,26 @@ function touchEnded(event) {
 }
 
 function mousePressed() {
-  console.log(mouseX + '_' + mouseY)
-  if (mouseX > 475 && mouseX < 538 && mouseY > 56 && mouseY < 106) {
+  console.log(mouseX/(wh/1200) + '_' + mouseY/(wh/1200))
+  if (mouseX/(wh/1200) > 475 && mouseX/(wh/1200) < 538 && mouseY/(wh/1200) > 56 && mouseY/(wh/1200) < 106) {
     createNewBlock(ones, 1)
   } else {
-    if (mouseX > 390 && mouseX < 457 && mouseY > 50 && mouseY < 200) {
+    if (mouseX/(wh/1200) > 390 && mouseX/(wh/1200) < 457 && mouseY/(wh/1200) > 50 && mouseY/(wh/1200) < 200) {
       createNewBlock(tens, 10)
     } else {
-      if (mouseX > 215 && mouseX < 362 && mouseY > 49 && mouseY < 198) {
+      if (mouseX/(wh/1200) > 215 && mouseX/(wh/1200) < 362 && mouseY/(wh/1200) > 49 && mouseY/(wh/1200) < 198) {
         createNewBlock(hundreds, 100)
       } else {
-        if (mouseX > 50 && mouseX < 199 && mouseY > 50 && mouseY < 198) {
+        if (mouseX/(wh/1200) > 50 && mouseX/(wh/1200) < 199 && mouseY/(wh/1200) > 50 && mouseY/(wh/1200) < 198) {
           createNewBlock(thousands, 1000)
         } else {
-          if (mouseX > 50 && mouseX < 149 && mouseY < height - 50 && mouseY > height - 100) {
+          if (mouseX/(wh/1200) > 50 && mouseX/(wh/1200) < 149 && mouseY/(wh/1200) < height - 50 && mouseY/(wh/1200) > height - 100) {
             blocks.length = 0
             number = 0
-          } else if (mouseX > 1035 && mouseX < 1185 && mouseY > 15 && mouseY < 81) {
+          } else if (mouseX/(wh/1200) > 1035 && mouseX/(wh/1200) < 1185 && mouseY/(wh/1200) > 15 && mouseY/(wh/1200) < 81) {
             undo()
           } else {
-            if (mouseX > 176 && mouseX < 277 && mouseY < height - 50 && mouseY > height - 100) {
+            if (mouseX/(wh/1200) > 176 && mouseX/(wh/1200) < 277 && mouseY/(wh/1200) < height - 50 && mouseY/(wh/1200) > height - 100) {
               newQuestion()
             }
           }
@@ -240,25 +255,25 @@ function mouseReleased() {
   }
   lastBlock.mousePressed = 0
   if (lastBlock.number == 1000) {
-    if (mouseX < 99 || mouseX > 195 || mouseY < 309 || mouseY > 494) {
+    if (mouseX/(wh/1200) < 99 || mouseX/(wh/1200) > 195 || mouseY/(wh/1200) < 309 || mouseY/(wh/1200) > 494) {
       undo()
       chartNum = 1
     }
   }
   if (lastBlock.number == 100) {
-    if (mouseX < 349 || mouseX > 446 || mouseY < 309 || mouseY > 494) {
+    if (mouseX/(wh/1200) < 349 || mouseX/(wh/1200) > 446 || mouseY/(wh/1200) < 309 || mouseY/(wh/1200) > 494) {
       undo()
       chartNum = 1
     }
   }
   if (lastBlock.number == 10) {
-    if (mouseX < 600 || mouseX > 824 || mouseY < 309 || mouseY > 494) {
+    if (mouseX/(wh/1200) < 600 || mouseX/(wh/1200) > 824 || mouseY/(wh/1200) < 309 || mouseY/(wh/1200) > 494) {
       undo()
       chartNum = 1
     }
   }
   if (lastBlock.number == 1) {
-    if (mouseX < 849 || mouseX > 1046 || mouseY < 309 || mouseY > 592) {
+    if (mouseX/(wh/1200) < 849 || mouseX/(wh/1200) > 1046 || mouseY/(wh/1200) < 309 || mouseY/(wh/1200) > 592) {
       undo()
       chartNum = 1
     }
