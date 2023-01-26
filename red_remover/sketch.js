@@ -972,6 +972,7 @@ function mousePressed() {
           ) {
             allSprites[i].remove();
             les.splice(i, 1);
+            tt = 100;
           }
         }
 
