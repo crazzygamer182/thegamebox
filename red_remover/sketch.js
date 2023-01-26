@@ -25,6 +25,8 @@ let savedLevels = [];
 let working = 0;
 let tt = 0;
 let ll = 28;
+let a;
+let a2;
 
 function preload() {
   font = loadFont("FredokaOne.ttf");
@@ -45,6 +47,8 @@ function preload() {
   music = loadSound("music.wav");
   sw = loadImage("switch.png");
   x = loadImage("x.png");
+  a = loadImage("arrow.png");
+  a2 = loadImage("arrow2.png");
 }
 
 function setup() {
@@ -972,7 +976,6 @@ function mousePressed() {
           ) {
             allSprites[i].remove();
             les.splice(i, 1);
-            tt = 100;
           }
         }
 
@@ -1820,6 +1823,8 @@ function drawLevels() {
       fill(214, 153, 56);
     }
     rect(475, 158, 25, 55, 10, 10);
+    imageMode(CENTER);
+    image(a, 475, 158, a.width/16, a.height/16);
   } else if (page == 2) {
     if (
       mouseX > (25 - 12.5) * (wh / 500) &&
@@ -1832,6 +1837,8 @@ function drawLevels() {
       fill(214, 153, 56);
     }
     rect(20, 158, 25, 55, 8, 10);
+    imageMode(CENTER);
+    image(a2, 21.5, 158, a2.width/16, a2.height/16);
   }
   textSize(17);
   fill(0);
@@ -1951,19 +1958,5 @@ function playy() {
 function keyPressed() {
   if (key == " ") {
     playy();
-  } else {
-    console.log(code());
-  }
-  if (key == "c") {
-    for (let i = 0; i < les.length; i++) {
-      if (
-        les[i].sprite.x > 0 &&
-        les[i].sprite.x < 500 &&
-        les[i].sprite.y > 0 &&
-        les[i].sprite.y < 300
-      ) {
-        console.log(les[i].sprite.vel.x, les[i].sprite.vel.y);
-      }
-    }
   }
 }
