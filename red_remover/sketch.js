@@ -116,7 +116,10 @@ function draw() {
     fill(0);
     textSize(40);
     noStroke();
-    text("Levels", 250, 40 - 65);
+    text("Levels", 250, 40 - 80);
+    textSize(10);
+    text("Post pictures of your levels on instagram with", 250, 40 - 50);
+    text("#redremoverlevel for a chance to have your level in the game!", 250, 40 - 40);
     strokeWeight(3);
     stroke(0);
     for (
@@ -976,6 +979,7 @@ function mousePressed() {
           ) {
             allSprites[i].remove();
             les.splice(i, 1);
+            tt = 100;
           }
         }
 
@@ -1626,7 +1630,7 @@ function nextLevel(won) {
     );
   } else if (level == 28) {
     decode(
-      "sb.275.212.370.21.1.r/b.135.144.20.105.1.r/b.243.144.20.106.1.r/b.188.144.20.106.1.r/b.303.144.20.106.1.r/b.361.144.20.106.1.r/b.418.144.20.105.1.r/dr.121.33.35.35.1.r/dr.177.32.35.35.1.r/dr.232.31.35.35.1.r/dr.293.31.35.35.1.r/dr.349.31.35.35.1.r/sb.45.94.20.20.1.r/b.23.94.20.20.4.r/sb.122.61.39.20.1.r/sb.177.61.40.20.1.r/sb.231.60.40.20.1.r/sb.293.61.39.20.1.r/sb.349.61.40.20.1.r/sb.453.60.42.20.1.r/sb.394.290.46.20.1.r/sb.505.290.47.20.1.r/g.453.25.35.35.1.r"
+      "sb.275.212.370.21.1.r/b.135.144.20.105.1.r/b.243.144.20.106.1.r/b.188.144.20.106.1.r/b.303.144.20.106.1.r/b.361.144.20.106.1.r/b.418.144.20.105.1.r/dr.121.33.35.35.1.r/dr.177.32.35.35.1.r/dr.232.31.35.35.1.r/dr.293.31.35.35.1.r/dr.349.31.35.35.1.r/sb.45.94.20.20.1.r/b.23.94.20.20.4.r/sb.122.61.39.20.1.r/sb.177.61.40.20.1.r/sb.231.60.40.20.1.r/sr.293.61.39.20.1.r/sb.349.61.40.20.1.r/sb.453.60.42.20.1.r/sb.394.290.46.20.1.r/sb.505.290.47.20.1.r/g.453.25.35.35.1.r"
     );
   }
 }
@@ -1958,5 +1962,19 @@ function playy() {
 function keyPressed() {
   if (key == " ") {
     playy();
+  } else {
+    console.log(code());
+  }
+  if (key == "c") {
+    for (let i = 0; i < les.length; i++) {
+      if (
+        les[i].sprite.x > 0 &&
+        les[i].sprite.x < 500 &&
+        les[i].sprite.y > 0 &&
+        les[i].sprite.y < 300
+      ) {
+        console.log(les[i].sprite.vel.x, les[i].sprite.vel.y);
+      }
+    }
   }
 }
