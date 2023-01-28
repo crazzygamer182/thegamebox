@@ -137,7 +137,7 @@ function draw() {
         circle(j * 150 + 30 + 3, i * 100 + 25 + 2.5, 30);
         fill(0);
         noStroke();
-        text(i * 3 + j, j * 150 + 30 + 3, i * 100 + 22 + 2.5);
+        text(i * 3 + j + 1, j * 150 + 30 + 3, i * 100 + 22 + 2.5);
         stroke(0);
         for (let k = 0; k < blocks.length; k++) {
           push();
@@ -620,6 +620,7 @@ function draw() {
     push();
     textSize(25);
     scale(wh / 500);
+    fill(0);
     text("More levels coming soon!", 250, 170);
     pop();
   }
