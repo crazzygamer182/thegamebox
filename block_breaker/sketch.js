@@ -122,7 +122,7 @@ function draw() {
     ) {
       image(s2, 0, 0, s1.width * (wh / s1.width), s1.height * (ht / s1.height));
     } else {
-      image(s1, 0, 0, s2.width * (wh / s2.width), s2.height * (ht / s2.height));
+      image(s1, 0, 0, s2.width * (wh / s2.width) + frameCount % 10, s2.height * (ht / s2.height) + frameCount % 10);
     }
   } else {
     startX3 += 7 * (wh / 500);
