@@ -133,8 +133,6 @@ function draw() {
     noStroke();
     text("Levels", 250, 40 - 80);
     textSize(10);
-    text("Post pictures of your levels on instagram with", 250, 40 - 50);
-    text("#redremoverlevel for a chance to have your level in the game!", 250, 40 - 40);
     strokeWeight(3);
     stroke(0);
     for (
@@ -1380,7 +1378,8 @@ function share() {
         "level_code": code()
     }
 }, function(result) {
-  navigator.clipboard.writeText("thegamebox.ca/redremover/?sharedLevel=" + result.guid);
+  navigator.clipboard.writeText("game.thegamebox.ca/red_remover/?sharedLevel=" + result.guid);
+  alert("Link copied to clipboard!");
 });
 }
 
