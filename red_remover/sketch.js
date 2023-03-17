@@ -111,6 +111,7 @@ function mouseWheel(event) {
       60
   )
     pos += event.delta;
+    return false;
 }
 
 function draw() {
