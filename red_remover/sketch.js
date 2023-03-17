@@ -85,7 +85,8 @@ function setup() {
     savedLevels = getItem("slevels");
   }
   let params = getURLParams();
-  if (params.sharedLevel != '') {
+  console.log(params.sharedLevel);
+  if (params.sharedLevel != null) {
     console.log(params.sharedLevel);
     httpGet("http://api2.thegamebox.ca/api/red-remover-levels?filters[guid]=" + params.sharedLevel, "json", false, function(response) {decodeToBlocks(response.data[0].attributes.level_code)});
     pos = 0;
