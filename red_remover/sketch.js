@@ -88,7 +88,7 @@ function setup() {
   console.log(params.sharedLevel);
   if (params.sharedLevel != undefined) {
     console.log(params.sharedLevel);
-    httpGet("http://api2.thegamebox.ca/api/red-remover-levels?filters[guid]=" + params.sharedLevel, "json", false, function(response) {decodeToBlocks(response.data[0].attributes.level_code)});
+    httpGet("https://api2.thegamebox.ca/api/red-remover-levels?filters[guid]=" + params.sharedLevel, "json", false, function(response) {decodeToBlocks(response.data[0].attributes.level_code)});
     pos = 0;
     level = -1;
     working = savedLevels.length;
