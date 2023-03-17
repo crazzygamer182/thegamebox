@@ -49,18 +49,23 @@ function preload() {
   x = loadImage("x.png");
   a = loadImage("arrow.png");
   a2 = loadImage("arrow2.png");
+  shareImg = loadImage("share.png");
 }
 
 function setup() {
-  if (500 * (windowHeight / 300) < windowWidth) {
-    wh = 500 * (windowHeight / 300);
-    ht = windowHeight;
+  let height = windowHeight - 60;
+  let width = document.getElementById("myParent").offsetWidth;
+  if (500 * (height / 300) < width) {
+    wh = 500 * (height / 300);
+    ht = height;
   } else {
-    wh = windowWidth;
-    ht = 300 * (windowWidth / 500);
+    wh = width;
+    ht = 300 * (width / 500);
   }
+  document.getElementById("myParent").style.height = ht + "px";
   cnv = createCanvas(wh, ht);
-  centerCanvas();
+  cnv.parent("myParent");
+  centerCanvas(width, ht);
   nextLevel(false);
   textFont(font);
   textAlign(CENTER, CENTER);
@@ -79,11 +84,20 @@ function setup() {
   if (getItem("slevels") != null) {
     savedLevels = getItem("slevels");
   }
+  let params = getURLParams();
+  if (params.sharedLevel != 'null') {
+    console.log(params.sharedLevel);
+    httpGet("http://api2.thegamebox.ca/api/red-remover-levels?filters[guid]=" + params.sharedLevel, "json", false, function(response) {decodeToBlocks(response.data[0].attributes.level_code)});
+    pos = 0;
+    level = -1;
+    working = savedLevels.length;
+    blocks = [];
+  }
 }
 
-function centerCanvas() {
-  let cx = (windowWidth - width) / 2;
-  let cy = (windowHeight - height) / 2;
+function centerCanvas(ww, wh) {
+  let cx = (ww - width) / 2;
+  let cy = (wh - height) / 2 + 25;
   cnv.position(cx, cy);
 }
 
@@ -594,6 +608,12 @@ function draw() {
       stroke(0, 75, 0);
       fill(120, 255, 120);
       circle(410, 35, 40);
+      stroke(0, 0, 75);
+      fill(120, 120, 255);
+      circle(355, 35, 40);
+      noStroke();
+      fill(225, 75, 75);
+      text("NEW", 355, 65);
       push();
       stroke(0);
       fill(100, 200, 100);
@@ -605,6 +625,7 @@ function draw() {
       pop();
       image(back, 35, 35, back.width / 17, back.height / 17);
       image(x, 465, 35, x.width / 17, x.height / 17);
+      image(shareImg, 355, 35, x.width / 17, x.height / 17);
       pop();
       if (dragged >= 0 && playing == 0) {
         blocks[dragged].show();
@@ -744,6 +765,9 @@ function mousePressed() {
           blocks = [];
           mg = 1;
           shape = "r";
+        } else if (dist(mouseX, mouseY, 355 * (wh / 500), 35 * (wh / 500)) <
+        20 * (wh / 500)) {
+          share();
         }
       }
     }
@@ -1349,6 +1373,16 @@ class Block {
   }
 }
 
+function share() {
+  httpPost("https://api2.thegamebox.ca/api/red-remover-levels", "json", {
+    "data": {
+        "level_code": code()
+    }
+}, function(result) {
+  navigator.clipboard.writeText("thegamebox.ca/redremover/?sharedLevel=" + result.guid);
+});
+}
+
 function nextLevel(won) {
   passed = false;
   resetLevel();
@@ -1633,6 +1667,10 @@ function nextLevel(won) {
     decode(
       "sb.275.212.370.21.1.r/b.135.144.20.105.1.r/b.243.144.20.106.1.r/b.188.144.20.106.1.r/b.303.144.20.106.1.r/b.361.144.20.106.1.r/b.418.144.20.105.1.r/dr.121.33.35.35.1.r/dr.177.32.35.35.1.r/dr.232.31.35.35.1.r/dr.293.31.35.35.1.r/dr.349.31.35.35.1.r/sb.45.94.20.20.1.r/b.23.94.20.20.4.r/sb.122.61.39.20.1.r/sb.177.61.40.20.1.r/sb.231.60.40.20.1.r/sb.293.61.39.20.1.r/sb.349.61.40.20.1.r/sr.453.60.42.20.1.r/sb.394.290.46.20.1.r/sb.505.290.47.20.1.r/g.453.25.35.35.1.r"
     );
+  } else if (level == 29) {
+    decode(
+      "dr.77.56.35.35.1.r/g.77.98.35.35.1.r/sr.77.130.47.20.1.r/sr.275.131.279.20.1.r/g.275.99.35.35.1.r/sb.275.181.35.35.1.r/sg.382.183.35.35.1.r/dr.382.99.35.35.1.r/dr.162.99.35.35.1.r/sr.162.180.35.35.1.r/sb.75.269.88.44.1.r/dr.462.56.20.20.2.r/b.456.153.20.20.2.r/sb.435.56.20.24.2.r/sr.432.154.20.25.2.r"
+    ); 
   }
 }
 
