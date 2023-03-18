@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+
+<body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', getSize);
+        window.addEventListener('resize', getSize);
+
+        var winW;
+        var winH;
+
+        function getSize() {
+            winW = window.innerWidth;
+            winH = window.innerHeight;
+        };
+
+        var player;
+        var player_bool = false;
+        var bot;
+        var weapon;
+
+        var tileW = 384;
+        var tileH = 288;
+
+        var speed = 0;
+        var maxspeed = 150;
+
+        var pnter;
+        var aimline;
+
+        var polymap = [];
+        var gfx;
+
+        var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+
+
+        //******************************* PRELOAD AND CREATE *****************************************//
+
+        function preload() {
+            game.load.spritesheet('shad', 'https://spoop.000webhostapp.com/iso_01/assets/img/shadow_01.png', 165, 105, 4);
+            game.load.spritesheet('ball', 'https://spoop.000webhostapp.com/iso_01/assets/img/ship_01.png', 165, 105, 4);
+            game.load.spritesheet('bot', 'https://spoop.000webhostapp.com/iso_01/assets/img/bot_01.png', 32, 48, 4);
+            game.load.image('block_01', 'https://spoop.000webhostapp.com/iso_01/assets/img/blox_01.png', 192, 176);
+            game.load.image('block_02', 'https://spoop.000webhostapp.com/iso_01/assets/img/blox_02.png', 192, 176);
+            game.load.image('bullet', 'https://spoop.000webhostapp.com/iso_01/assets/img/bullet_01.png', 72, 40);
+            game.load.image('tilemap_01', 'https://spoop.000webhostapp.com/iso_01/assets/img/floor_01.png');
+            game.load.tilemap('map_01', 'map.csv', null, Phaser.Tilemap.CSV);
+        };
+
+        function create() {
+            game.scale.setGameSize(winW, winH);
+            game.renderer.renderSession.roundPixels = true;
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+            Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+            game.time.advancedTiming = true;
+            game.stage.backgroundColor = '#606060';
+            //bg = game.add.tileSprite(0, 0, winW, winH, 'tilemap_00');
+            //bg.fixedToCamera = true;
+
+            map_01 = game.add.tilemap('map_01', tileW, tileH);
+            map_01.addTilesetImage('tilemap_01');
+            //map_01.setCollision(3);
+
+            layer_01 = map_01.createLayer(0);
+            layer_01.resizeWorld();
+            //layer_01.debug = true;
+
+            aliens = game.add.group();
+            aliens.enableBody = true;
+
+            aimline = new Phaser.Line(0, 0, 0, 0);
+            pnter = game.input.activePointer;
+
+            shadow = game.add.sprite(0, 0, 'shad');
+            shadow.anchor.setTo(0.2, 1.0);
+            shadow.alpha = 0.3;
+            weapon = game.add.weapon(30, 'bullet');
+            weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+            weapon.bulletAngleOffset = 90;
+            weapon.bulletSpeed = 400;
+            weapon.fireRate = 60;
+
+            ggroup = game.add.group();
+
+            getTiles();
+            createPlayer();
+            for (var i = 0; i < 50; i++) {
+                bot = game.add.sprite(game.world.randomX, game.world.randomY, 'bot');
+                game.physics.enable(bot, Phaser.Physics.ARCADE);
+                bot.body.allowGravity = false;
+                bot.body.collideWorldBounds = true;
+                bot.body.bounce.setTo(0.3, 0.3);
+                bot.name = 'alien';
+                bot.body.velocity.set(game.rnd.integerInRange(-100, 100), game.rnd.integerInRange(-100, 100));
+                ggroup.add(bot);
+            };
+        };
+
+        function createPlayer() {
+            player = game.add.sprite(512, 512, 'ball');
+            player.anchor.setTo(0.5, 1.0);
+            game.physics.enable(player, Phaser.Physics.ARCADE);
+            player.body.maxVelocity.setTo(150, 150);
+            player.body.acceleration.setTo(10, 10);
+            player.body.allowGravity = false;
+            player.body.collideWorldBounds = true;
+            player.name = 'player';
+            weapon.trackSprite(player, 14, 0);
+            game.camera.follow(player);
+            ggroup.add(player);
+            player_bool = true;
+        };
+
+        function getTiles() {
+            var lenW = map_01.layers[0].width;
+            var lenH = map_01.layers[0].height;
+            for (var i = 0; i < lenW; i++) {
+                for (var j = 0; j < lenH; j++) {
+                    var bval = map_01.layers[0].data[j][i].index;
+                    if (bval == 1 || bval == 3) {
+                        newPoly(map_01.layers[0].data[j][i].worldX, map_01.layers[0].data[j][i].worldY);
+                        newBlox(map_01.layers[0].data[j][i].worldX, map_01.layers[0].data[j][i].worldY, bval);
+                    };
+                };
+            };
+        };
+
+        function newPoly(px, py) {
+            var posx = px;
+            var posy = py + 48;
+            var poly = new Phaser.Polygon([posx, posy + 48, posx + 96, posy, posx + 192, posy + 48, posx + 96, posy + 96]);
+            poly.cx = poly.points[0].x + (poly.points[2].x - poly.points[0].x) / 2;
+            poly.cy = poly.points[0].y + (poly.points[2].y - poly.points[0].y) / 2;
+            /*
+            var gfx = game.add.graphics(0, 0);
+            gfx.beginFill(0xFF0000);
+            gfx.alpha = 0.1;
+            gfx.drawPolygon(poly.points);
+            gfx.endFill();
+            */
+            polymap.push(poly);
+        };
+
+        function newBlox(px, py, val) {
+            if (val == 1) {
+                blox_01 = game.add.sprite(px + 96, py + 96, 'block_01');
+                blox_01.anchor.setTo(0.5, 0.7);
+                ggroup.add(blox_01);
+            };
+            if (val == 3) {
+                blox_02 = game.add.sprite(px + 96, py + 96, 'block_02');
+                blox_02.anchor.setTo(0.5, 0.7);
+                ggroup.add(blox_02);
+            };
+        };
+
+        //******************************* UPDATE *****************************************//
+
+        function update() {
+            if (player_bool) {
+                if (polymap.some(checkContain)) {
+
+                };
+                if (polymap.some(checkBots)) {
+
+                };
+                //console.log(player.body.speed)
+                if (speed >= maxspeed) {
+                    speed = maxspeed;
+                } else {
+                    speed = game.physics.arcade.distanceToPointer(player);
+                };
+                game.physics.arcade.accelerateToPointer(player, pnter, speed, maxspeed, maxspeed);
+                shadow.position = player.position;
+                game.physics.arcade.collide([player, ggroup], [ggroup], null, checkColl, this);
+                ggroup.sort('y', Phaser.Group.SORT_ASCENDING);
+                ggroup.forEach(checkColl, this);
+                if (pnter.isDown) {
+                    weapon.fire();
+                };
+            };
+        };
+        function checkBots(obj) {
+            ggroup.forEach(checkColl, this);
+
+
+        }
+        function checkColl(obj) {
+            //console.log(obj.name)
+            if (obj.name == 'alien') {
+                if (obj.body.velocity.x > 0 && obj.body.velocity.y > 0) {
+                    obj.frame = 0;
+                } else if (obj.body.velocity.x < 0 && obj.body.velocity.y > 0) {
+                    obj.frame = 1;
+                } else if (obj.body.velocity.x < 0 && obj.body.velocity.y < 0) {
+                    obj.frame = 2;
+                } else if (obj.body.velocity.x > 0 && obj.body.velocity.y < 0) {
+                    obj.frame = 3;
+                };
+            } else if (obj.name == 'player') {
+                if (obj.body.velocity.x > 0 && obj.body.velocity.y > 0) {
+                    obj.frame = 0;
+                    shadow.frame = 0;
+                } else if (obj.body.velocity.x < 0 && obj.body.velocity.y > 0) {
+                    obj.frame = 1;
+                    shadow.frame = 1;
+                } else if (obj.body.velocity.x < 0 && obj.body.velocity.y < 0) {
+                    obj.frame = 2;
+                    shadow.frame = 2;
+                } else if (obj.body.velocity.x > 0 && obj.body.velocity.y < 0) {
+                    obj.frame = 3;
+                    shadow.frame = 3;
+                };
+            };
+        };
+
+        function checkContain(obj) {
+            if (obj.contains(player.x, player.y)) {
+                aimline.start.x = obj.cx;
+                aimline.start.y = obj.cy;
+                aimline.end.x = player.x;
+                aimline.end.y = player.y;
+                if (player.x < obj.cx && player.y < obj.cy) {
+                    player.body.velocity.x = -speed / 5;
+                    player.body.velocity.y = -speed / 5;
+                } else if (player.x > obj.cx && player.y < obj.cy) {
+                    player.body.velocity.x = +speed / 5;
+                    player.body.velocity.y = -speed / 5;
+                } else if (player.x < obj.cx && player.y > obj.cy) {
+                    player.body.velocity.x = -speed / 5;
+                    player.body.velocity.y = +speed / 5;
+                } else if (player.x > obj.cx && player.y > obj.cy) {
+                    player.body.velocity.x = +speed / 5;
+                    player.body.velocity.y = +speed / 5;
+                };
+                return true
+            };
+        };
+
+        function render() {
+            if (player_bool) {
+                game.debug.geom(aimline, '#ff0000');
+                //game.debug.spriteBounds(player);
+                game.debug.spriteInfo(player, 32, 64);
+                game.debug.text('FPS: ' + game.time.fps || 'FPS: --', 32, 40, "#00ff00");
+            };
+        };
+
+
+
+
+
+
+// Sprites Richtungen / idle animation
+
+
+    </script>
+
+</body>
+
+</html>
