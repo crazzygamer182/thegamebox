@@ -37,6 +37,7 @@ function setup() {
   document.getElementById("myParent").style.height = ht + "px";
   cnv = createCanvas(wh, ht);
   cnv.parent("myParent");
+  textFont(fontt);
   centerCanvas(width, ht);
   preset();
 }
@@ -48,6 +49,7 @@ function centerCanvas(ww, wh) {
 }
 
 function preload() {
+  fontt = loadFont("Comfortaa-Regular.ttf");
   base = loadImage("base.png");
   back = loadImage("background.png");
   for (let i = 0; i < 4; i++) {
@@ -77,6 +79,7 @@ function preset() {
 function fixSubject(t, x, y, size) {
   allSprites[allSprites.length - 1].draw = () => {
     let z = allSprites[allSprites.length - 1];
+    fill(125);
     rect(0, 0, z.width, z.height);
     fill(0);
     if (size == null) {
@@ -84,13 +87,14 @@ function fixSubject(t, x, y, size) {
     } else {
       textSize(size);
     }
-    text(t, x, y);
+    text(t, x, y-10);
   };
 }
 
 function fixLevel(t1, t, x, y, size) {
   allSprites[allSprites.length - 1].draw = () => {
     let z = allSprites[allSprites.length - 1];
+    fill(125);
     rect(0, 0, z.width, z.height);
     fill(0);
     textSize(10);
@@ -100,7 +104,7 @@ function fixLevel(t1, t, x, y, size) {
     } else {
       textSize(size);
     }
-    text(t, x, y + 10);
+    text(t, x, y + 8);
   };
 }
 
@@ -108,11 +112,11 @@ function next() {
   allSprites.remove();
   gameStart = "wait";
   createSprite(170, 175, 70, 70);
-  fixLevel("One Digit", "1", 0, 0);
+  fixLevel("One Digit", "3", 0, 0);
   createSprite(250, 175, 70, 70);
-  fixLevel("Two Digits", "10", 0, 0, 35);
+  fixLevel("Two Digits", "48", 0, 0, 35);
   createSprite(330, 175, 70, 70);
-  fixLevel("Three Digits", "100", 0, 0, 30);
+  fixLevel("Three Digits", "217", 0, 0, 30);
 }
 
 function start() {
@@ -198,9 +202,9 @@ function draw() {
     if (count == 0 && message == false) {
       message = true;
     }
-    fill(0, 0, 255);
+    fill(50, 75, 255);
     rect(85, 267, 100, 25);
-    fill(255, 0, 0);
+    fill(75);
     gcount += (count - gcount) / 20;
     rect(
       85 - (gcount * (100 / goods)) / 2 + 50,
@@ -211,7 +215,7 @@ function draw() {
     image(base, 423, 265, base.width/15, base.height/15);
     fill(255);
     textSize(15);
-    text("What is " + num1 + " " + subject + " " + num2 + "?", 250, 246);
+    text("What is " + num1 + " " + subject + " " + num2 + "?", 250, 245);
     if (message == true) {
       createMessage();
     }
@@ -222,14 +226,14 @@ function draw() {
       createMiniMessage2();
     }
     if (dead == true) {
-      fill(255);
-      rect(250, 115, 350, 200);
       fill(0);
+      rect(250, 115, 350, 200);
+      fill(207, 119, 17);
       textSize(45);
       text("You Lose!", 250, 70);
       textSize(25);
       text("Score: " + finalScore, 250, 120);
-      fill(255);
+      fill(125);
       rect(250, 172, 100, 40);
       fill(0);
       textSize(17);
@@ -249,8 +253,10 @@ function draw() {
     push();
     scale(wh / 500);
     image(back, 250, 150, 500, 300);
+    fill(0);
     rect(250, 150, 400, 200);
     textSize(27);
+    fill(207, 119, 17);
     if (gameStart != "wait") {
       text("Choose a subject", 250, 100);
     } else {
@@ -261,11 +267,11 @@ function draw() {
 }
 
 function createMiniMessage() {
-  fill(255);
-  rect(75, 40, 160, 30);
   fill(0);
+  rect(75, 40, 160, 30);
+  fill(207, 119, 17);
   textSize(15);
-  text("Place New Tower", 77, 41);
+  text("Place New Tower", 77, 39);
 }
 
 function makeQuestion() {
@@ -304,7 +310,11 @@ class Option {
       this.num = num;
       this.right = true;
     } else {
-      this.num = int(random(num1, num2 + 1) * random(1, 3) * random(0, 1));
+      if (subject != "÷") {
+        this.num = int(random(right-5*level, right+5*level + 1) * random(1, 3) * random(0, 1));
+      } else {
+        this.num = int(random(right, num2 + 1) * random(1, 3) * random(0, 1));
+      }
       this.right = false;
     }
     this.sprite = createSprite(x, y, 30, 30, "static");
@@ -318,38 +328,45 @@ class Option {
       fill(255);
       if (level == 1) {
         textSize(20);
+        text(this.num, 0, -1);
       } else if (level == 10) {
         textSize(15);
+        text(this.num, 0, -1);
       } else if (level == 100) {
-        textSize(10);
+        if (subject != "X") {
+          textSize(10);
+          text(this.num, 0, -1);
+        } else {
+          textSize(7);
+          text(this.num, 0, -1);
+        }
       }
-      text(this.num, 0, 1);
     };
   }
 }
 
 function createMiniMessage2() {
-  fill(255);
-  rect(75, 40, 160, 30);
   fill(0);
-  textSize(12);
-  text("Choose tower to upgrade", 77, 41);
+  rect(75, 40, 160, 30);
+  fill(207, 119, 17);
+  textSize(10);
+  text("Choose tower to upgrade", 77, 39);
 }
 
 function createMessage() {
   message = true;
-  fill(255);
-  rect(250, 115, 350, 200);
   fill(0);
+  rect(250, 115, 350, 200);
+  fill(207, 119, 17);
   textSize(30);
   text("Upgrade Unlocked", 250, 60);
-  fill(255);
+  fill(125);
   rect(325, 143, 125, 80);
   rect(175, 143, 125, 80);
   textSize(18);
   fill(0);
   text("New Tower", 325, 143);
-  textSize(16);
+  textSize(13);
   text("Upgrade Tower", 175, 143);
 }
 
@@ -372,7 +389,7 @@ class Enemy {
       circle(0, 0, this.sprite.width);
       fill(0);
       textSize(10);
-      text(this.health, 0, 0.5);
+      text(this.health, 0, -1);
       if (this.sprite.y < 58) {
         this.sprite.moveTo(94, 58);
       } else if (this.sprite.x < 327 && this.sprite.y < 121) {
