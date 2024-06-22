@@ -15,6 +15,7 @@ function setup() {
   centerCanvas();
   rectMode(CENTER);
   textAlign(CENTER, CENTER);
+  textWrap(WORD);
   fixer = wh / 493.4117647058823;
 }
 
@@ -26,7 +27,7 @@ function centerCanvas() {
 }
 
 function preload() {
-  appScreen = loadImage("appscreen.png");
+  appScreen = loadImage("70appscreen.png");
 }
 
 function draw() {
@@ -36,9 +37,8 @@ function draw() {
     strokeWeight(10);
     rect(270, 510, 450, 925);
     textSize(40);
-    text("Your " + type + " is:", 270, 440 - 100 / answer.length);
-    textSize(8 + 550 / answer.length);
-    text(answer, 270, 510);
+    text("Your " + type + " is:", 270, 300);
+    text(answer, 270, 510, 400);
     textSize(30);
     text("Click anywhere to continue", 270, 800);
   }
@@ -47,6 +47,44 @@ function draw() {
 function mousePressed() {
   console.log(mouseX, mouseY);
   if (stage == 0) {
+    //for 70's
+    if (
+      mouseX > 40 * fixer &&
+      mouseX < 462 * fixer &&
+      mouseY > 243 * fixer &&
+      mouseY < 662 * fixer
+    ) {
+      answer = "";
+      httpGet(
+        "https://api.nation-builder.org/api/cards/random?category=2",
+        "json",
+        false,
+        function (response) {
+          console.log(response);
+          answer = response.name;
+        }
+      );
+      type = "movie";
+      stage = 1;
+    } else if (
+      mouseX > 40 * fixer &&
+      mouseX < 462 * fixer &&
+      mouseY > 689 * fixer &&
+      mouseY < 889 * fixer
+    ) {
+      httpGet(
+        "https://api.nation-builder.org/api/cards/random?category=3",
+        "json",
+        false,
+        function (response) {
+          answer = response.name;
+        }
+      );
+      type = "movie";
+      stage = 1;
+    }
+    //normal one
+    /*
     if (
       mouseX > 40 * fixer &&
       mouseX < 222 * fixer &&
@@ -148,6 +186,7 @@ function mousePressed() {
       type = "random";
       stage = 1;
     }
+    */
   } else {
     stage = 0;
   }
