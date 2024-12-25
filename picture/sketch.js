@@ -27,7 +27,7 @@ function centerCanvas() {
 }
 
 function preload() {
-  appScreen = loadImage("70appscreen.png");
+  appScreen = loadImage("appscreen.png");
 }
 
 function draw() {
@@ -47,44 +47,6 @@ function draw() {
 function mousePressed() {
   console.log(mouseX, mouseY);
   if (stage == 0) {
-    //for 70's
-    if (
-      mouseX > 40 * fixer &&
-      mouseX < 462 * fixer &&
-      mouseY > 243 * fixer &&
-      mouseY < 662 * fixer
-    ) {
-      answer = "";
-      httpGet(
-        "https://api.nation-builder.org/api/cards/random?category=2",
-        "json",
-        false,
-        function (response) {
-          console.log(response);
-          answer = response.name;
-        }
-      );
-      type = "movie";
-      stage = 1;
-    } else if (
-      mouseX > 40 * fixer &&
-      mouseX < 462 * fixer &&
-      mouseY > 689 * fixer &&
-      mouseY < 889 * fixer
-    ) {
-      httpGet(
-        "https://api.nation-builder.org/api/cards/random?category=3",
-        "json",
-        false,
-        function (response) {
-          answer = response.name;
-        }
-      );
-      type = "movie";
-      stage = 1;
-    }
-    //normal one
-    /*
     if (
       mouseX > 40 * fixer &&
       mouseX < 222 * fixer &&
@@ -186,7 +148,6 @@ function mousePressed() {
       type = "random";
       stage = 1;
     }
-    */
   } else {
     stage = 0;
   }
