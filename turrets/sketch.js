@@ -23,29 +23,26 @@ let level = 0
 let dead = false;
 let base;
 let finalScore;
+let wh, ht;
 
 function setup() {
-  let height = windowHeight - 60;
-  let width = document.getElementById("myParent").offsetWidth;
-  if (500 * (height / 300) < width) {
-    wh = 500 * (height / 300);
-    ht = height;
-  } else {
-    wh = width;
-    ht = 300 * (width / 500);
-  }
-  document.getElementById("myParent").style.height = ht + "px";
-  cnv = createCanvas(wh, ht);
-  cnv.parent("myParent");
   textFont(fontt);
-  centerCanvas(width, ht);
+  if (500 * (windowHeight / 300) < windowWidth) {
+    wh = 500 * (windowHeight / 300);
+    ht = windowHeight;
+  } else {
+    wh = windowWidth;
+    ht = 300 * (windowWidth / 500);
+  }
   preset();
+  cnv = createCanvas(wh, ht);
+  centerCanvas();
 }
 
-function centerCanvas(ww, wh) {
-  let cx = (ww - width) / 2;
-  let cy = (wh - height) / 2 + 25;
-  cnv.position(cx, cy);
+function centerCanvas() {
+  let x = (windowWidth - width) / 2;
+  let y = (windowHeight - height) / 2;
+  cnv.position(x, y);
 }
 
 function preload() {
