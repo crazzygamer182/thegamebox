@@ -12,6 +12,8 @@ let skeletonImage;
 let knightImage;
 let fireballCardImage;
 let arrowsCardImage;
+let arrowImage; // New arrow image for projectiles
+let fireballImage; // New fireball image for projectiles
 let goblinImage;
 let witchImage;
 let mathPoints = 0; // Player's math points
@@ -24,12 +26,18 @@ let displayedElixir = 0; // Animated elixir value for smooth bar animation
 let elixirAnimationSpeed = 0.1; // How fast the bar animates
 let elixirGradient = null; // Store gradient to avoid recreating it every frame
 let frameCount = 0; // Frame counter for debugging
+let lastMathAnswerTime = 0; // Track when last math question was answered
+let mathAnswerCooldown = 500; // 500ms cooldown after answering math question
 
 // Enemy AI system
 let enemyElixir = 0; // Enemy's elixir (max 10)
 let enemyLastSpawn = 0; // Track when enemy last spawned a unit
 let enemySpawnInterval = 8000; // Enemy spawns every 8 seconds
 let enemyDeck = []; // Enemy's deck of cards
+
+// Card properties
+let fireballradius = 30;
+let arrowsradius = 60;
 
 // Bridge properties
 let bridges = [
@@ -39,6 +47,184 @@ let bridges = [
 
 // Projectile system for witch attacks
 let projectiles = [];
+
+// Arrow projectile system for arrows spell
+let arrowProjectiles = [];
+
+// Tower arrow system for tower defense
+let towerArrows = [];
+
+class TowerArrow {
+  constructor(towerX, towerY, targetX, targetY, damage, towerSide) {
+    this.x = towerX;
+    this.y = towerY;
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.damage = damage;
+    this.towerSide = towerSide; // Track which side shot this arrow
+    this.speed = 4;
+    this.radius = 3;
+    this.hit = false;
+    this.hitTime = 0;
+    this.size = 6; // Size of the tower arrow image
+    
+    // Calculate direction
+    let dx = targetX - towerX;
+    let dy = targetY - towerY;
+    let distance = sqrt(dx * dx + dy * dy);
+    this.dx = (dx / distance) * this.speed;
+    this.dy = (dy / distance) * this.speed;
+    
+    // Calculate angle for arrow rotation
+    this.angle = atan2(dy, dx);
+  }
+  
+  update() {
+    if (!this.hit) {
+      this.x += this.dx;
+      this.y += this.dy;
+      
+      // Check if arrow reached target area
+      let distanceToTarget = dist(this.x, this.y, this.targetX, this.targetY);
+      if (distanceToTarget < 10) {
+        this.hit = true;
+        this.hitTime = millis();
+        this.dealDamage();
+      }
+    }
+  }
+  
+  dealDamage() {
+    // Deal single target damage to the specific troop that was targeted
+    let splashRadius = 15;
+    let targetSide = this.towerSide === "player" ? "enemy" : "player"; // Determine which troops to damage
+    
+    // Damage troops
+    for (let troop of spawnedCards) {
+      if (troop && troop.health > 0 && troop.isEnemy === (targetSide === "enemy")) {
+        let distance = dist(this.x, this.y, troop.x, troop.y);
+        if (distance < splashRadius) {
+          troop.health -= this.damage;
+          if (troop.health < 0) {
+            troop.health = 0;
+          }
+          break; // Only damage one troop (single target)
+        }
+      }
+    }
+  }
+  
+  display() {
+    if (!this.hit) {
+      // Draw tower arrow image rotated to face the target
+      push();
+      translate(this.x, this.y);
+      rotate(this.angle);
+      imageMode(CENTER);
+      image(arrowImage, 0, 0, this.size * 2, this.size);
+      pop();
+    }
+  }
+  
+  isDead() {
+    // Keep arrow visible for a short time after hitting
+    if (this.hit) {
+      return millis() - this.hitTime > 100;
+    }
+    return false;
+  }
+}
+
+class ArrowProjectile {
+  constructor(startX, startY, targetX, targetY, damage) {
+    this.x = startX;
+    this.y = startY;
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.damage = damage;
+    this.speed = 4;
+    this.radius = 3;
+    this.hit = false;
+    this.hitTime = 0;
+    this.size = 8; // Size of the arrow image
+    
+    // Calculate direction
+    let dx = targetX - startX;
+    let dy = targetY - startY;
+    let distance = sqrt(dx * dx + dy * dy);
+    this.dx = (dx / distance) * this.speed;
+    this.dy = (dy / distance) * this.speed;
+    
+    // Calculate angle for arrow rotation
+    this.angle = atan2(dy, dx);
+  }
+  
+  update() {
+    if (!this.hit) {
+      this.x += this.dx;
+      this.y += this.dy;
+      
+      // Check if arrow reached target area
+      let distanceToTarget = dist(this.x, this.y, this.targetX, this.targetY);
+      if (distanceToTarget < 10) {
+        this.hit = true;
+        this.hitTime = millis();
+        this.dealDamage();
+      }
+    }
+  }
+  
+  dealDamage() {
+    // Deal damage to troops in a small radius around the arrow
+    let splashRadius = arrowsradius/2;
+    
+    // Damage troops
+    for (let troop of spawnedCards) {
+      if (troop && troop.health > 0 && troop.isEnemy) {
+        let distance = dist(this.x, this.y, troop.x, troop.y);
+        if (distance < splashRadius) {
+          troop.health -= this.damage;
+          if (troop.health < 0) {
+            troop.health = 0;
+          }
+        }
+      }
+    }
+    
+    // Damage enemy towers
+    for (let tower of towers) {
+      if (tower.side === "enemy") {
+        let distance = dist(this.x, this.y, tower.x, tower.y);
+        if (distance < splashRadius) {
+          tower.health -= this.damage;
+          if (tower.health < 0) {
+            tower.health = 0;
+          }
+        }
+      }
+    }
+  }
+  
+  display() {
+    if (!this.hit) {
+      // Draw arrow image rotated to face the target
+      push();
+      translate(this.x, this.y);
+      rotate(this.angle);
+      imageMode(CENTER);
+      image(arrowImage, 0, 0, this.size*3, this.size);
+      pop();
+    }
+  }
+  
+  isDead() {
+    // Keep arrow visible for a short time after hitting
+    if (this.hit) {
+      return millis() - this.hitTime > 100;
+    }
+    return false;
+  }
+}
 
 function preload() {
   // Load background image
@@ -51,6 +237,12 @@ function preload() {
   witchcard = loadImage('witchcard.png');
   fireballcard = loadImage('fireballcard.png');
   arrowcard = loadImage('arrowcard.png');
+  
+  // Load arrow projectile image
+  arrowImage = loadImage('arrow.png'); // Load the arrow image for projectiles
+  
+  // Load fireball projectile image
+  fireballImage = loadImage('fireball.png'); // Load the fireball image for projectiles
   
   // Load unit images
   knight = loadImage('knight.png');
@@ -77,11 +269,11 @@ function setup() {
   // Initialize cards
   deck = [
     new Card("fast", "melee", false, 60, "Goblin", goblin, 50, goblincard, 25, [100, 200, 100], 2),
-    new Card("medium", "ranged", false, 60, "Witch", witch, 100, witchcard, 35, [150, 100, 200], 4),
-    new Card("medium", "melee", false, 65, "Knight", knight, 200, knightcard, 40, [100, 150, 255], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skelly, 30, skellycard, 3, [150, 150, 150], 3),
-    new Card("n/a", "spell", true, 40, "Fireball", null, 0, fireballcard, 80, [255, 150, 50], 4),
-    new Card("n/a", "spell", true, 100, "Arrows", null, 0, arrowcard, 50, [255, 100, 100], 3)
+    new Card("medium", "ranged", false, 60, "Witch", witch, 150, witchcard, 35, [150, 100, 200], 4),
+    new Card("medium", "melee", false, 65, "Knight", knight, 200, knightcard, 60, [100, 150, 255], 4),
+    new Card("fast", "melee", false, 60, "Skeletons", skelly, 25, skellycard, 3, [205, 155, 100], 3),
+    new Card("n/a", "spell", true, fireballradius, "Fireball", null, 0, fireballcard, 120, [255, 150, 50], 4),
+    new Card("n/a", "spell", true, arrowsradius, "Arrows", null, 0, arrowcard, 25, [255, 100, 100], 3)
   ];
 
   // Initialize enemy deck (enemy versions of units)
@@ -89,7 +281,7 @@ function setup() {
     new Card("fast", "melee", false, 60, "Goblin", goblinenemy, 50, goblincard, 25, [200, 100, 100], 2),
     new Card("medium", "ranged", false, 60, "Witch", witchenemy, 100, witchcard, 35, [200, 100, 150], 4),
     new Card("medium", "melee", false, 65, "Knight", knightenemy, 200, knightcard, 40, [255, 100, 100], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 30, skellycard, 3, [200, 150, 150], 3)
+    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 30, skellycard, 3, [205, 205, 100], 3)
   ];
 
   // Start with some math points
@@ -161,6 +353,33 @@ function draw() {
     }
   }
   
+  // Update arrow projectiles
+  for (let i = arrowProjectiles.length - 1; i >= 0; i--) {
+    let arrow = arrowProjectiles[i];
+    arrow.update();
+
+    // Remove dead arrows
+    if (arrow.isDead()) {
+      arrowProjectiles.splice(i, 1);
+    }
+  }
+  
+  // Update tower arrows
+  for (let i = towerArrows.length - 1; i >= 0; i--) {
+    let arrow = towerArrows[i];
+    arrow.update();
+
+    // Remove dead arrows
+    if (arrow.isDead()) {
+      towerArrows.splice(i, 1);
+    }
+  }
+  
+  // Update towers (for archery)
+  for (let tower of towers) {
+    tower.update();
+  }
+  
   // Enemy AI logic
   updateEnemyAI();
   
@@ -189,6 +408,16 @@ function draw() {
     drawableObjects.push({object: projectile, y: projectile.y, type: 'projectile'});
   }
   
+  // Add arrow projectiles
+  for (let arrow of arrowProjectiles) {
+    drawableObjects.push({object: arrow, y: arrow.y, type: 'arrow'});
+  }
+  
+  // Add tower arrows
+  for (let arrow of towerArrows) {
+    drawableObjects.push({object: arrow, y: arrow.y, type: 'towerArrow'});
+  }
+  
   // Add bottom cards (but not the one being dragged)
   for (let i = 0; i < 4 && i < deck.length; i++) {
     if (deck[i] !== draggedCard) {
@@ -210,10 +439,12 @@ function draw() {
   
   // Draw preview if dragging (always on top)
   if (draggedCard) {
-    // Draw enemy territory indicator (red transparent rectangle)
-    fill(255, 0, 0, 80); // Semi-transparent red
-    noStroke();
-    rect(0, 0, width, height/3); // Top third of screen is enemy territory (smaller area)
+    // Draw enemy territory indicator (red transparent rectangle) only for non-spell cards
+    if (!draggedCard.spell) {
+      fill(255, 0, 0, 80); // Semi-transparent red
+      noStroke();
+      rect(0, 0, width, height/3); // Top third of screen is enemy territory (smaller area)
+    }
     
     drawSpawnPreview(mouseX, mouseY, draggedCard);
   }
@@ -245,7 +476,7 @@ function mousePressed() {
   }
   
   // Check if clicking on math problem choices
-  if (currentProblem && elixir < 10) {
+  if (currentProblem && elixir < 10 && millis() - lastMathAnswerTime > mathAnswerCooldown) {
     let problemY = height - 80; // Match the new problem Y position
     let choiceY = problemY + 20; // Match the new choice Y position
     let choiceWidth = 60;
@@ -257,12 +488,14 @@ function mousePressed() {
           mouseY > choiceY && mouseY < choiceY + choiceHeight) {
         // Check if answer is correct
         if (problemChoices[i] === currentProblem.answer) {
-          elixir = Math.min(elixir + 1, 10); // Add 1 elixir, max 10
+          elixir = Math.min(elixir + 2, 10); // Add 1 elixir, max 10
+          lastMathAnswerTime = millis(); // Record when question was answered
           // Generate new problem only when answered correctly
           generateMathProblem();
         } else {
           // Wrong answer - lose 1 elixir and keep same question
           elixir = Math.max(elixir - 1, 0); // Subtract 1 elixir, min 0
+          lastMathAnswerTime = millis(); // Record when question was answered
         }
         break;
       }
@@ -287,8 +520,8 @@ function mouseReleased() {
       return;
     }
     
-    // Check if trying to play card in enemy territory (top third of screen)
-    if (mouseY < height/3) {
+    // Check if trying to play non-spell card in enemy territory (top third of screen)
+    if (mouseY < height/3 && !draggedCard.spell) {
       // Don't play the card, just return it to hand
       layoutBottomCards();
       draggedCard = null;
@@ -348,6 +581,48 @@ function layoutBottomCards() {
 
 // Spawns a card effect at the drop location
 function spawnCard(x, y, card) {
+  if (card.name === "Fireball") {
+    // Create a fireball projectile that travels to the target location
+    let fireballProjectile = new Projectile(width*(4/5), height-247, x, y, card.damage, false); // false = player projectile
+    fireballProjectile.isFireball = true; // Mark as fireball for special handling
+    projectiles.push(fireballProjectile);
+    return; // Exit early for spells
+  }
+  
+  if (card.name === "Arrows") {
+    // Create multiple arrow projectiles that travel to the target location
+    let numArrows = 20;
+    let spreadRadius = arrowsradius; // Radius of the spread area around the target
+    let startSpreadRadius = 45; // Radius of the starting spread area
+    
+    for (let i = 0; i < numArrows; i++) {
+      // Calculate random offset within the spread radius for target
+      let angle = random(TWO_PI);
+      let distance = random(spreadRadius);
+      let offsetX = cos(angle) * distance;
+      let offsetY = sin(angle) * distance;
+      
+      // Target position with offset
+      let targetX = x + offsetX;
+      let targetY = y + offsetY;
+      
+      // Calculate random starting position around the launch point
+      let startAngle = random(TWO_PI);
+      let startDistance = random(startSpreadRadius);
+      let startOffsetX = cos(startAngle) * startDistance;
+      let startOffsetY = sin(startAngle) * startDistance;
+      
+      // Starting position with offset
+      let startX = width*(4/5) + startOffsetX;
+      let startY = height-247 + startOffsetY;
+      
+      // Create arrow projectile
+      let arrow = new ArrowProjectile(startX, startY, targetX, targetY, card.damage);
+      arrowProjectiles.push(arrow);
+    }
+    return; // Exit early for spells
+  }
+  
   if (card.name === "Skeletons") {
     // Spawn 13 skeletons in a fixed diamond formation (removed front and back)
     let positions = [
@@ -432,7 +707,28 @@ function drawSpawnPreview(x, y, card) {
   // Set reduced saturation for preview
   drawingContext.globalAlpha = 0.6;
   
-  if (card.name === "Skeletons") {
+  if (card.name === "Fireball") {
+    // Preview fireball explosion radius
+    fill(255, 165, 0, 100); // Semi-transparent orange
+    stroke(255, 100, 0, 150);
+    strokeWeight(2);
+    ellipse(x, y, card.radius * 2, card.radius * 2); // Show splash radius (60 * 2)
+    
+    // Add glow effect
+    fill(255, 200, 100, 50);
+    ellipse(x, y, card.radius * 2, card.radius * 2);
+  } else if (card.name === "Arrows") {
+    // Preview arrows spread area
+    fill(255, 255, 255, 100); // Semi-transparent white
+    stroke(200, 200, 200, 150);
+    strokeWeight(2);
+    ellipse(x, y, card.radius * 2, card.radius * 2); // Show spread radius
+    
+    // Add glow effect
+    fill(255, 255, 255, 50);
+    ellipse(x, y, card.radius * 2 + 20, card.radius * 2 + 20);
+    
+  } else if (card.name === "Skeletons") {
     // Preview 13 skeletons in fixed diamond formation (removed front and back)
     let positions = [
       // Center row (5 skeletons)
@@ -498,7 +794,7 @@ function drawSpawnPreview(x, y, card) {
 function generateMathProblem() {
   let num1 = Math.floor(Math.random() * 10) + 1;
   let num2 = Math.floor(Math.random() * 10) + 1;
-  let operators = ['+', '-', '*'];
+  let operators = ['+', '-', 'x'];
   let operator = operators[Math.floor(Math.random() * operators.length)];
   
   let answer;
@@ -513,7 +809,7 @@ function generateMathProblem() {
       }
       answer = num1 - num2; 
       break;
-    case '*': 
+    case 'x': 
       answer = num1 * num2; 
       break;
   }
@@ -584,7 +880,7 @@ function drawMathUI() {
     let problemY = height - 80;
     
     // Problem background
-    fill(255, 255, 255, 200);
+    fill(255, 225, 225, 175);
     stroke(0);
     strokeWeight(2);
     rect(width/2 - 150, problemY - 20, 300, 80, 10);
@@ -602,7 +898,7 @@ function drawMathUI() {
       let choiceX = width/2 - 135 + i * 70;
       
       // Choice button
-      fill(200, 200, 255);
+      fill(255, 235, 235, 175);
       stroke(0);
       strokeWeight(1);
       rect(choiceX, choiceY, 60, 30, 5);
@@ -657,8 +953,15 @@ class Card {
   }
 
   display() {
-    // Use card-specific color for background
-    fill(this.color[0], this.color[1], this.color[2]);
+    // Check if player has enough elixir for this card
+    let canAfford = elixir >= this.cost;
+    
+    // Use card-specific color for background, or gray if can't afford
+    if (canAfford) {
+      fill(this.color[0], this.color[1], this.color[2]);
+    } else {
+      fill(100, 100, 100); // Gray background when can't afford
+    }
     noStroke();
     rect(this.x, this.y, this.w, this.h, 15);
     
@@ -668,22 +971,33 @@ class Card {
     noFill();
     rect(this.x + 2, this.y + 2, this.w - 4, this.h - 4, 13);
 
-
-// Display cost in purple circle
+    // Display cost in purple circle
     fill(150, 100, 200); // Purple background
-    stroke(0);
+    stroke(45, 30, 60);
     strokeWeight(2);
     ellipse(this.x+4, this.y+5, 25, 25);
+    
     // Display card image or fallback circle
     if (this.cardImage) {
       imageMode(CENTER);
-      image(this.cardImage, this.x + this.w / 2, 13 + this.y + this.h / 3, 90, 90);
+      if (canAfford) {
+        // Normal colored image
+        image(this.cardImage, this.x + this.w / 2, 13 + this.y + this.h / 3, 90, 90);
+      } else {
+        // Completely colorless (black and white) image when can't afford
+        push();
+        drawingContext.filter = 'grayscale(100%)'; // Convert to pure black and white
+        image(this.cardImage, this.x + this.w / 2, 13 + this.y + this.h / 3, 90, 90);
+        pop();
+      }
     } else {
-    fill(200, 100, 100);
-    ellipse(this.x + this.w / 2, this.y + this.h / 3, this.radius);
+      if (canAfford) {
+        fill(200, 100, 100);
+      } else {
+        fill(100, 100, 100); // Gray fallback circle
+      }
+      ellipse(this.x + this.w / 2, this.y + this.h / 3, this.radius);
     }
-    
-    
     
     // Cost text
     fill(255);
@@ -729,6 +1043,11 @@ class SpawnedCard {
     // Bridge crossing state
     this.isCrossingBridge = false;
     this.hasCrossedBridge = false;
+    
+    // Formation system to prevent overlapping
+    this.formationOffset = {x: 0, y: 0};
+    this.formationRadius = 20; // How far troops spread from target
+    this.formationAngle = random(TWO_PI); // Random angle for formation position
     
     // Set movement speed based on card speed
     if (this.speed === "fast") {
@@ -826,7 +1145,18 @@ class SpawnedCard {
   isInAttackRange() {
     let target = this.targetTower || this.targetEnemy;
     if (!target) return false;
-    let distance = dist(this.x, this.y, target.x, target.y);
+    
+    // Calculate distance considering formation offset
+    let targetX = target.x;
+    let targetY = target.y;
+    
+    // Apply formation offset if targeting an enemy troop
+    if (this.targetEnemy) {
+      targetX += cos(this.formationAngle) * this.formationRadius;
+      targetY += sin(this.formationAngle) * this.formationRadius;
+    }
+    
+    let distance = dist(this.x, this.y, targetX, targetY);
     return distance <= this.attackRange;
   }
 
@@ -918,6 +1248,12 @@ class SpawnedCard {
           }
         } else {
           this.isCrossingBridge = false;
+          
+          // Apply formation offset to prevent overlapping (only when targeting enemies, not bridges)
+          if (this.targetEnemy) {
+            targetX += cos(this.formationAngle) * this.formationRadius;
+            targetY += sin(this.formationAngle) * this.formationRadius;
+          }
         }
         
         // Check if unit has reached the bridge
@@ -1002,20 +1338,58 @@ class Tower {
     this.y = y;
     this.type = type; // "archer" or "king"
     this.side = side; // "player" or "enemy"
+    this.lastShotTime = 0; // Track when tower last shot an arrow
+    this.shotCooldown = 1500; // Tower shoots every 1.5 seconds
     
     // Set properties based on tower type
     if (type === "king") {
       this.radius = 25;
-      this.maxHealth = 4000;
-      this.health = 4000;
+      this.maxHealth = 2200;
+      this.health = 2200;
       this.damage = 50;
-      this.range = 100;
+      this.range = 120;
     } else { // archer tower
       this.radius = 20;
       this.maxHealth = 1400;
       this.health = 1400;
       this.damage = 30;
-      this.range = 80;
+      this.range = 120;
+    }
+  }
+
+  update() {
+    // Both player and enemy towers shoot at enemy troops
+    if (this.health > 0) {
+      this.findAndShootAtEnemies();
+    }
+  }
+
+  findAndShootAtEnemies() {
+    // Check if tower can shoot (cooldown)
+    if (millis() - this.lastShotTime < this.shotCooldown) {
+      return;
+    }
+
+    // Find nearest enemy troop within range
+    let nearestEnemy = null;
+    let nearestDistance = Infinity;
+    let targetSide = this.side === "player" ? "enemy" : "player"; // Enemy towers target player troops
+
+    for (let troop of spawnedCards) {
+      if (troop && troop.health > 0 && troop.isEnemy === (targetSide === "enemy")) {
+        let distance = dist(this.x, this.y, troop.x, troop.y);
+        if (distance <= this.range && distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestEnemy = troop;
+        }
+      }
+    }
+
+    // Shoot at the nearest enemy
+    if (nearestEnemy) {
+      let towerArrow = new TowerArrow(this.x, this.y, nearestEnemy.x, nearestEnemy.y, this.damage, this.side);
+      towerArrows.push(towerArrow);
+      this.lastShotTime = millis();
     }
   }
 
@@ -1116,6 +1490,18 @@ class Projectile {
     this.exploded = false;
     this.explosionTime = 0; // Track when explosion started
     this.blastParticles = null; // Will be set on explosion
+    this.isFireball = false; // Track if this is a fireball spell
+    this.isArrows = false; // Track if this is an arrows spell
+    this.size = 12; // Size of the projectile image
+    
+    // For fireball and arrows spells, start from player's side
+    if (this.isFireball || this.isArrows) {
+      this.x = width / 2; // Start from center of screen
+      this.y = height - 100; // Start from player's side
+      if (this.isFireball) {
+        this.radius = fireballradius;
+      }
+    }
     
     // Calculate direction
     let dx = targetX - x;
@@ -1123,6 +1509,9 @@ class Projectile {
     let distance = sqrt(dx * dx + dy * dy);
     this.dx = (dx / distance) * this.speed;
     this.dy = (dy / distance) * this.speed;
+    
+    // Calculate angle for projectile rotation
+    this.angle = atan2(dy, dx);
   }
   
   update() {
@@ -1149,12 +1538,18 @@ class Projectile {
   dealSplashDamage() {
     // Deal splash damage to towers and troops on the opposite side of the attacker
     let targetSide = this.isEnemyAttacker ? "player" : "enemy";
-    let splashRadius = 20; // 20 pixel splash radius
+    let splashRadius = 20; // Default splash radius
+    
+    if (this.isFireball) {
+      splashRadius = fireballradius*1.3; // Fireball has larger splash radius
+    } else if (this.isArrows) {
+      splashRadius = arrowsradius*20; // Arrows have medium splash radius
+    }
     
     // Damage towers
     for (let tower of towers) {
       if (tower.side === targetSide) {
-        let distance = dist(this.x, this.y, tower.x, tower.y);
+        let distance = dist(this.targetX, this.targetY, tower.x, tower.y);
         if (distance < splashRadius) {
           tower.health -= this.damage;
           if (tower.health < 0) {
@@ -1167,7 +1562,7 @@ class Projectile {
     // Damage troops
     for (let troop of spawnedCards) {
       if (troop && troop.health > 0 && troop.isEnemy !== this.isEnemyAttacker) {
-        let distance = dist(this.x, this.y, troop.x, troop.y);
+        let distance = dist(this.targetX, this.targetY, troop.x, troop.y);
         if (distance < splashRadius) {
           troop.health -= this.damage;
           if (troop.health < 0) {
@@ -1183,17 +1578,34 @@ class Projectile {
     this.explosionTime = millis(); // Record when explosion started
     // Create blast particles
     this.blastParticles = [];
-    let numParticles = 18;
+    let numParticles = 18; // Default number of particles
+    
+    if (this.isFireball) {
+      numParticles = 25; // More particles for fireball
+    } else if (this.isArrows) {
+      numParticles = 20; // Medium particles for arrows
+    }
+    
     for (let i = 0; i < numParticles; i++) {
       let angle = (TWO_PI / numParticles) * i + random(-0.2, 0.2);
       let speed = random(2, 5);
+      let particleColor;
+      
+      if (this.isFireball) {
+        particleColor = color(255, random(140,200), 0, 200); // Orange for fireball
+      } else if (this.isArrows) {
+        particleColor = color(255, 255, 255, 200); // White for arrows
+      } else {
+        particleColor = color(255, random(140,200), 0, 200); // Default orange
+      }
+      
       this.blastParticles.push({
         x: this.x,
         y: this.y,
         vx: cos(angle) * speed,
         vy: sin(angle) * speed,
         r: random(3, 7),
-        color: color(255, random(140,200), 0, 200),
+        color: particleColor,
         life: 0.3 // seconds
       });
     }
@@ -1201,15 +1613,36 @@ class Projectile {
   
   display() {
     if (!this.exploded) {
-      // Draw orange projectile
-      fill(255, 165, 0); // Orange
-      stroke(255, 100, 0);
-      strokeWeight(2);
-      ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
-      
-      // Add glow effect
-      fill(255, 200, 100, 100);
-      ellipse(this.x, this.y, this.radius * 4, this.radius * 4);
+      // Draw projectile based on type
+      if (this.isArrows) {
+        // Draw white arrows projectile
+        fill(255, 255, 255); // White
+        stroke(200, 200, 200);
+        strokeWeight(2);
+        ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
+        
+        // Add glow effect
+        fill(255, 255, 255, 100);
+        ellipse(this.x, this.y, this.radius * 4, this.radius * 4);
+      } else if (this.isFireball) {
+        // Draw fireball image rotated to face the target
+        push();
+        translate(this.x, this.y);
+        rotate(this.angle);
+        imageMode(CENTER);
+        image(fireballImage, 0, 0, this.size * 8, this.size * 5);
+        pop();
+      } else {
+        // Draw orange projectile (witch)
+        fill(255, 165, 0); // Orange
+        stroke(255, 100, 0);
+        strokeWeight(2);
+        ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
+        
+        // Add glow effect
+        fill(255, 200, 100, 100);
+        ellipse(this.x, this.y, this.radius * 4, this.radius * 4);
+      }
     } else if (this.blastParticles) {
       // Draw blast particles
       noStroke();
