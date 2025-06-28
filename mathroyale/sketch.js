@@ -265,6 +265,15 @@ function preload() {
 
 function setup() {
   createCanvas(400, 700);
+  
+  // Center the canvas in the window
+  let canvas = document.querySelector('canvas');
+  if (canvas) {
+    canvas.style.position = 'absolute';
+    canvas.style.left = '50%';
+    canvas.style.top = '50%';
+    canvas.style.transform = 'translate(-50%, -50%)';
+  }
 
   // Initialize cards
   deck = [
