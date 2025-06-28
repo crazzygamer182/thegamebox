@@ -79,7 +79,7 @@ function setup() {
     new Card("fast", "melee", false, 60, "Goblin", goblin, 50, goblincard, 25, [100, 200, 100], 2),
     new Card("medium", "ranged", false, 60, "Witch", witch, 100, witchcard, 35, [150, 100, 200], 4),
     new Card("medium", "melee", false, 65, "Knight", knight, 200, knightcard, 40, [100, 150, 255], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skelly, 30, skellycard, 15, [150, 150, 150], 3),
+    new Card("fast", "melee", false, 60, "Skeletons", skelly, 30, skellycard, 3, [150, 150, 150], 3),
     new Card("n/a", "spell", true, 40, "Fireball", null, 0, fireballcard, 80, [255, 150, 50], 4),
     new Card("n/a", "spell", true, 100, "Arrows", null, 0, arrowcard, 50, [255, 100, 100], 3)
   ];
@@ -89,7 +89,7 @@ function setup() {
     new Card("fast", "melee", false, 60, "Goblin", goblinenemy, 50, goblincard, 25, [200, 100, 100], 2),
     new Card("medium", "ranged", false, 60, "Witch", witchenemy, 100, witchcard, 35, [200, 100, 150], 4),
     new Card("medium", "melee", false, 65, "Knight", knightenemy, 200, knightcard, 40, [255, 100, 100], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 30, skellycard, 15, [200, 150, 150], 3)
+    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 30, skellycard, 3, [200, 150, 150], 3)
   ];
 
   // Start with some math points
@@ -163,6 +163,13 @@ function draw() {
   
   // Enemy AI logic
   updateEnemyAI();
+  
+  // Remove dead towers (health <= 0)
+  for (let i = towers.length - 1; i >= 0; i--) {
+    if (towers[i].health <= 0) {
+      towers.splice(i, 1);
+    }
+  }
   
   // Collect all drawable objects with their y positions for depth sorting
   let drawableObjects = [];
@@ -1140,16 +1147,31 @@ class Projectile {
   }
   
   dealSplashDamage() {
-    // Deal splash damage to towers on the opposite side of the attacker
+    // Deal splash damage to towers and troops on the opposite side of the attacker
     let targetSide = this.isEnemyAttacker ? "player" : "enemy";
+    let splashRadius = 20; // 20 pixel splash radius
     
+    // Damage towers
     for (let tower of towers) {
       if (tower.side === targetSide) {
         let distance = dist(this.x, this.y, tower.x, tower.y);
-        if (distance < 40) { // Splash radius
+        if (distance < splashRadius) {
           tower.health -= this.damage;
           if (tower.health < 0) {
             tower.health = 0;
+          }
+        }
+      }
+    }
+    
+    // Damage troops
+    for (let troop of spawnedCards) {
+      if (troop && troop.health > 0 && troop.isEnemy !== this.isEnemyAttacker) {
+        let distance = dist(this.x, this.y, troop.x, troop.y);
+        if (distance < splashRadius) {
+          troop.health -= this.damage;
+          if (troop.health < 0) {
+            troop.health = 0;
           }
         }
       }
