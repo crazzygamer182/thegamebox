@@ -279,7 +279,7 @@ function setup() {
   deck = [
     new Card("fast", "melee", false, 60, "Goblin", goblin, 50, goblincard, 25, [100, 200, 100], 2),
     new Card("medium", "ranged", false, 60, "Witch", witch, 150, witchcard, 35, [150, 100, 200], 4),
-    new Card("medium", "melee", false, 65, "Knight", knight, 200, knightcard, 60, [100, 150, 255], 4),
+    new Card("medium", "melee", false, 65, "Knight", knight, 200, knightcard, 120, [100, 150, 255], 4),
     new Card("fast", "melee", false, 60, "Skeletons", skelly, 25, skellycard, 3, [205, 155, 100], 3),
     new Card("n/a", "spell", true, fireballradius, "Fireball", null, 0, fireballcard, 120, [255, 150, 50], 4),
     new Card("n/a", "spell", true, arrowsradius, "Arrows", null, 0, arrowcard, 25, [255, 100, 100], 3)
@@ -288,9 +288,9 @@ function setup() {
   // Initialize enemy deck (enemy versions of units)
   enemyDeck = [
     new Card("fast", "melee", false, 60, "Goblin", goblinenemy, 50, goblincard, 25, [200, 100, 100], 2),
-    new Card("medium", "ranged", false, 60, "Witch", witchenemy, 100, witchcard, 35, [200, 100, 150], 4),
-    new Card("medium", "melee", false, 65, "Knight", knightenemy, 200, knightcard, 40, [255, 100, 100], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 30, skellycard, 3, [205, 205, 100], 3)
+    new Card("medium", "ranged", false, 60, "Witch", witchenemy, 150, witchcard, 35, [200, 100, 150], 4),
+    new Card("medium", "melee", false, 65, "Knight", knightenemy, 200, knightcard, 120, [255, 100, 100], 4),
+    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 25, skellycard, 3, [205, 205, 100], 3)
   ];
 
   // Start with some math points
