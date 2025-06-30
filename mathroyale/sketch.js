@@ -1986,16 +1986,16 @@ class Tower {
     // Set properties based on tower type
     if (type === "king") {
       this.radius = 25;
-      this.maxHealth = 1400;
-      //this.health = this.maxHealth;
-      this.health = 1;
+      this.maxHealth = 1500;
+      this.health = this.maxHealth;
+      //this.health = 1;
       this.damage = 16;
       this.range = 110;
     } else { // archer tower
       this.radius = 20;
-      this.maxHealth = 800;
-      //this.health = this.maxHealth;
-      this.health = 1;
+      this.maxHealth = 1000;
+      this.health = this.maxHealth;
+      //this.health = 1;
       this.damage = 12;
       this.range = 120;
     }
