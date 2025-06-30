@@ -618,7 +618,7 @@ function drawHomeScreen() {
   noStroke();
   textAlign(CENTER);
   textSize(23);
-  text("Choose a game mode!\nAnswer questions to play cards!", width/2, 445);
+  text("Choose your game mode!\nAnswer questions to play cards!", width/2, 445);
   
   // Start Game button
   let buttonY = height/2 - 191;
@@ -708,7 +708,7 @@ function drawHomeScreen() {
   if (selectedOperations.division) {
     fill(100, 200, 100, 0); // Green when selected
   } else if (mouseOverDiv) {
-    fill(50, 50, 50, 200); // Dark gray when not selected
+    fill(50, 50, 50, 150); // Gray when hovered but not selected
   } else {
     fill(50, 50, 50, 200); // Dark gray when not selected
   }
@@ -871,8 +871,18 @@ function drawGame() {
   
   // Draw preview if dragging (always on top)
   if (draggedCard) {
-    // Check if mouse is over the battlefield (not in UI areas)
-    let isOverBattlefield = mouseY < height - 247; // Above the bottom UI area
+    // Get current pointer position (mouse or touch)
+    let currentX = mouseX;
+    let currentY = mouseY;
+    
+    // Use touch position if available
+    if (touches.length > 0) {
+      currentX = touches[0].x;
+      currentY = touches[0].y;
+    }
+    
+    // Check if pointer is over the battlefield (not in UI areas)
+    let isOverBattlefield = currentY < height - 247; // Above the bottom UI area
     
     if (isOverBattlefield) {
       // Show spawn preview when over battlefield
@@ -883,10 +893,10 @@ function drawGame() {
         rect(0, 0, width, height/3); // Top third of screen is enemy territory (smaller area)
       }
       
-      drawSpawnPreview(mouseX, mouseY, draggedCard);
+      drawSpawnPreview(currentX, currentY, draggedCard);
     } else {
       // Show card form when over UI areas
-      drawDraggedCardPreview();
+      drawDraggedCardPreview(currentX, currentY);
     }
   }
 }
@@ -904,6 +914,15 @@ function initializeTowers() {
 }
 
 function mousePressed() {
+  handleClick(mouseX, mouseY);
+}
+
+function touchStarted() {
+  handleClick(touchX, touchY);
+  return false; // prevent default scrolling
+}
+
+function handleClick(x, y) {
   // Prevent clicks immediately after state change
   if (millis() - lastStateChange < stateChangeCooldown) {
     return;
@@ -925,8 +944,8 @@ function mousePressed() {
     let buttonHeight = 80;
     let buttonX = width/2 - buttonWidth/2;
     
-    if (mouseX > buttonX && mouseX < buttonX + buttonWidth &&
-        mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+    if (x > buttonX && x < buttonX + buttonWidth &&
+        y > buttonY && y < buttonY + buttonHeight) {
       // Go to home screen instead of directly to game
       gameState = "home";
       lastStateChange = millis(); // Record state change time
@@ -953,8 +972,8 @@ function mousePressed() {
       let saveButtonX = (width - saveButtonWidth) / 2;
       let saveButtonY = popupY + 130;
       
-      if (mouseX > saveButtonX && mouseX < saveButtonX + saveButtonWidth &&
-          mouseY > saveButtonY && mouseY < saveButtonY + saveButtonHeight) {
+      if (x > saveButtonX && x < saveButtonX + saveButtonWidth &&
+          y > saveButtonY && y < saveButtonY + saveButtonHeight) {
         saveUsername();
         return;
       }
@@ -969,8 +988,8 @@ function mousePressed() {
     let buttonHeight = 142;
     let buttonX = width/2 - buttonWidth/2;
     
-    if (mouseX > buttonX && mouseX < buttonX + buttonWidth &&
-        mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+    if (x > buttonX && x < buttonX + buttonWidth &&
+        y > buttonY && y < buttonY + buttonHeight) {
       // Check if at least one operation is selected
       let hasSelectedOperation = selectedOperations.addition || selectedOperations.subtraction || 
                                 selectedOperations.multiplication || selectedOperations.division;
@@ -993,44 +1012,44 @@ function mousePressed() {
     
     // Addition button
     let addButtonX = opStartX;
-    if (mouseX > addButtonX && mouseX < addButtonX + opButtonSize &&
-        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+    if (x > addButtonX && x < addButtonX + opButtonSize &&
+        y > opButtonY && y < opButtonY + opButtonSize) {
       selectedOperations.addition = !selectedOperations.addition;
       return;
     }
     
     // Subtraction button
     let subButtonX = opStartX + opButtonSize + opButtonSpacing;
-    if (mouseX > subButtonX && mouseX < subButtonX + opButtonSize &&
-        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+    if (x > subButtonX && x < subButtonX + opButtonSize &&
+        y > opButtonY && y < opButtonY + opButtonSize) {
       selectedOperations.subtraction = !selectedOperations.subtraction;
       return;
     }
     
     // Multiplication button
     let mulButtonX = opStartX + (opButtonSize + opButtonSpacing) * 2;
-    if (mouseX > mulButtonX && mouseX < mulButtonX + opButtonSize &&
-        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+    if (x > mulButtonX && x < mulButtonX + opButtonSize &&
+        y > opButtonY && y < opButtonY + opButtonSize) {
       selectedOperations.multiplication = !selectedOperations.multiplication;
       return;
     }
     
     // Division button
     let divButtonX = opStartX + (opButtonSize + opButtonSpacing) * 3;
-    if (mouseX > divButtonX && mouseX < divButtonX + opButtonSize &&
-        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+    if (x > divButtonX && x < divButtonX + opButtonSize &&
+        y > opButtonY && y < opButtonY + opButtonSize) {
       selectedOperations.division = !selectedOperations.division;
       return;
     }
   } else if (gameState === "playing") {
     // Original game mouse handling
     for (let i = 0; i < 4 && i < deck.length; i++) {
-      if (deck[i].contains(mouseX, mouseY)) {
+      if (deck[i].contains(x, y)) {
         // Check if player has enough elixir
         if (elixir >= deck[i].cost) {
         draggedCard = deck[i];
-        offsetX = mouseX - draggedCard.x;
-        offsetY = mouseY - draggedCard.y;
+        offsetX = x - draggedCard.x;
+        offsetY = y - draggedCard.y;
         }
         break;
       }
@@ -1045,8 +1064,8 @@ function mousePressed() {
       
       for (let i = 0; i < problemChoices.length; i++) {
         let choiceX = width/2 - 135 + i * 70; // Match the new choice X positioning
-        if (mouseX > choiceX && mouseX < choiceX + choiceWidth &&
-            mouseY > choiceY && mouseY < choiceY + choiceHeight) {
+        if (x > choiceX && x < choiceX + choiceWidth &&
+            y > choiceY && y < choiceY + choiceHeight) {
           // Check if answer is correct
           if (problemChoices[i] === currentProblem.answer) {
             elixir = Math.min(elixir + 2, 10); // Add 1 elixir, max 10
@@ -1072,10 +1091,29 @@ function mouseDragged() {
   }
 }
 
+function touchMoved() {
+  if (draggedCard && touches.length > 0) {
+    draggedCard.x = touches[0].x - offsetX;
+    draggedCard.y = touches[0].y - offsetY;
+  }
+  return false; // prevent default scrolling
+}
+
 function mouseReleased() {
+  handleRelease(mouseX, mouseY);
+}
+
+function touchEnded() {
+  if (touches.length > 0) {
+    handleRelease(touches[0].x, touches[0].y);
+  }
+  return false; // prevent default behavior
+}
+
+function handleRelease(x, y) {
   if (draggedCard) {
     // Check if trying to play card inside the UI area (bottom 247 pixels)
-    if (mouseY > height - 247) {
+    if (y > height - 247) {
       // Don't play the card, just return it to hand
       layoutBottomCards();
       draggedCard = null;
@@ -1083,7 +1121,7 @@ function mouseReleased() {
     }
     
     // Check if trying to play non-spell card in enemy territory (top third of screen)
-    if (mouseY < height/3 && !draggedCard.spell) {
+    if (y < height/3 && !draggedCard.spell) {
       // Don't play the card, just return it to hand
       layoutBottomCards();
       draggedCard = null;
@@ -1091,7 +1129,7 @@ function mouseReleased() {
     }
     
     // Call the spawn function at the drop location
-    spawnCard(mouseX, mouseY, draggedCard);
+    spawnCard(x, y, draggedCard);
 
     // Deduct elixir for playing the card
     elixir -= draggedCard.cost;
@@ -1358,7 +1396,7 @@ function drawSpawnPreview(x, y, card) {
   drawingContext.globalAlpha = 1.0;
 }
 
-function drawDraggedCardPreview() {
+function drawDraggedCardPreview(x, y) {
   // Draw the dragged card in its card form
   let card = draggedCard;
   let cardWidth = 80;
@@ -1374,31 +1412,31 @@ function drawDraggedCardPreview() {
     fill(100, 100, 100); // Gray background when can't afford
   }
   noStroke();
-  rect(mouseX - cardWidth/2, mouseY - cardHeight/2, cardWidth, cardHeight, 15);
+  rect(x - cardWidth/2, y - cardHeight/2, cardWidth, cardHeight, 15);
   
   // Add a subtle inner border
   stroke(255, 255, 255, 100);
   strokeWeight(2);
   noFill();
-  rect(mouseX - cardWidth/2 + 2, mouseY - cardHeight/2 + 2, cardWidth - 4, cardHeight - 4, 13);
+  rect(x - cardWidth/2 + 2, y - cardHeight/2 + 2, cardWidth - 4, cardHeight - 4, 13);
 
   // Display cost in purple circle
   fill(150, 100, 200); // Purple background
   stroke(45, 30, 60);
   strokeWeight(2);
-  ellipse(mouseX - cardWidth/2 + 4, mouseY - cardHeight/2 + 5, 25, 25);
+  ellipse(x - cardWidth/2 + 4, y - cardHeight/2 + 5, 25, 25);
   
   // Display card image or fallback circle
   if (card.cardImage) {
     imageMode(CENTER);
     if (canAfford) {
       // Normal colored image
-      image(card.cardImage, mouseX, mouseY - cardHeight/2 + 13 + cardHeight/3, 90, 90);
+      image(card.cardImage, x, y - cardHeight/2 + 13 + cardHeight/3, 90, 90);
     } else {
       // Completely colorless (black and white) image when can't afford
       push();
       drawingContext.filter = 'grayscale(100%)'; // Convert to pure black and white
-      image(card.cardImage, mouseX, mouseY - cardHeight/2 + 13 + cardHeight/3, 90, 90);
+      image(card.cardImage, x, y - cardHeight/2 + 13 + cardHeight/3, 90, 90);
       pop();
     }
   } else {
@@ -1407,7 +1445,7 @@ function drawDraggedCardPreview() {
     } else {
       fill(100, 100, 100); // Gray fallback circle
     }
-    ellipse(mouseX, mouseY - cardHeight/2 + cardHeight/3, card.radius);
+    ellipse(x, y - cardHeight/2 + cardHeight/3, card.radius);
   }
   
   // Cost text
@@ -1416,7 +1454,7 @@ function drawDraggedCardPreview() {
   strokeWeight(1);
   textAlign(CENTER);
   textSize(12);
-  text(card.cost, mouseX - cardWidth/2 + 4, mouseY - cardHeight/2 + 8.5);
+  text(card.cost, x - cardWidth/2 + 4, y - cardHeight/2 + 8.5);
 }
 
 function generateMathProblem() {
