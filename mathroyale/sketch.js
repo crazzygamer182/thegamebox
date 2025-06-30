@@ -87,6 +87,7 @@ let gameEndType = "win"; // "win" or "loss"
 let gameEndAnimationTime = 0;
 let gameEndAnimationDuration = 3000; // 3 seconds
 let gameEndParticles = [];
+let gameEndClickDelay = 2000; // 2 seconds before player can click to restart
 
 class TowerArrow {
   constructor(towerX, towerY, targetX, targetY, damage, towerSide) {
@@ -910,8 +911,10 @@ function mousePressed() {
   
   // Handle game restart after win/loss animation
   if (gameState === "gameEnd") {
-    // Animation is playing, restart game when clicked
-    restartGame();
+    // Only allow restart after the click delay has passed
+    if (gameEndAnimationTime > gameEndClickDelay) {
+      restartGame();
+    }
     return;
   }
   
@@ -2504,27 +2507,11 @@ function drawGameEndAnimation() {
     text(subtitle, width/2, textY + 60);
   }
   
-  // Show restart prompt after animation is mostly complete
-  if (progress > 0.7) {
+  // Show restart prompt only after click delay has passed
+  if (gameEndAnimationTime > gameEndClickDelay) {
     fill(255, 255, 255, 255);
     textSize(18);
     text("Click anywhere to exit", width/2, height - 50);
-  }
-}
-
-function drawSparkles() {
-  let sparkleCount = 20;
-  for (let i = 0; i < sparkleCount; i++) {
-    let angle = (TWO_PI / sparkleCount) * i + frameCount * 0.02;
-    let radius = 100 + sin(frameCount * 0.01 + i) * 20;
-    let x = width/2 + cos(angle) * radius;
-    let y = height/2 + sin(angle) * radius;
-    
-    push();
-    fill(255, 255, 100, 200);
-    noStroke();
-    ellipse(x, y, 3);
-    pop();
   }
 }
 
