@@ -14,6 +14,8 @@ let fireballCardImage;
 let arrowsCardImage;
 let arrowImage; // New arrow image for projectiles
 let fireballImage; // New fireball image for projectiles
+let titleScreenImage; // Title screen background image
+let homeScreenImage; // Home screen background image
 let goblinImage;
 let witchImage;
 let mathPoints = 0; // Player's math points
@@ -53,6 +55,38 @@ let arrowProjectiles = [];
 
 // Tower arrow system for tower defense
 let towerArrows = [];
+
+// Game state system
+let gameState = "title"; // "title", "home", or "playing"
+let titleScreenAlpha = 0; // For fade-in effect
+let titleFadeSpeed = 0.02; // How fast the title fades in
+let lastStateChange = 0; // Track when game state last changed
+let stateChangeCooldown = 300; // 200ms cooldown after state change
+
+// Operation selection system
+let selectedOperations = {
+  addition: true,
+  subtraction: true,
+  multiplication: false,
+  division: false
+};
+
+// Username system
+let playerUsername = "";
+let showUsernamePopup = false;
+let usernameInputElement = null;
+let popupAnimationY = 0; // For slide-in animation
+let popupAnimationSpeed = 0.15; // Animation speed
+
+// Trophy system
+let playerTrophies = 0;
+
+// Win/Loss animation system
+let showGameEndAnimation = false; // Controlled by game conditions
+let gameEndType = "win"; // "win" or "loss"
+let gameEndAnimationTime = 0;
+let gameEndAnimationDuration = 3000; // 3 seconds
+let gameEndParticles = [];
 
 class TowerArrow {
   constructor(towerX, towerY, targetX, targetY, damage, towerSide) {
@@ -261,6 +295,10 @@ function preload() {
   enemyTower = loadImage('enemytower.png');
   playerKingTower = loadImage('playertower.png');
   enemyKingTower = loadImage('enemytower.png');
+  
+  // Load title screen image
+  titleScreenImage = loadImage('title_screen.png');
+  homeScreenImage = loadImage('homescreen.png');
 }
 
 function setup() {
@@ -275,22 +313,223 @@ function setup() {
     canvas.style.transform = 'translate(-50%, -50%)';
   }
 
+  // Set Fredoka font for all text
+  setFredokaFont();
+
+  // Start in title screen mode
+  gameState = "title";
+  titleScreenAlpha = 100;
+  
+  // Load username from localStorage
+  loadUsername();
+  loadTrophies();
+}
+
+function setFredokaFont() {
+  // Set Fredoka as the default font for all text
+  textFont('Fredoka');
+}
+
+function loadUsername() {
+  // Try to load username from localStorage
+  if (typeof(Storage) !== "undefined") {
+    playerUsername = localStorage.getItem("mathRoyaleUsername") || "";
+  }
+  
+  // Don't show popup automatically - wait for player to reach home screen
+}
+
+function loadTrophies() {
+  // Try to load trophies from localStorage
+  if (typeof(Storage) !== "undefined") {
+    playerTrophies = parseInt(localStorage.getItem("mathRoyaleTrophies")) || 0;
+  }
+}
+
+function saveTrophies() {
+  // Save trophies to localStorage
+  if (typeof(Storage) !== "undefined") {
+    localStorage.setItem("mathRoyaleTrophies", playerTrophies.toString());
+  }
+}
+
+function createUsernamePopup() {
+  // Get canvas element to position popup relative to it
+  let canvas = document.querySelector('canvas');
+  let canvasRect = canvas.getBoundingClientRect();
+  
+  // Create popup container
+  let popupContainer = document.createElement('div');
+  popupContainer.id = 'usernamePopup';
+  popupContainer.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    font-family: "Fredoka", sans-serif;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  `;
+  
+  // Create popup content
+  let popupContent = document.createElement('div');
+  popupContent.style.cssText = `
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 300px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    transform: translateY(100vh);
+    transition: transform 0.4s ease-out;
+    font-family: "Fredoka", sans-serif;
+  `;
+  
+  // Create title
+  let title = document.createElement('h2');
+  title.textContent = 'Enter Your Username';
+  title.style.cssText = `
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 24px;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+  `;
+  
+  // Create input field
+  let input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Type your username here...';
+  input.maxLength = 20;
+  input.style.cssText = `
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 400;
+  `;
+  
+  // Create save button
+  let saveButton = document.createElement('button');
+  saveButton.textContent = 'Save Username';
+  saveButton.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 500;
+  `;
+  
+  // Add hover effect
+  saveButton.onmouseover = () => {
+    saveButton.style.background = '#45a049';
+  };
+  saveButton.onmouseout = () => {
+    saveButton.style.background = '#4CAF50';
+  };
+  
+  // Add event listeners
+  let saveUsername = () => {
+    let username = input.value.trim();
+    if (username !== '') {
+      playerUsername = username;
+      localStorage.setItem("mathRoyaleUsername", playerUsername);
+      showUsernamePopup = false;
+      
+      // Animate out
+      popupContainer.style.opacity = '0';
+      popupContent.style.transform = 'translateY(100vh)';
+      
+      setTimeout(() => {
+        if (document.body.contains(popupContainer)) {
+          document.body.removeChild(popupContainer);
+        }
+      }, 400);
+    }
+  };
+  
+  saveButton.onclick = saveUsername;
+  input.onkeypress = (e) => {
+    if (e.key === 'Enter') {
+      saveUsername();
+    }
+  };
+  
+  // Assemble popup
+  popupContent.appendChild(title);
+  popupContent.appendChild(input);
+  popupContent.appendChild(saveButton);
+  popupContainer.appendChild(popupContent);
+  
+  // Add to page
+  document.body.appendChild(popupContainer);
+  
+  // Animate in
+  setTimeout(() => {
+    popupContainer.style.opacity = '1';
+    popupContent.style.transform = 'translateY(0)';
+  }, 10);
+  
+  // Focus the input after animation
+  setTimeout(() => {
+    input.focus();
+  }, 400);
+  
+  // Store reference to input element
+  usernameInputElement = input;
+}
+
+function saveUsername() {
+  if (typeof(Storage) !== "undefined" && usernameInputElement.value.trim() !== "") {
+    playerUsername = usernameInputElement.value.trim();
+    localStorage.setItem("mathRoyaleUsername", playerUsername);
+    showUsernamePopup = false;
+    usernameInputElement = null;
+  }
+}
+
+function drawUsernamePopup() {
+  // This function is no longer used - we now use proper HTML input elements
+  // The popup is created by createUsernamePopup() function
+}
+
+function initializeGame() {
   // Initialize cards
   deck = [
-    new Card("fast", "melee", false, 60, "Goblin", goblin, 50, goblincard, 25, [100, 200, 100], 2),
-    new Card("medium", "ranged", false, 60, "Witch", witch, 150, witchcard, 35, [150, 100, 200], 4),
-    new Card("medium", "melee", false, 65, "Knight", knight, 200, knightcard, 120, [100, 150, 255], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skelly, 25, skellycard, 3, [205, 155, 100], 3),
+    new Card("medium", "melee", false, 60, "Goblin", goblin, 50, goblincard, 25, [100, 200, 100], 2),
+    new Card("slow", "ranged", false, 60, "Witch", witch, 150, witchcard, 25, [150, 100, 200], 4),
+    new Card("slow", "melee", false, 65, "Knight", knight, 200, knightcard, 120, [100, 150, 255], 4),
+    new Card("medium", "melee", false, 60, "Skeletons", skelly, 12, skellycard, 12, [205, 155, 100], 3),
     new Card("n/a", "spell", true, fireballradius, "Fireball", null, 0, fireballcard, 120, [255, 150, 50], 4),
     new Card("n/a", "spell", true, arrowsradius, "Arrows", null, 0, arrowcard, 25, [255, 100, 100], 3)
   ];
 
   // Initialize enemy deck (enemy versions of units)
   enemyDeck = [
-    new Card("fast", "melee", false, 60, "Goblin", goblinenemy, 50, goblincard, 25, [200, 100, 100], 2),
-    new Card("medium", "ranged", false, 60, "Witch", witchenemy, 150, witchcard, 35, [200, 100, 150], 4),
-    new Card("medium", "melee", false, 65, "Knight", knightenemy, 200, knightcard, 120, [255, 100, 100], 4),
-    new Card("fast", "melee", false, 60, "Skeletons", skellyenemy, 25, skellycard, 3, [205, 205, 100], 3)
+    new Card("medium", "melee", false, 60, "Goblin", goblinenemy, 50, goblincard, 25, [200, 100, 100], 2),
+    new Card("slow", "ranged", false, 60, "Witch", witchenemy, 150, witchcard, 25, [200, 100, 150], 4),
+    new Card("slow", "melee", false, 65, "Knight", knightenemy, 200, knightcard, 120, [255, 100, 100], 4),
+    new Card("medium", "melee", false, 60, "Skeletons", skellyenemy, 12, skellycard, 12, [205, 205, 100], 3)
   ];
 
   // Start with some math points
@@ -308,6 +547,178 @@ function setup() {
 }
 
 function draw() {
+  if (gameState === "title") {
+    drawTitleScreen();
+  } else if (gameState === "home") {
+    drawHomeScreen();
+  } else if (gameState === "playing") {
+    drawGame();
+  } else if (gameState === "gameEnd") {
+    // Show the last frame of the game during animation
+    drawGame();
+  }
+  
+  // Update and draw game end animation (always on top)
+  if (showGameEndAnimation) {
+    updateGameEndAnimation();
+    drawGameEndAnimation();
+  }
+}
+
+function drawTitleScreen() {
+  // Display title screen background image
+  imageMode(CORNER);
+  image(titleScreenImage, 0, 0, width, height);
+  
+  // Start button
+  let buttonY = height/2 - 55;
+  let buttonWidth = 244;
+  let buttonHeight = 80;
+  let buttonX = width/2 - buttonWidth/2;
+  
+  // Check if mouse is over button
+  let mouseOverButton = mouseX > buttonX && mouseX < buttonX + buttonWidth &&
+                       mouseY > buttonY && mouseY < buttonY + buttonHeight;
+  
+  if (mouseOverButton) {
+    fill(100, 100, 100, 100);
+  } else {
+    fill(150, 150, 150, 0);
+  }
+  
+  stroke(255, 255, 255, 200);
+  noStroke();
+  rect(buttonX, buttonY, buttonWidth, buttonHeight, 27);
+}
+
+function drawHomeScreen() {
+  // Display background image
+  imageMode(CORNER);
+  image(homeScreenImage, 0, 0, width, height);
+  
+  // Display username at top of screen
+  if (playerUsername !== "") {
+    fill(15);
+    noStroke();
+    textAlign(CENTER);
+    textSize(40);
+    text(playerUsername, width/2, 86);
+  }
+  
+  // Display trophy count
+  fill(0); // Gold color for trophies
+  noStroke();
+  textAlign(CENTER);
+  textSize(30);
+  text(playerTrophies, width/2, 571);
+  
+  // Display concise instructions
+  fill(0);
+  noStroke();
+  textAlign(CENTER);
+  textSize(23);
+  text("Choose a game mode!\nAnswer questions to play cards!", width/2, 445);
+  
+  // Start Game button
+  let buttonY = height/2 - 191;
+  let buttonWidth = 165;
+  let buttonHeight = 142;
+  let buttonX = width/2 - buttonWidth/2;
+  
+  // Check if mouse is over button
+  let mouseOverButton = mouseX > buttonX && mouseX < buttonX + buttonWidth &&
+                       mouseY > buttonY && mouseY < buttonY + buttonHeight;
+  
+  // Check if at least one operation is selected
+  let hasSelectedOperation = selectedOperations.addition || selectedOperations.subtraction || 
+                            selectedOperations.multiplication || selectedOperations.division;
+  
+  if (!hasSelectedOperation) {
+    fill(50, 50, 50, 100); // Gray when no operations selected
+  } else if (mouseOverButton) {
+    fill(100, 200, 100, 80); // Darker green when hovered
+  } else {
+    fill(70, 170, 70, 0);
+  }
+  
+  noStroke();
+  rect(buttonX, buttonY, buttonWidth, buttonHeight, 10);
+  
+  // Operation selection buttons
+  let opButtonSize = 63;
+  let opButtonSpacing = 17;
+  let totalOpWidth = (opButtonSize * 4) + (opButtonSpacing * 3);
+  let opStartX = (width - totalOpWidth) / 2 + 2;
+  let opButtonY = height/2 - 23;
+  
+  // Addition button
+  let addButtonX = opStartX;
+  let mouseOverAdd = mouseX > addButtonX && mouseX < addButtonX + opButtonSize &&
+                    mouseY > opButtonY && mouseY < opButtonY + opButtonSize;
+  
+  if (selectedOperations.addition) {
+    fill(100, 200, 100, 0); // Green when selected
+  } else if (mouseOverAdd) {
+    fill(50, 50, 50, 150); // Gray when hovered but not selected
+  } else {
+    fill(50, 50, 50, 200); // Dark gray when not selected
+  }
+  
+  noStroke();
+  rect(addButtonX, opButtonY-0.6, opButtonSize+1.5, opButtonSize+1, 5);
+  
+  // Subtraction button
+  let subButtonX = opStartX + opButtonSize + opButtonSpacing;
+  let mouseOverSub = mouseX > subButtonX && mouseX < subButtonX + opButtonSize &&
+                    mouseY > opButtonY && mouseY < opButtonY + opButtonSize;
+  
+  if (selectedOperations.subtraction) {
+    fill(100, 200, 100, 0); // Green when selected
+  } else if (mouseOverSub) {
+    fill(50, 50, 50, 150); // Gray when hovered but not selected
+  } else {
+    fill(50, 50, 50, 200); // Dark gray when not selected
+  }
+  
+  noStroke();
+  rect(subButtonX+1, opButtonY-0.5, opButtonSize, opButtonSize+1, 5);
+  
+  // Multiplication button
+  let mulButtonX = opStartX + (opButtonSize + opButtonSpacing) * 2;
+  let mouseOverMul = mouseX > mulButtonX && mouseX < mulButtonX + opButtonSize &&
+                    mouseY > opButtonY && mouseY < opButtonY + opButtonSize;
+  
+  if (selectedOperations.multiplication) {
+    fill(100, 200, 100, 0); // Green when selected
+  } else if (mouseOverMul) {
+    fill(50, 50, 50, 150); // Gray when hovered but not selected
+  } else {
+    fill(50, 50, 50, 200); // Dark gray when not selected
+  }
+  
+  noStroke();
+  rect(mulButtonX+0.5, opButtonY-0.5, opButtonSize, opButtonSize+1, 5);
+  
+  // Division button
+  let divButtonX = opStartX + (opButtonSize + opButtonSpacing) * 3;
+  let mouseOverDiv = mouseX > divButtonX && mouseX < divButtonX + opButtonSize &&
+                    mouseY > opButtonY && mouseY < opButtonY + opButtonSize;
+  
+  if (selectedOperations.division) {
+    fill(100, 200, 100, 0); // Green when selected
+  } else if (mouseOverDiv) {
+    fill(50, 50, 50, 200); // Dark gray when not selected
+  } else {
+    fill(50, 50, 50, 200); // Dark gray when not selected
+  }
+  
+  noStroke();
+  rect(divButtonX, opButtonY-0.5, opButtonSize, opButtonSize+1, 5);
+  
+  // Username popup is now handled by HTML elements in createUsernamePopup()
+}
+
+function drawGame() {
   frameCount++;
   
   // Safety check - prevent infinite loops
@@ -319,7 +730,6 @@ function draw() {
   imageMode(CORNER)
   image(backgroundImg, 0, 0, width, height-247);
 
-
   // Draw battlefield separator - section off the lower UI area
   fill(100, 80, 60); // Dark brown separator
   stroke(0);
@@ -328,6 +738,15 @@ function draw() {
 
   // Draw bridges
   //drawBridges();
+
+  // Display username at top of screen - REMOVED: only show on home screen
+  // if (playerUsername !== "") {
+  //   fill(255, 255, 255);
+  //   noStroke();
+  //   textAlign(LEFT);
+  //   textSize(16);
+  //   text("Player: " + playerUsername, 10, 25);
+  // }
 
   // Update elixir bar animation
   displayedElixir += (elixir - displayedElixir) * elixirAnimationSpeed;
@@ -392,6 +811,9 @@ function draw() {
   // Enemy AI logic
   updateEnemyAI();
   
+  // Check for game end conditions BEFORE removing dead towers
+  checkGameEndConditions();
+  
   // Remove dead towers (health <= 0)
   for (let i = towers.length - 1; i >= 0; i--) {
     if (towers[i].health <= 0) {
@@ -448,14 +870,23 @@ function draw() {
   
   // Draw preview if dragging (always on top)
   if (draggedCard) {
-    // Draw enemy territory indicator (red transparent rectangle) only for non-spell cards
-    if (!draggedCard.spell) {
-      fill(255, 0, 0, 80); // Semi-transparent red
-      noStroke();
-      rect(0, 0, width, height/3); // Top third of screen is enemy territory (smaller area)
-    }
+    // Check if mouse is over the battlefield (not in UI areas)
+    let isOverBattlefield = mouseY < height - 247; // Above the bottom UI area
     
-    drawSpawnPreview(mouseX, mouseY, draggedCard);
+    if (isOverBattlefield) {
+      // Show spawn preview when over battlefield
+      // Draw enemy territory indicator (red transparent rectangle) only for non-spell cards
+      if (!draggedCard.spell) {
+        fill(255, 0, 0, 80); // Semi-transparent red
+        noStroke();
+        rect(0, 0, width, height/3); // Top third of screen is enemy territory (smaller area)
+      }
+      
+      drawSpawnPreview(mouseX, mouseY, draggedCard);
+    } else {
+      // Show card form when over UI areas
+      drawDraggedCardPreview();
+    }
   }
 }
 
@@ -472,41 +903,160 @@ function initializeTowers() {
 }
 
 function mousePressed() {
-  for (let i = 0; i < 4 && i < deck.length; i++) {
-    if (deck[i].contains(mouseX, mouseY)) {
-      // Check if player has enough elixir
-      if (elixir >= deck[i].cost) {
-      draggedCard = deck[i];
-      offsetX = mouseX - draggedCard.x;
-      offsetY = mouseY - draggedCard.y;
-      }
-      break;
-    }
+  // Prevent clicks immediately after state change
+  if (millis() - lastStateChange < stateChangeCooldown) {
+    return;
   }
   
-  // Check if clicking on math problem choices
-  if (currentProblem && elixir < 10 && millis() - lastMathAnswerTime > mathAnswerCooldown) {
-    let problemY = height - 80; // Match the new problem Y position
-    let choiceY = problemY + 20; // Match the new choice Y position
-    let choiceWidth = 60;
-    let choiceHeight = 30;
+  // Handle game restart after win/loss animation
+  if (gameState === "gameEnd") {
+    // Animation is playing, restart game when clicked
+    restartGame();
+    return;
+  }
+  
+  if (gameState === "title") {
+    // Check if start button is clicked
+    let buttonY = height/2 - 55;
+    let buttonWidth = 244;
+    let buttonHeight = 80;
+    let buttonX = width/2 - buttonWidth/2;
     
-    for (let i = 0; i < problemChoices.length; i++) {
-      let choiceX = width/2 - 135 + i * 70; // Match the new choice X positioning
-      if (mouseX > choiceX && mouseX < choiceX + choiceWidth &&
-          mouseY > choiceY && mouseY < choiceY + choiceHeight) {
-        // Check if answer is correct
-        if (problemChoices[i] === currentProblem.answer) {
-          elixir = Math.min(elixir + 2, 10); // Add 1 elixir, max 10
-          lastMathAnswerTime = millis(); // Record when question was answered
-          // Generate new problem only when answered correctly
-          generateMathProblem();
-        } else {
-          // Wrong answer - lose 1 elixir and keep same question
-          elixir = Math.max(elixir - 1, 0); // Subtract 1 elixir, min 0
-          lastMathAnswerTime = millis(); // Record when question was answered
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth &&
+        mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+      // Go to home screen instead of directly to game
+      gameState = "home";
+      lastStateChange = millis(); // Record state change time
+      
+      // Check if player needs to enter username
+      if (playerUsername === "") {
+        showUsernamePopup = true;
+        createUsernamePopup();
+      }
+      
+      return;
+    }
+  } else if (gameState === "home") {
+    // Handle username popup clicks first
+    if (showUsernamePopup) {
+      let popupWidth = 300;
+      let popupHeight = 200;
+      let popupX = (width - popupWidth) / 2;
+      let popupY = (height - popupHeight) / 2;
+      
+      // Save button
+      let saveButtonWidth = 100;
+      let saveButtonHeight = 40;
+      let saveButtonX = (width - saveButtonWidth) / 2;
+      let saveButtonY = popupY + 130;
+      
+      if (mouseX > saveButtonX && mouseX < saveButtonX + saveButtonWidth &&
+          mouseY > saveButtonY && mouseY < saveButtonY + saveButtonHeight) {
+        saveUsername();
+        return;
+      }
+      
+      // If popup is active, don't process other clicks
+      return;
+    }
+    
+    // Check if start game button is clicked
+    let buttonY = height/2 - 191;
+    let buttonWidth = 165;
+    let buttonHeight = 142;
+    let buttonX = width/2 - buttonWidth/2;
+    
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth &&
+        mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+      // Check if at least one operation is selected
+      let hasSelectedOperation = selectedOperations.addition || selectedOperations.subtraction || 
+                                selectedOperations.multiplication || selectedOperations.division;
+      
+      if (hasSelectedOperation) {
+        // Start the game
+        gameState = "playing";
+        lastStateChange = millis(); // Record state change time
+        initializeGame();
+      }
+      return;
+    }
+    
+    // Check operation button clicks
+    let opButtonSize = 63;
+    let opButtonSpacing = 17;
+    let totalOpWidth = (opButtonSize * 4) + (opButtonSpacing * 3);
+    let opStartX = (width - totalOpWidth) / 2 + 2;
+    let opButtonY = height/2 - 23;
+    
+    // Addition button
+    let addButtonX = opStartX;
+    if (mouseX > addButtonX && mouseX < addButtonX + opButtonSize &&
+        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+      selectedOperations.addition = !selectedOperations.addition;
+      return;
+    }
+    
+    // Subtraction button
+    let subButtonX = opStartX + opButtonSize + opButtonSpacing;
+    if (mouseX > subButtonX && mouseX < subButtonX + opButtonSize &&
+        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+      selectedOperations.subtraction = !selectedOperations.subtraction;
+      return;
+    }
+    
+    // Multiplication button
+    let mulButtonX = opStartX + (opButtonSize + opButtonSpacing) * 2;
+    if (mouseX > mulButtonX && mouseX < mulButtonX + opButtonSize &&
+        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+      selectedOperations.multiplication = !selectedOperations.multiplication;
+      return;
+    }
+    
+    // Division button
+    let divButtonX = opStartX + (opButtonSize + opButtonSpacing) * 3;
+    if (mouseX > divButtonX && mouseX < divButtonX + opButtonSize &&
+        mouseY > opButtonY && mouseY < opButtonY + opButtonSize) {
+      selectedOperations.division = !selectedOperations.division;
+      return;
+    }
+  } else if (gameState === "playing") {
+    // Original game mouse handling
+    for (let i = 0; i < 4 && i < deck.length; i++) {
+      if (deck[i].contains(mouseX, mouseY)) {
+        // Check if player has enough elixir
+        if (elixir >= deck[i].cost) {
+        draggedCard = deck[i];
+        offsetX = mouseX - draggedCard.x;
+        offsetY = mouseY - draggedCard.y;
         }
         break;
+      }
+    }
+    
+    // Check if clicking on math problem choices
+    if (currentProblem && elixir < 10 && millis() - lastMathAnswerTime > mathAnswerCooldown) {
+      let problemY = height - 80; // Match the new problem Y position
+      let choiceY = problemY + 20; // Match the new choice Y position
+      let choiceWidth = 60;
+      let choiceHeight = 30;
+      
+      for (let i = 0; i < problemChoices.length; i++) {
+        let choiceX = width/2 - 135 + i * 70; // Match the new choice X positioning
+        if (mouseX > choiceX && mouseX < choiceX + choiceWidth &&
+            mouseY > choiceY && mouseY < choiceY + choiceHeight) {
+          // Check if answer is correct
+          if (problemChoices[i] === currentProblem.answer) {
+            elixir = Math.min(elixir + 2, 10); // Add 1 elixir, max 10
+            lastMathAnswerTime = millis(); // Record when question was answered
+            // Generate new problem only when answered correctly
+            generateMathProblem();
+          } else {
+            // Wrong answer - lose 1 elixir and keep same question
+            elixir = Math.max(elixir - 1, 0); // Subtract 1 elixir, min 0
+            lastMathAnswerTime = millis(); // Record when question was answered
+          }
+          break;
+        }
       }
     }
   }
@@ -559,6 +1109,11 @@ function mouseReleased() {
     layoutBottomCards();
     draggedCard = null;
   }
+}
+
+function keyPressed() {
+  // Username input is now handled by HTML elements in createUsernamePopup()
+  // No longer need to handle keyboard input here
 }
 
 // Position cards at the bottom
@@ -800,11 +1355,84 @@ function drawSpawnPreview(x, y, card) {
   drawingContext.globalAlpha = 1.0;
 }
 
+function drawDraggedCardPreview() {
+  // Draw the dragged card in its card form
+  let card = draggedCard;
+  let cardWidth = 80;
+  let cardHeight = 90;
+  
+  // Check if player has enough elixir for this card
+  let canAfford = elixir >= card.cost;
+  
+  // Use card-specific color for background, or gray if can't afford
+  if (canAfford) {
+    fill(card.color[0], card.color[1], card.color[2]);
+  } else {
+    fill(100, 100, 100); // Gray background when can't afford
+  }
+  noStroke();
+  rect(mouseX - cardWidth/2, mouseY - cardHeight/2, cardWidth, cardHeight, 15);
+  
+  // Add a subtle inner border
+  stroke(255, 255, 255, 100);
+  strokeWeight(2);
+  noFill();
+  rect(mouseX - cardWidth/2 + 2, mouseY - cardHeight/2 + 2, cardWidth - 4, cardHeight - 4, 13);
+
+  // Display cost in purple circle
+  fill(150, 100, 200); // Purple background
+  stroke(45, 30, 60);
+  strokeWeight(2);
+  ellipse(mouseX - cardWidth/2 + 4, mouseY - cardHeight/2 + 5, 25, 25);
+  
+  // Display card image or fallback circle
+  if (card.cardImage) {
+    imageMode(CENTER);
+    if (canAfford) {
+      // Normal colored image
+      image(card.cardImage, mouseX, mouseY - cardHeight/2 + 13 + cardHeight/3, 90, 90);
+    } else {
+      // Completely colorless (black and white) image when can't afford
+      push();
+      drawingContext.filter = 'grayscale(100%)'; // Convert to pure black and white
+      image(card.cardImage, mouseX, mouseY - cardHeight/2 + 13 + cardHeight/3, 90, 90);
+      pop();
+    }
+  } else {
+    if (canAfford) {
+      fill(200, 100, 100);
+    } else {
+      fill(100, 100, 100); // Gray fallback circle
+    }
+    ellipse(mouseX, mouseY - cardHeight/2 + cardHeight/3, card.radius);
+  }
+  
+  // Cost text
+  fill(255);
+  stroke(0);
+  strokeWeight(1);
+  textAlign(CENTER);
+  textSize(12);
+  text(card.cost, mouseX - cardWidth/2 + 4, mouseY - cardHeight/2 + 8.5);
+}
+
 function generateMathProblem() {
   let num1 = Math.floor(Math.random() * 10) + 1;
   let num2 = Math.floor(Math.random() * 10) + 1;
-  let operators = ['+', '-', 'x'];
-  let operator = operators[Math.floor(Math.random() * operators.length)];
+  
+  // Create array of available operators based on selected operations
+  let availableOperators = [];
+  if (selectedOperations.addition) availableOperators.push('+');
+  if (selectedOperations.subtraction) availableOperators.push('-');
+  if (selectedOperations.multiplication) availableOperators.push('x');
+  if (selectedOperations.division) availableOperators.push('÷');
+  
+  // If no operations are selected, default to addition
+  if (availableOperators.length === 0) {
+    availableOperators = ['+'];
+  }
+  
+  let operator = availableOperators[Math.floor(Math.random() * availableOperators.length)];
   
   let answer;
   switch(operator) {
@@ -820,6 +1448,11 @@ function generateMathProblem() {
       break;
     case 'x': 
       answer = num1 * num2; 
+      break;
+    case '÷': 
+      // Ensure division results in whole numbers
+      answer = num1;
+      num1 = num1 * num2;
       break;
   }
   
@@ -882,7 +1515,7 @@ function drawMathUI() {
   strokeWeight(1);
   textAlign(CENTER);
   textSize(14);
-  text(`${elixir}/10`, width/2, barY + 15);
+  text(elixir, width/2 - 135, barY + 14);
   
   // Always draw math problem if elixir is not full
   if (elixir < 10 && currentProblem) {
@@ -1353,15 +1986,17 @@ class Tower {
     // Set properties based on tower type
     if (type === "king") {
       this.radius = 25;
-      this.maxHealth = 2200;
-      this.health = 2200;
-      this.damage = 50;
-      this.range = 120;
+      this.maxHealth = 1400;
+      //this.health = this.maxHealth;
+      this.health = 1;
+      this.damage = 16;
+      this.range = 110;
     } else { // archer tower
       this.radius = 20;
-      this.maxHealth = 1400;
-      this.health = 1400;
-      this.damage = 30;
+      this.maxHealth = 800;
+      //this.health = this.maxHealth;
+      this.health = 1;
+      this.damage = 12;
       this.range = 120;
     }
   }
@@ -1769,4 +2404,208 @@ function spawnEnemyCard(x, y, card) {
     let spawnedCard = new SpawnedCard(x, y, enemyCard);
     spawnedCards.push(spawnedCard);
   }
+}
+
+function createGameEndParticles() {
+  gameEndParticles = [];
+  let numParticles = 50;
+  
+  for (let i = 0; i < numParticles; i++) {
+    let particle = {
+      x: random(width),
+      y: random(height),
+      vx: random(-5, 5),
+      vy: random(-8, -2),
+      size: random(5, 15),
+      life: 1.0,
+      decay: random(0.01, 0.03),
+      color: gameEndType === "win" ? 
+        color(random(100, 255), random(200, 255), random(100, 200)) : 
+        color(random(200, 255), random(100, 150), random(100, 150))
+    };
+    gameEndParticles.push(particle);
+  }
+}
+
+function updateGameEndAnimation() {
+  if (!showGameEndAnimation) return;
+  
+  // Update animation time
+  gameEndAnimationTime += deltaTime;
+  
+  // Update particles
+  for (let i = gameEndParticles.length - 1; i >= 0; i--) {
+    let particle = gameEndParticles[i];
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+    particle.vy += 0.2; // Gravity
+    particle.life -= particle.decay;
+    
+    // Remove dead particles
+    if (particle.life <= 0) {
+      gameEndParticles.splice(i, 1);
+    }
+  }
+  
+  // Don't automatically hide the animation - let the player click to restart
+  // The animation will stay visible until restartGame() is called
+}
+
+function drawGameEndAnimation() {
+  if (!showGameEndAnimation) return;
+  
+  // Semi-transparent overlay
+  fill(0, 0, 0, 225);
+  noStroke();
+  rect(0, 0, width, height);
+  
+  // Calculate animation progress and cap it at 1.0
+  let progress = min(gameEndAnimationTime / gameEndAnimationDuration, 1.0);
+  let easeProgress = 1 - pow(1 - progress, 3); // Ease-out cubic
+  
+  // Draw particles
+  for (let particle of gameEndParticles) {
+    push();
+    fill(red(particle.color), green(particle.color), blue(particle.color), 
+         alpha(particle.color) * particle.life);
+    noStroke();
+    ellipse(particle.x, particle.y, particle.size * particle.life);
+    pop();
+  }
+  
+  // Draw main text with animation (capped size)
+  let textSizee = map(easeProgress, 0, 1, 20, 60);
+  let textY = map(easeProgress, 0, 1, height/2 - 50, height/2 - 100);
+  let textAlpha = map(easeProgress, 0, 0.5, 0, 255);
+  
+  // Set text color based on win/loss
+  if (gameEndType === "win") {
+    fill(100, 255, 100, textAlpha); // Green for win
+  } else {
+    fill(255, 100, 100, textAlpha); // Red for loss
+  }
+  
+  noStroke();
+  textAlign(CENTER);
+  textSize(textSizee);
+  
+  let mainText = gameEndType === "win" ? "VICTORY!" : "DEFEAT!";
+  text(mainText, width/2, textY);
+  
+  // Draw subtitle with delay
+  if (progress > 0.3) {
+    let subtitleAlpha = map(progress, 0.3, 0.8, 0, 255);
+    fill(255, 255, 255, subtitleAlpha);
+    textSize(24);
+    
+    let subtitle = gameEndType === "win" ? 
+      "You've conquered the battlefield!" : 
+      "Better luck next time!";
+    text(subtitle, width/2, textY + 60);
+  }
+  
+  // Show restart prompt after animation is mostly complete
+  if (progress > 0.7) {
+    fill(255, 255, 255, 255);
+    textSize(18);
+    text("Click anywhere to exit", width/2, height - 50);
+  }
+}
+
+function drawSparkles() {
+  let sparkleCount = 20;
+  for (let i = 0; i < sparkleCount; i++) {
+    let angle = (TWO_PI / sparkleCount) * i + frameCount * 0.02;
+    let radius = 100 + sin(frameCount * 0.01 + i) * 20;
+    let x = width/2 + cos(angle) * radius;
+    let y = height/2 + sin(angle) * radius;
+    
+    push();
+    fill(255, 255, 100, 200);
+    noStroke();
+    ellipse(x, y, 3);
+    pop();
+  }
+}
+
+function checkGameEndConditions() {
+  if (gameState !== "playing") return;
+  
+  let playerKingTower = null;
+  let enemyKingTower = null;
+  
+  // Find king towers
+  for (let tower of towers) {
+    if (tower.type === "king") {
+      if (tower.side === "player") {
+        playerKingTower = tower;
+      } else if (tower.side === "enemy") {
+        enemyKingTower = tower;
+      }
+    }
+  }
+  
+  // Debug logging
+  console.log("Checking game end conditions:");
+  console.log("Player king tower:", playerKingTower ? `health: ${playerKingTower.health}` : "null");
+  console.log("Enemy king tower:", enemyKingTower ? `health: ${enemyKingTower.health}` : "null");
+  console.log("Total towers:", towers.length);
+  
+  // Check win/loss conditions
+  if (playerKingTower && playerKingTower.health <= 0) {
+    console.log("PLAYER LOST - King tower destroyed!");
+    triggerGameEnd("loss");
+  } else if (enemyKingTower && enemyKingTower.health <= 0) {
+    console.log("PLAYER WON - Enemy king tower destroyed!");
+    triggerGameEnd("win");
+  }
+}
+
+function triggerGameEnd(type) {
+  gameEndType = type;
+  showGameEndAnimation = true;
+  gameEndAnimationTime = 0;
+  createGameEndParticles();
+  
+  // Award trophy if player won
+  if (type === "win") {
+    playerTrophies++;
+    saveTrophies();
+  }
+  
+  // Pause the game
+  gameState = "gameEnd";
+}
+
+function restartGame() {
+  // Reset game state
+  gameState = "home";
+  showGameEndAnimation = false;
+  gameEndAnimationTime = 0;
+  gameEndParticles = [];
+  
+  // Reset game variables
+  spawnedCards = [];
+  projectiles = [];
+  arrowProjectiles = [];
+  towerArrows = [];
+  draggedCard = null;
+  elixir = 5;
+  displayedElixir = 5;
+  mathPoints = 10;
+  currentProblem = null;
+  problemChoices = [];
+  lastMathAnswerTime = 0;
+  enemyElixir = 0;
+  enemyLastSpawn = 0;
+  
+  // Reinitialize towers
+  towers = [];
+  initializeTowers();
+  
+  // Generate new math problem
+  generateMathProblem();
+  
+  // Record state change
+  lastStateChange = millis();
 }
